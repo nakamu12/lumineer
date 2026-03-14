@@ -59,7 +59,11 @@ jobs:
             -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
             -var="api_image=${{ secrets.API_IMAGE }}" \
             -var="ai_image=${{ secrets.AI_IMAGE }}" \
-            2>&1 | tee plan_output.txt
+            2>&1 \
+            | sed 's/${{ secrets.GCP_PROJECT_ID }}/[PROJECT_ID]/g' \
+            | sed 's/${{ secrets.API_IMAGE }}/[API_IMAGE]/g' \
+            | sed 's/${{ secrets.AI_IMAGE }}/[AI_IMAGE]/g' \
+            | tee plan_output.txt
           echo "exitcode=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
         continue-on-error: true
 
