@@ -7,6 +7,8 @@ resource "google_artifact_registry_repository" "images" {
   format        = "DOCKER"
   location      = var.region
   description   = "Docker images for Lumineer services"
+
+  depends_on = [time_sleep.api_propagation]
 }
 
 # =============================================================================

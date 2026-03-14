@@ -24,6 +24,8 @@ resource "google_secret_manager_secret" "app_secrets" {
     app = var.app_name
     env = var.environment
   }
+
+  depends_on = [time_sleep.api_propagation]
 }
 
 # =============================================================================

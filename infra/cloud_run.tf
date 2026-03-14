@@ -19,6 +19,12 @@ resource "google_project_service" "services" {
   disable_on_destroy = false
 }
 
+# Wait for API enablement to propagate across GCP systems (~60s)
+resource "time_sleep" "api_propagation" {
+  create_duration = "60s"
+  depends_on      = [google_project_service.services]
+}
+
 # =============================================================================
 # Cloud Run — API (Bun + Hono)
 # =============================================================================
@@ -74,7 +80,7 @@ resource "google_cloud_run_v2_service" "api" {
     }
   }
 
-  depends_on = [google_project_service.services]
+  depends_on = [time_sleep.api_propagation]
 }
 
 # =============================================================================
@@ -157,7 +163,7 @@ resource "google_cloud_run_v2_service" "ai" {
     }
   }
 
-  depends_on = [google_project_service.services]
+  depends_on = [time_sleep.api_propagation]
 }
 
 # =============================================================================

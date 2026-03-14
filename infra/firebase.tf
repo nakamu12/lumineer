@@ -1,7 +1,11 @@
 # =============================================================================
 # Firebase Hosting — Frontend (React SPA)
-# Note: Firebase resources require the Firebase project to be initialized first.
-# Run: firebase init hosting  (one-time manual step)
+#
+# PREREQUISITE (one-time manual step before terraform apply):
+#   1. GCP コンソールで Firebase を有効化:
+#      https://console.firebase.google.com/ → プロジェクトを追加 → 既存の GCP プロジェクトを選択
+#   2. 完了後に terraform apply を実行
+#
 # Terraform manages the hosting site configuration only.
 # =============================================================================
 
@@ -10,7 +14,7 @@ resource "google_firebase_hosting_site" "frontend" {
   project  = var.project_id
   site_id  = "${var.app_name}-frontend"
 
-  depends_on = [google_project_service.services]
+  depends_on = [time_sleep.api_propagation]
 }
 
 # =============================================================================
