@@ -1,0 +1,80 @@
+name: Project Automation
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  move-to-done:
+    name: Move linked issues to Done
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Move issues to Done in GitHub Project
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PROJECT_ID: "PVT_kwHOArXseM4BRwSj"
+          STATUS_FIELD_ID: "PVTSSF_lAHOArXseM4BRwSjzg_fT98"
+          DONE_OPTION_ID: "448bcca5"
+          REPO: ${{ github.repository }}
+        run: |
+          # PR 本文から "Closes #N" / "Fixes #N" / "Resolves #N" のIssue番号を抽出
+          ISSUE_NUMBERS=$(echo "$PR_BODY" | grep -oiE '(closes|fixes|resolves) #[0-9]+' | grep -oE '[0-9]+' || true)
+
+          if [ -z "$ISSUE_NUMBERS" ]; then
+            echo "No linked issues found in PR body. Skipping."
+            exit 0
+          fi
+
+          for ISSUE_NUMBER in $ISSUE_NUMBERS; do
+            echo "Processing Issue #$ISSUE_NUMBER ..."
+
+            # Issue の node_id を取得
+            ISSUE_NODE_ID=$(gh api "repos/$REPO/issues/$ISSUE_NUMBER" --jq '.node_id')
+            echo "  node_id: $ISSUE_NODE_ID"
+
+            # Issue に紐づくプロジェクトアイテムのIDを取得
+            ITEM_ID=$(gh api graphql -f query="
+              query {
+                node(id: \"$ISSUE_NODE_ID\") {
+                  ... on Issue {
+                    projectItems(first: 10) {
+                      nodes {
+                        id
+                        project { id }
+                      }
+                    }
+                  }
+                }
+              }
+            " --jq ".data.node.projectItems.nodes[] | select(.project.id == \"$PROJECT_ID\") | .id")
+
+            if [ -z "$ITEM_ID" ]; then
+              echo "  Issue #$ISSUE_NUMBER is not in the project. Skipping."
+              continue
+            fi
+
+            echo "  item_id: $ITEM_ID"
+
+            # ステータスを Done に更新
+            gh api graphql -f query="
+              mutation {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: \"$PROJECT_ID\"
+                  itemId: \"$ITEM_ID\"
+                  fieldId: \"$STATUS_FIELD_ID\"
+                  value: { singleSelectOptionId: \"$DONE_OPTION_ID\" }
+                }) {
+                  projectV2Item { id }
+                }
+              }
+            "
+
+            echo "  ✅ Issue #$ISSUE_NUMBER moved to Done."
+          done
