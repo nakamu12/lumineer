@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun *)",
+      "Bash(uv *)",
+      "Bash(docker compose *)",
+      "Bash(ruff *)",
+      "Bash(mypy *)",
+      "Bash(pytest *)",
+      "Bash(git *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)"
+    ]
+  }
+}

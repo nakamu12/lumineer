@@ -1,0 +1,31 @@
+{
+  "[json][jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "[typescript][typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}/ai/.venv/bin/python",
+  "ruff.configuration": "${workspaceFolder}/ai/pyproject.toml",
+  "ruff.importStrategy": "fromEnvironment",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "editor.rulers": [100],
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/node_modules": true,
+    "**/.ruff_cache": true
+  }
+}

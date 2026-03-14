@@ -1,0 +1,210 @@
+# =============================================================================
+# Lumineer — .gitignore
+# Stack: Bun + React (Vite) + Hono (TypeScript) + Python + Docker + GCP
+# =============================================================================
+
+# =============================================================================
+# SECRETS — NEVER COMMIT
+# =============================================================================
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+*.pem
+*.key
+service-account*.json
+gcloud-credentials*.json
+firebase-adminsdk*.json
+
+# =============================================================================
+# OS
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# =============================================================================
+# IDE / Editor
+# =============================================================================
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+# VSCode (keep settings.json & extensions.json for team consistency)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+
+# =============================================================================
+# Frontend — Bun + React (Vite)
+# =============================================================================
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/.turbo/
+frontend/coverage/
+frontend/*.tsbuildinfo
+frontend/.bun/
+
+# Bun lockfile is committed (equivalent to package-lock.json)
+# bun.lockb → KEEP (do not ignore)
+
+# =============================================================================
+# Backend — Bun + Hono (TypeScript)
+# =============================================================================
+backend/node_modules/
+backend/dist/
+backend/build/
+backend/.cache/
+backend/*.tsbuildinfo
+backend/.bun/
+backend/coverage/
+
+# =============================================================================
+# AI Processing — Python + uv
+# =============================================================================
+
+# Virtual environments
+ai/.venv/
+ai/venv/
+ai/.python-version
+
+# uv cache
+.uv/
+ai/.uv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Type checking / linting caches
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.pyre/
+pyrightconfig.json
+
+# Testing
+ai/.pytest_cache/
+ai/htmlcov/
+ai/coverage.xml
+ai/.coverage
+ai/.coverage.*
+ai/test-results/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# =============================================================================
+# Data — Coursera dataset & processed files
+# =============================================================================
+# Keep: data/coursera.csv, data/coursera.parquet (tracked as project data)
+# Ignore: generated / large derived files
+data/processed/
+data/embeddings/
+data/raw/
+data/**/*.npy
+data/**/*.npz
+data/**/*.pkl
+data/**/*.pickle
+data/**/*.bin
+
+# =============================================================================
+# Qdrant (local Docker volume data)
+# =============================================================================
+qdrant_storage/
+.qdrant/
+
+# =============================================================================
+# Observability (local Docker volumes)
+# =============================================================================
+# Langfuse
+langfuse_data/
+langfuse-db/
+
+# Prometheus
+prometheus_data/
+prometheus/data/
+
+# Grafana
+grafana_data/
+grafana/data/
+
+# =============================================================================
+# Docker
+# =============================================================================
+# Keep Dockerfiles and docker-compose.yml
+# Ignore runtime artifacts
+docker-volumes/
+.docker/
+
+# =============================================================================
+# GCP / Firebase
+# =============================================================================
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+.firebaserc
+# Keep firebase.json if committed
+
+# Terraform state (sensitive)
+infra/**/*.tfstate
+infra/**/*.tfstate.backup
+infra/**/.terraform/
+infra/**/.terraform.lock.hcl
+infra/**/terraform.tfvars
+infra/**/*.auto.tfvars
+
+# =============================================================================
+# Logs
+# =============================================================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun-error.log*
+lerna-debug.log*
+
+# =============================================================================
+# Build artifacts
+# =============================================================================
+dist/
+build/
+out/
+*.min.js
+*.min.css
+
+# =============================================================================
+# Evals — generated outputs (keep datasets & benchmarks)
+# =============================================================================
+ai/evals/results/
+ai/evals/outputs/
+ai/evals/**/*.html
+
+# =============================================================================
+# Misc
+# =============================================================================
+*.bak
+*.tmp
+*.temp
+.cache/
+tmp/
+temp/

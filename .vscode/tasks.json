@@ -1,0 +1,292 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "GitHub: タスク作成 (Issue + ブランチ)",
+      "type": "shell",
+      "command": "bash ./scripts/gh-task.sh \"${input:taskType}\" \"${input:taskScope}\" \"${input:taskDescription}\" \"${input:branchSuffix}\"",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "detail": "GitHub Issue を作成し、LM命名規則でブランチを切る"
+    },
+    {
+      "label": "GitHub: 既存Issueからブランチ作成",
+      "type": "shell",
+      "command": "bash ./scripts/gh-branch.sh \"${input:issueNumber}\" \"${input:branchSuffix}\"",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "detail": "既存の Issue 番号からLM命名規則のブランチを作成"
+    },
+    {
+      "label": "Start All",
+      "type": "shell",
+      "dependsOn": [
+        "Start Frontend",
+        "Start API Layer",
+        "Start AI Processing"
+      ],
+      "dependsOrder": "parallel",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Frontend + API Layer + AI Processing を並列起動"
+    },
+    {
+      "label": "Start Frontend",
+      "type": "shell",
+      "command": "bun dev",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start API Layer",
+      "type": "shell",
+      "command": "bun dev",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start AI Processing",
+      "type": "shell",
+      "command": "uv run python main.py",
+      "options": {
+        "cwd": "${workspaceFolder}/ai"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Format All",
+      "type": "shell",
+      "dependsOn": [
+        "Format Python",
+        "Format Frontend"
+      ],
+      "dependsOrder": "parallel",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Python (ruff) + Frontend (biome/eslint) を並列フォーマット"
+    },
+    {
+      "label": "Format Python",
+      "type": "shell",
+      "command": "uv run ruff check . --fix && uv run ruff format .",
+      "options": {
+        "cwd": "${workspaceFolder}/ai"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Format Frontend",
+      "type": "shell",
+      "command": "bun run lint --fix",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Test: Python",
+      "type": "shell",
+      "command": "uv run pytest",
+      "options": {
+        "cwd": "${workspaceFolder}/ai"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": [],
+      "detail": "pytest 実行"
+    },
+    {
+      "label": "Test: Frontend",
+      "type": "shell",
+      "command": "bun test",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Type Check: Python",
+      "type": "shell",
+      "command": "uv run mypy .",
+      "options": {
+        "cwd": "${workspaceFolder}/ai"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Type Check: Frontend",
+      "type": "shell",
+      "command": "bun run typecheck",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "developブランチから新規ブランチ作成",
+      "type": "shell",
+      "command": "git checkout develop && git pull && git checkout -b ${input:manualBranch}",
+      "problemMatcher": [],
+      "detail": "手動でブランチ名を指定して作成"
+    },
+    {
+      "label": "git fetch origin",
+      "type": "shell",
+      "command": "git fetch origin",
+      "problemMatcher": []
+    },
+    {
+      "label": "git commit",
+      "type": "shell",
+      "command": "git add . && git commit -m \"${input:commitMessage}\"",
+      "problemMatcher": [],
+      "detail": "変更をステージしてコミット"
+    },
+    {
+      "label": "git push",
+      "type": "shell",
+      "command": "git push -u origin HEAD",
+      "problemMatcher": [],
+      "detail": "現在ブランチをリモートにプッシュ"
+    },
+    {
+      "label": "Docker: 全サービス起動",
+      "type": "shell",
+      "command": "docker compose up",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": [],
+      "detail": "docker compose up（全コンテナ）"
+    },
+    {
+      "label": "Docker: 全サービス起動 (バックグラウンド)",
+      "type": "shell",
+      "command": "docker compose up -d",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: 停止",
+      "type": "shell",
+      "command": "docker compose down",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "taskType",
+      "type": "pickString",
+      "description": "タスクの種類（type）を選択",
+      "options": [
+        "feature",
+        "fix",
+        "hotfix",
+        "refactor",
+        "docs",
+        "test",
+        "chore"
+      ],
+      "default": "feature"
+    },
+    {
+      "id": "taskScope",
+      "type": "pickString",
+      "description": "タスクのスコープ（scope）を選択",
+      "options": [
+        "frontend",
+        "backend",
+        "rag",
+        "agents",
+        "data",
+        "infra",
+        "mcp"
+      ],
+      "default": "backend"
+    },
+    {
+      "id": "taskDescription",
+      "type": "promptString",
+      "description": "タスクの説明（例: Hybrid Search 実装）"
+    },
+    {
+      "id": "branchSuffix",
+      "type": "promptString",
+      "description": "ブランチ名サフィックス（省略時は説明文から自動生成）",
+      "default": ""
+    },
+    {
+      "id": "issueNumber",
+      "type": "promptString",
+      "description": "Issue 番号（例: 5, #5, LM0005）"
+    },
+    {
+      "id": "commitMessage",
+      "type": "promptString",
+      "description": "コミットメッセージを入力"
+    },
+    {
+      "id": "manualBranch",
+      "type": "promptString",
+      "description": "ブランチ名を入力（例: LM0001-feature/rag-hybrid_search）"
+    }
+  ]
+}
