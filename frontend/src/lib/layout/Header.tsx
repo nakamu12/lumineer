@@ -17,8 +17,10 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
         <Link to="/" className="flex items-center gap-2 font-semibold">
-          <BookOpen className="h-5 w-5 text-primary" />
-          <span className="text-primary">Lumineer</span>
+          <BookOpen className="h-5 w-5 text-teal-500" />
+          <span className="bg-gradient-to-r from-teal-500 to-blue-500 bg-clip-text text-transparent">
+            Lumineer
+          </span>
         </Link>
         <nav className="ml-auto flex items-center gap-1">
           {navItems.map((item) => (
