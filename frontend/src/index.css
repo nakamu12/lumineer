@@ -57,3 +57,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .gradient-text {
+    @apply bg-gradient-to-r from-teal-500 to-blue-500 bg-clip-text text-transparent;
+  }
+  .gradient-text-primary {
+    @apply bg-gradient-to-r from-teal-400 via-teal-500 to-blue-500 bg-clip-text text-transparent;
+  }
+}
