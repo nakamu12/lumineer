@@ -93,16 +93,15 @@ git rev-parse --show-toplevel
 
 ### 4-1. develop を最新化してワークツリーを作成
 ```bash
-# develop を最新化
-git fetch origin develop
+# どのブランチにいても develop に切り替えて最新化
 git checkout develop
 git pull origin develop
 
 # worktree ディレクトリを確保（初回のみ）
 mkdir -p {project_root}/../worktree
 
-# worktree を作成（develop から新しいブランチを分岐）
-git worktree add {worktree_path} -b {branch_name} origin/develop
+# プルした develop を起点にワークツリーを作成
+git worktree add {worktree_path} -b {branch_name} develop
 ```
 
 ### 4-2. リモートへ push
