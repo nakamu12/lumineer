@@ -2,10 +2,10 @@
 name: lumineer-issue-start
 description: >
   Lumineer プロジェクトで新しい Issue の作業を開始するワークフローを自動化するスキル。
-  ブランチ作成・リモート push・GitHub Project へのカンバン登録・ステータスを "In Progress"
-  に設定するまでの一連の手順を一括で行う。
+  Issue 確認・ブランチ作成・git worktree セットアップ・GitHub Project への登録・
+  ステータスを "In Progress" に設定するまでの一連の手順を一括で行う。
   ユーザーが「ブランチを切る」「Issue を始める」「作業開始」「/lumineer-issue-start」
-  と言った場合や、新しい機能・修正・チョアの実装に着手しようとしている場面で使用すること。
+  と言った場合や、新しい機能・修正・チョアの実装に着手しようとしている場面で必ず使用すること。
 ---
 
 # Lumineer Issue Start ワークフロー
@@ -16,8 +16,9 @@ description: >
 
 1. 必要な情報を収集する
 2. GitHub Issue を確認（または新規作成）する
-3. ブランチを作成して push する
-4. GitHub Project にカンバン登録し "In Progress" にする
+3. ブランチ名を構築する
+4. git worktree を作成して開発環境を準備する
+5. GitHub Project にカンバン登録し "In Progress" にする
 
 ---
 
@@ -28,7 +29,7 @@ description: >
 
 | 項目 | 説明 | 例 |
 |------|------|-----|
-| `issue_number` | 既存 Issue 番号（新規の場合は「new」） | `1`, `42`, `new` |
+| `issue_number` | 既存 Issue 番号（新規の場合は「new」） | `5`, `42`, `new` |
 | `type` | ブランチ種別 | `feature` / `fix` / `hotfix` / `refactor` / `docs` / `test` / `chore` |
 | `scope` | 対象領域 | `frontend` / `backend` / `rag` / `agents` / `data` / `infra` / `mcp` |
 | `detail` | 内容の要約（snake_case） | `hybrid_search`, `settings_page` |
@@ -54,34 +55,75 @@ gh issue create --title "{title}" --body "{body}"
 
 ---
 
-## Step 3: ブランチ名の構築
+## Step 3: ブランチ名とワークツリーパスの構築
 
-以下の形式でブランチ名を組み立てる:
-
+### ブランチ名
 ```
 LM{NNNN}-{type}/{scope}-{detail}
 ```
-
-- `NNNN` は Issue 番号を4桁ゼロ埋め（例: 1 → `0001`, 42 → `0042`）
+- `NNNN` は Issue 番号を 4 桁ゼロ埋め（例: 5 → `0005`）
 - `detail` は snake_case
 
 **例:**
-- Issue #1, feature, infra, terraform_gcp_setup → `LM0001-feature/infra-terraform_gcp_setup`
-- Issue #10, fix, agents, triage_routing → `LM0010-fix/agents-triage_routing`
-- Issue #3, feature, frontend+backend, search_results → `LM0003-feature/frontend+backend-search_results`
+- Issue #5, chore, infra, docker_compose → `LM0005-chore/infra-docker_compose`
+- Issue #8, feature, rag, hybrid_search → `LM0008-feature/rag-hybrid_search`
+
+### ワークツリーディレクトリ名
+ブランチ名の `/` を `-` に変換した名前を使用する:
+```
+LM{NNNN}-{type}-{scope}-{detail}
+```
+
+**例:** `LM0005-chore-infra-docker_compose`
+
+### ワークツリーパス
+プロジェクトルートの **1 つ上の階層** に `worktree/` ディレクトリを作成する:
+```
+{project_root}/../worktree/{worktree_dir_name}
+```
+
+プロジェクトルートを確認:
+```bash
+git rev-parse --show-toplevel
+```
 
 ---
 
-## Step 4: ブランチ作成と push
+## Step 4: ワークツリー作成と開発環境セットアップ
 
-`develop` ブランチから分岐させる:
-
+### 4-1. develop を最新化してワークツリーを作成
 ```bash
+# develop を最新化
+git fetch origin develop
 git checkout develop
 git pull origin develop
-git checkout -b {branch_name}
+
+# worktree ディレクトリを確保（初回のみ）
+mkdir -p {project_root}/../worktree
+
+# worktree を作成（develop から新しいブランチを分岐）
+git worktree add {worktree_path} -b {branch_name} origin/develop
+```
+
+### 4-2. リモートへ push
+```bash
+cd {worktree_path}
 git push -u origin {branch_name}
 ```
+
+### 4-3. scope に応じた依存関係インストール
+
+scope に応じて以下のコマンドを実行する（不要な scope はスキップ）:
+
+| scope | コマンド | 対象ディレクトリ |
+|-------|---------|----------------|
+| `frontend` | `bun install` | `{worktree_path}/frontend/` |
+| `backend` | `bun install` | `{worktree_path}/backend/` |
+| `rag` / `agents` / `data` | `uv sync` | `{worktree_path}/ai/` |
+| `infra` | なし | — |
+| `mcp` | `uv sync` | `{worktree_path}/ai/` |
+
+対象ディレクトリが存在する場合のみ実行する。
 
 ---
 
@@ -130,12 +172,30 @@ mutation {
 ```
 ✅ 作業準備完了
 
-Issue   : #{issue_number} {issue_title}
-Branch  : {branch_name}
-Project : In Progress に設定済み
+Issue      : #{issue_number} {issue_title}
+Branch     : {branch_name}
+Worktree   : {worktree_path}
+Project    : In Progress に設定済み
 
-次のステップ: 実装を開始してください。
+作業ディレクトリ: cd {worktree_path}
 完了後は PR を作成し、本文に `Closes #{issue_number}` を記載してください。
+```
+
+---
+
+## ワークツリーのクリーンアップ（PR マージ後）
+
+PR マージ後に不要になったワークツリーを削除する:
+
+```bash
+# プロジェクトルートに戻る
+cd {project_root}
+
+# ワークツリーを削除
+git worktree remove {worktree_path}
+
+# ローカルブランチを削除
+git branch -d {branch_name}
 ```
 
 ---
