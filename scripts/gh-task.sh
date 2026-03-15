@@ -124,7 +124,8 @@ PADDED_NUM="$(printf '%04d' "$ISSUE_NUM")"
 BRANCH_NAME="LM${PADDED_NUM}-${TASK_TYPE}/${TASK_SCOPE}-${BR_DETAIL}"
 # ブランチ名の / を - に置換してディレクトリ名にする
 WORKTREE_DIR="$(echo "${BRANCH_NAME}" | tr '/' '-')"
-REPO_ROOT="$(git rev-parse --show-toplevel)"
+# worktree 内から実行された場合でも main リポジトリのルートを取得する
+REPO_ROOT="$(git worktree list --porcelain | awk 'NR==1{print $2}')"
 WORKTREE_PATH="${REPO_ROOT}/../worktree/${WORKTREE_DIR}"
 
 echo "worktree を作成中: ${BRANCH_NAME}" >&2
