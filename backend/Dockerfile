@@ -12,3 +12,11 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 EXPOSE 8000
 CMD ["bun", "run", "dev"]
+
+# Production
+FROM base AS prod
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN bun run build
+EXPOSE 8000
+CMD ["bun", "run", "start"]
