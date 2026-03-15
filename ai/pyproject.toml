@@ -1,0 +1,17 @@
+[project]
+name = "lumineer-ai"
+version = "0.1.0"
+description = "Lumineer AI Processing Service"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.9",
+    "mypy>=1.0",
+    "pytest>=8.0",
+]
