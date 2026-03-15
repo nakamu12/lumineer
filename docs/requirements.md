@@ -688,7 +688,8 @@ app/guardrails/
 ### 3 層テスト構成
 
 ```
-Layer 1: Unit Tests（pytest） — 毎コミット
+Layer 1: Unit Tests（Vitest / pytest） — 毎コミット
+  → Frontend/Backend: Vitest、AI Processing: pytest
   → Formatter, Reranker, メタデータフィルタ等の関数テスト
 
 Layer 2: RAG Evaluation（DeepEval + Golden Dataset） — LLM 関連変更時のみ
@@ -740,8 +741,10 @@ Tier 3（改善指針）:
 ```
 Push / PR
     ↓
-Stage 1: Lint + Unit Test（全 Push）
-  → ruff + pytest
+Stage 1: Lint + Format + Unit Test（全 Push）
+  → Frontend: prettier --check + eslint + tsc --noEmit + vitest
+  → Backend:  prettier --check + eslint + tsc --noEmit + vitest
+  → AI:       ruff format --check + ruff check + mypy + pytest
     ↓
 Stage 2: LLM Eval（LLM 関連変更時のみ — paths フィルタ）
   → DeepEval + Golden Dataset
