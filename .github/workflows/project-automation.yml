@@ -1,6 +1,8 @@
 name: Project Automation
 
 on:
+  issues:
+    types: [opened]
   pull_request:
     types: [closed]
 
@@ -9,10 +11,39 @@ permissions:
   pull-requests: read
 
 jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+
+    steps:
+      - name: Add issue to GitHub Project
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
+          PROJECT_ID: "PVT_kwHOArXseM4BRwSj"
+        run: |
+          ISSUE_NODE_ID="${{ github.event.issue.node_id }}"
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+
+          echo "Adding Issue #$ISSUE_NUMBER to project..."
+
+          gh api graphql -f query="
+            mutation {
+              addProjectV2ItemById(input: {
+                projectId: \"$PROJECT_ID\"
+                contentId: \"$ISSUE_NODE_ID\"
+              }) {
+                item { id }
+              }
+            }
+          "
+
+          echo "✅ Issue #$ISSUE_NUMBER added to project."
+
   move-to-done:
     name: Move linked issues to Done
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
 
     steps:
       - name: Move issues to Done in GitHub Project
@@ -24,7 +55,7 @@ jobs:
           DONE_OPTION_ID: "448bcca5"
           REPO: ${{ github.repository }}
         run: |
-          # PR 本文から "Closes #N" / "Fixes #N" / "Resolves #N" のIssue番号を抽出
+          # PR 本文から "Closes #N" / "Fixes #N" / "Resolves #N" の Issue 番号を抽出
           ISSUE_NUMBERS=$(echo "$PR_BODY" | grep -oiE '(closes|fixes|resolves) #[0-9]+' | grep -oE '[0-9]+' || true)
 
           if [ -z "$ISSUE_NUMBERS" ]; then
@@ -39,7 +70,7 @@ jobs:
             ISSUE_NODE_ID=$(gh api "repos/$REPO/issues/$ISSUE_NUMBER" --jq '.node_id')
             echo "  node_id: $ISSUE_NODE_ID"
 
-            # Issue に紐づくプロジェクトアイテムのIDを取得
+            # Issue に紐づくプロジェクトアイテムの ID を取得
             ITEM_ID=$(gh api graphql -f query="
               query {
                 node(id: \"$ISSUE_NODE_ID\") {
@@ -55,12 +86,23 @@ jobs:
               }
             " --jq ".data.node.projectItems.nodes[] | select(.project.id == \"$PROJECT_ID\") | .id")
 
+            # プロジェクト未登録の場合は先に追加する
             if [ -z "$ITEM_ID" ]; then
-              echo "  Issue #$ISSUE_NUMBER is not in the project. Skipping."
-              continue
+              echo "  Issue #$ISSUE_NUMBER not in project. Adding first..."
+              ITEM_ID=$(gh api graphql -f query="
+                mutation {
+                  addProjectV2ItemById(input: {
+                    projectId: \"$PROJECT_ID\"
+                    contentId: \"$ISSUE_NODE_ID\"
+                  }) {
+                    item { id }
+                  }
+                }
+              " --jq '.data.addProjectV2ItemById.item.id')
+              echo "  Added. item_id: $ITEM_ID"
+            else
+              echo "  item_id: $ITEM_ID"
             fi
-
-            echo "  item_id: $ITEM_ID"
 
             # ステータスを Done に更新
             gh api graphql -f query="
