@@ -1,9 +1,16 @@
 """AI Processing Service entrypoint."""
+import uvicorn
 
+from app.config.settings import get_settings
+from app.interfaces.api.routes import create_app
 
-def main() -> None:
-    print("Lumineer AI Processing Service - placeholder")
-
+app = create_app()
 
 if __name__ == "__main__":
-    main()
+    settings = get_settings()
+    uvicorn.run(
+        "main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.APP_ENV == "dev",
+    )
