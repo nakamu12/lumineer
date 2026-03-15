@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # =============================================================================
-# gh-task.sh — GitHub Issue 作成 + ブランチ作成
+# gh-task.sh — GitHub Issue 作成 + worktree 作成
 #
 # 使い方: gh-task.sh "<type>" "<scope>" "<説明文>" ["<ブランチ名>"]
 # 例:     gh-task.sh "feature" "rag" "Hybrid Search 実装" "hybrid-search"
@@ -57,14 +57,6 @@ if ! git rev-parse --is-inside-work-tree &>/dev/null; then
   exit 1
 fi
 
-if ! git diff --quiet || ! git diff --cached --quiet; then
-  echo "エラー: 未コミットの変更があります。先にコミットしてから実行してください。" >&2
-  echo "" >&2
-  echo "未コミットのファイル:" >&2
-  git status --porcelain >&2
-  exit 1
-fi
-
 echo "Git 状態 OK" >&2
 
 # --- ブランチ名サフィックス生成 ---
@@ -102,7 +94,7 @@ fi
 
 ISSUE_URL="$(gh issue create \
   --title "${ISSUE_TITLE}" \
-  "${LABEL_ARGS[@]}" \
+  ${LABEL_ARGS[@]+"${LABEL_ARGS[@]}"} \
   --body "## 概要
 
 ${TASK_DESC}
@@ -127,26 +119,29 @@ fi
 # 4桁ゼロパディング
 PADDED_NUM="$(printf '%04d' "$ISSUE_NUM")"
 
-# --- ブランチ作成 ---
+# --- worktree 作成 ---
 
 BRANCH_NAME="LM${PADDED_NUM}-${TASK_TYPE}/${TASK_SCOPE}-${BR_DETAIL}"
+# ブランチ名の / を - に置換してディレクトリ名にする
+WORKTREE_DIR="$(echo "${BRANCH_NAME}" | tr '/' '-')"
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+WORKTREE_PATH="${REPO_ROOT}/../worktree/${WORKTREE_DIR}"
 
-echo "ブランチを作成中: ${BRANCH_NAME}" >&2
+echo "worktree を作成中: ${BRANCH_NAME}" >&2
 
 if git show-ref --verify --quiet "refs/heads/${BRANCH_NAME}"; then
   echo "エラー: ブランチ '${BRANCH_NAME}' は既に存在します" >&2
   exit 1
 fi
 
-# ベースブランチに切り替えて最新化
-if git show-ref --verify --quiet "refs/heads/${GIT_BASE_BRANCH}"; then
-  git checkout "${GIT_BASE_BRANCH}"
-  git pull origin "${GIT_BASE_BRANCH}" 2>/dev/null || true
-else
-  echo "警告: ${GIT_BASE_BRANCH} ブランチが存在しません。現在のブランチから分岐します。" >&2
-fi
+# ベースブランチを fetch して最新化（現在のブランチは変えない）
+git fetch origin "${GIT_BASE_BRANCH}" 2>/dev/null || true
 
-git checkout -b "${BRANCH_NAME}"
+# worktree を作成
+git worktree add "${WORKTREE_PATH}" -b "${BRANCH_NAME}" "origin/${GIT_BASE_BRANCH}"
+
+# リモートに push
+git -C "${WORKTREE_PATH}" push -u origin "${BRANCH_NAME}"
 
 # --- 完了 ---
 
@@ -156,5 +151,9 @@ echo "  Issue     : #${ISSUE_NUM} - ${ISSUE_TITLE}" >&2
 echo "  URL       : ${ISSUE_URL}" >&2
 echo "  Branch    : ${BRANCH_NAME}" >&2
 echo "  Base      : ${GIT_BASE_BRANCH}" >&2
+echo "  Worktree  : ${WORKTREE_PATH}" >&2
+echo "" >&2
+echo "作業開始:" >&2
+echo "  cd ${WORKTREE_PATH}" >&2
 echo "" >&2
 echo "PR 作成時に 'Closes #${ISSUE_NUM}' を含めてください" >&2
