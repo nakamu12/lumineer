@@ -43,6 +43,7 @@ docker compose up
   - scope: frontend / backend / rag / agents / data / infra / mcp
   - 例: `LM0001-feature/rag-hybrid_search`
 - **Flow**: develop → feature branch → PR → CI → develop → main
+- **develop / main への直接コミット禁止**: どんな小さな変更（docs 修正含む）でも必ず feature branch → PR 経由。直接コミットすると origin と分岐し他ブランチに波及する
 - **PR**: `Closes #{IssueID}` で Issue 自動クローズ
 - **Commit**: 日本語 OK、簡潔に
 

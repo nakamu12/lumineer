@@ -25,7 +25,8 @@ LM{IssueID}-{type}/{scope}-{detail}
 hotfix: main → hotfix branch → PR → main + develop マージ
 ```
 
-- main への直接 push 禁止
+- **main への直接 push 禁止**
+- **develop への直接コミット禁止** — どんな小さな変更（ドキュメント修正含む）でも必ず feature branch → PR 経由でマージする。直接コミットすると origin/develop と分岐して他ブランチに影響する
 - feature branch は develop から分岐
 
 ## PR 規約
