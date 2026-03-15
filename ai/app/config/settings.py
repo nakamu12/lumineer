@@ -1,4 +1,5 @@
-"""Application settings managed via Pydantic Settings."""
+"""Application settings managed by Pydantic Settings."""
+
 from functools import lru_cache
 from typing import Literal
 
@@ -12,18 +13,38 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env.local",
         env_file_encoding="utf-8",
-        case_sensitive=True,
+        extra="ignore",
     )
 
     APP_ENV: Literal["dev", "prod"] = "dev"
-    OPENAI_API_KEY: str = ""
+
+    # OpenAI
+    OPENAI_API_KEY: str
+    EMBEDDING_MODEL: str = "text-embedding-3-large"
+    EMBEDDING_DIMENSIONS: int = 3072
+    LLM_MODEL: str = "gpt-4o-mini"
+
+    # Qdrant
     QDRANT_URL: str = "http://qdrant:6333"
     QDRANT_API_KEY: str | None = None
-    EMBEDDING_MODEL: str = "text-embedding-3-large"
+    QDRANT_COLLECTION: str = "courses"
+
+    # Ingestion
+    DATA_PATH: str = "../data/coursera.parquet"
+    PREPROCESSED_PATH: str = "data/processed/preprocessed.jsonl"
+    BATCH_SIZE_LLM: int = 10
+    BATCH_SIZE_EMBEDDING: int = 100
+    BATCH_SIZE_UPSERT: int = 200
+    CHUNK_SIZE: int = 600
+    CHUNK_OVERLAP: int = 120
+
+    # RAG defaults
     RERANKER_STRATEGY: Literal["none", "heuristic", "cross-encoder"] = "none"
     CONTEXT_FORMAT: Literal["json", "toon"] = "json"
     TOP_K: int = 10
     SIMILARITY_THRESHOLD: float = 0.7
+
+    # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8001
 
@@ -38,4 +59,4 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     """Return cached application settings."""
-    return Settings()
+    return Settings()  # type: ignore[call-arg]
