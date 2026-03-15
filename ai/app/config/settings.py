@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     BATCH_SIZE_LLM: int = 10
     BATCH_SIZE_EMBEDDING: int = 100
     BATCH_SIZE_UPSERT: int = 200
+    CHUNK_SIZE: int = 600
+    CHUNK_OVERLAP: int = 120
 
     # RAG defaults
     RERANKER_STRATEGY: Literal["none", "heuristic", "cross-encoder"] = "none"

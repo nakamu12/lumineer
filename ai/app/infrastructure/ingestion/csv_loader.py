@@ -59,8 +59,9 @@ def load_courses(data_path: str | Path) -> list[dict[str, Any]]:
             description = ""
 
         instructor_str = str(row.get("Instructor", "") or "").strip()
-        instructor: str | None = instructor_str if instructor_str and instructor_str != "nan" \
-            else None
+        instructor: str | None = (
+            instructor_str if instructor_str and instructor_str != "nan" else None
+        )
 
         modules_str = str(row.get("Modules/Courses", "") or "").strip()
         modules: str | None = modules_str if modules_str and modules_str != "nan" else None
