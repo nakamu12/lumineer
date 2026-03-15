@@ -197,16 +197,14 @@ Project    : In Progress に設定済み
 
 ## ワークツリーのクリーンアップ（PR マージ後）
 
-PR マージ後に不要になったワークツリーを削除する:
+PR マージ後に不要になったワークツリーを削除する。
+`~/develop/learning/courses/capstone/lumineer` は常に develop なので、そこから実行する:
 
 ```bash
-# プロジェクトルートに戻る
-cd {project_root}
+# メインリポジトリ（常に develop）から実行
+cd ~/develop/learning/courses/capstone/lumineer
 
-# ワークツリーを削除
 git worktree remove {worktree_path}
-
-# ローカルブランチを削除
 git branch -d {branch_name}
 ```
 
