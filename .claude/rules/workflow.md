@@ -40,8 +40,43 @@ hotfix: main → hotfix branch → PR → main + develop マージ
 - 1コミット = 1つの論理的変更
 - API Key やシークレットを含むコミットは禁止
 
+## 並列開発: git worktree
+
+複数 Issue を同時並行で進める場合は `git worktree` を使用する。
+
+### worktree の格納場所
+
+```
+{project_root}/../worktree/{worktree_dir}/
+```
+
+例: プロジェクトが `capstone/lumineer/` の場合 → `capstone/worktree/LM0005-chore-infra-docker_compose/`
+
+### ディレクトリ名の規則
+
+ブランチ名の `/` を `-` に置換する:
+- ブランチ: `LM0005-chore/infra-docker_compose`
+- ディレクトリ: `LM0005-chore-infra-docker_compose`
+
+### 作業開始（/lumineer-issue-start スキルで自動化）
+
+```bash
+git worktree add ../worktree/LM{NNNN}-{type}-{scope}-{detail} \
+  -b LM{NNNN}-{type}/{scope}-{detail} origin/develop
+cd ../worktree/LM{NNNN}-{type}-{scope}-{detail}
+git push -u origin LM{NNNN}-{type}/{scope}-{detail}
+```
+
+### 作業終了（PR マージ後）
+
+```bash
+git worktree remove ../worktree/{worktree_dir}
+git branch -d LM{NNNN}-{type}/{scope}-{detail}
+```
+
 ## タスク管理
 
 - 全タスクは GitHub Issues で採番
 - GitHub Projects カンバン: Backlog → To Do → In Progress → Review → Done
 - PR マージで Issue 自動クローズ + カンバン自動移動
+- 作業開始時は `/lumineer-issue-start` スキルで一括セットアップ
