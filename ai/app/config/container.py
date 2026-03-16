@@ -1,4 +1,5 @@
 """Dependency injection container."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
@@ -30,21 +31,24 @@ class Container:
         """Return the registered VectorStorePort implementation."""
         from app.domain.ports.vector_store import VectorStorePort
 
-        return self.resolve(VectorStorePort)  # type: ignore[return-value]
+        result: VectorStorePort = self.resolve(VectorStorePort)
+        return result
 
     @property
     def embedding(self) -> EmbeddingPort:
         """Return the registered EmbeddingPort implementation."""
         from app.domain.ports.embedding import EmbeddingPort
 
-        return self.resolve(EmbeddingPort)  # type: ignore[return-value]
+        result: EmbeddingPort = self.resolve(EmbeddingPort)
+        return result
 
     @property
     def llm(self) -> LLMPort:
         """Return the registered LLMPort implementation."""
         from app.domain.ports.llm import LLMPort
 
-        return self.resolve(LLMPort)  # type: ignore[return-value]
+        result: LLMPort = self.resolve(LLMPort)
+        return result
 
 
 _container: Container | None = None
@@ -56,3 +60,34 @@ def get_container() -> Container:
     if _container is None:
         _container = Container()
     return _container
+
+
+def build_container() -> Container:
+    """Wire up all ports with their concrete implementations."""
+    from app.config.settings import get_settings
+    from app.domain.ports.embedding import EmbeddingPort
+    from app.domain.ports.vector_store import VectorStorePort
+    from app.infrastructure.embeddings.openai_embedding_adapter import OpenAIEmbeddingAdapter
+    from app.infrastructure.vectordb.qdrant_search_adapter import QdrantSearchAdapter
+
+    settings = get_settings()
+    container = get_container()
+
+    container.register(
+        EmbeddingPort,
+        OpenAIEmbeddingAdapter(
+            api_key=settings.OPENAI_API_KEY,
+            model=settings.EMBEDDING_MODEL,
+            dimensions=settings.EMBEDDING_DIMENSIONS,
+        ),
+    )
+    container.register(
+        VectorStorePort,
+        QdrantSearchAdapter(
+            url=settings.QDRANT_URL,
+            collection_name=settings.QDRANT_COLLECTION,
+            api_key=settings.QDRANT_API_KEY,
+        ),
+    )
+
+    return container
