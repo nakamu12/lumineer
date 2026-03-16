@@ -2,6 +2,7 @@ import type { UserRepositoryPort } from "../ports/user_repository.ts"
 import type { UserEntity } from "../entities/user.ts"
 import { hashPassword } from "../../infrastructure/auth/password.ts"
 import { issueTokenPair, type TokenPair } from "../../infrastructure/auth/jwt.ts"
+import { ConflictError } from "../errors.ts"
 
 export type RegisterUserInput = {
   email: string
@@ -20,7 +21,7 @@ export class RegisterUserUseCase {
   async execute(input: RegisterUserInput): Promise<RegisterUserResult> {
     const exists = await this.userRepository.existsByEmail(input.email)
     if (exists) {
-      throw new Error("Email already registered")
+      throw new ConflictError("Email already registered")
     }
 
     const passwordHash = await hashPassword(input.password)
