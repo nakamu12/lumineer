@@ -3,19 +3,35 @@ services:
   # App services
   # =============================================================================
 
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./gateway:/app
+      - /app/node_modules
+    environment:
+      - PORT=3000
+      - BACKEND_URL=http://backend:3001
+      - ALLOWED_ORIGINS=http://localhost:5173
+    depends_on:
+      - backend
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "5173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:3000
     depends_on:
-      - backend
+      - gateway
 
   postgres:
     image: postgres:16
@@ -38,13 +54,14 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "3001:3001"
     volumes:
       - ./backend:/app
       - /app/node_modules
     env_file: .env.local
     environment:
       - APP_ENV=dev
+      - PORT=3001
       - AI_SERVICE_URL=http://ai:8001
       - DATABASE_URL=postgres://lumineer:lumineer@postgres:5432/lumineer
       - JWT_SECRET=dev-secret-change-in-prod-min-16chars
