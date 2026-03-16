@@ -1,1 +1,0 @@
-"""Embedding model infrastructure adapters."""
