@@ -6,7 +6,9 @@
 
 import { getDb } from "../infrastructure/db/client.ts"
 import { users } from "../infrastructure/db/schema.ts"
-import { hashPassword } from "../infrastructure/auth/password.ts"
+import { BcryptPasswordHasher } from "../infrastructure/auth/password.ts"
+
+const passwordHasher = new BcryptPasswordHasher()
 
 const DEMO_USERS = [
   {
@@ -21,7 +23,7 @@ async function seed(): Promise<void> {
   console.log("Seeding demo users...")
 
   for (const u of DEMO_USERS) {
-    const passwordHash = await hashPassword(u.password)
+    const passwordHash = await passwordHasher.hash(u.password)
     await db
       .insert(users)
       .values({

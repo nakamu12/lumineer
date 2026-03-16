@@ -4,9 +4,11 @@ import type { Container } from "../config/container.ts"
 import type { UserRepositoryPort, CreateUserInput } from "../domain/ports/user_repository.ts"
 import type { UserEntity, UserEntityWithHash } from "../domain/entities/user.ts"
 import { UserFactory } from "../domain/entities/user.ts"
+import { BcryptPasswordHasher } from "../infrastructure/auth/password.ts"
+import { JoseTokenIssuer } from "../infrastructure/auth/jwt.ts"
 import { RegisterUserUseCase } from "../domain/usecases/register_user.ts"
 import { LoginUserUseCase } from "../domain/usecases/login_user.ts"
-import { verifyToken } from "../infrastructure/auth/jwt.ts"
+import { RefreshTokenUseCase } from "../domain/usecases/refresh_token.ts"
 
 // ── In-memory user repository ────────────────────────────────────────────────
 
@@ -52,22 +54,23 @@ class InMemoryUserRepository implements UserRepositoryPort {
     }
     return false
   }
-
-  clear(): void {
-    this.users.clear()
-    this.nextId = 1
-  }
 }
 
 // ── Test helpers ─────────────────────────────────────────────────────────────
+
+const passwordHasher = new BcryptPasswordHasher()
+const tokenIssuer = new JoseTokenIssuer()
 
 function createTestContainer(userRepository: InMemoryUserRepository): Container {
   return {
     searchCoursesUseCase: { execute: () => Promise.reject(new Error("not implemented")) } as never,
     chatUseCase: { execute: () => Promise.reject(new Error("not implemented")) } as never,
     userRepository,
-    registerUserUseCase: new RegisterUserUseCase(userRepository),
-    loginUserUseCase: new LoginUserUseCase(userRepository),
+    passwordHasher,
+    tokenIssuer,
+    registerUserUseCase: new RegisterUserUseCase(userRepository, passwordHasher, tokenIssuer),
+    loginUserUseCase: new LoginUserUseCase(userRepository, passwordHasher, tokenIssuer),
+    refreshTokenUseCase: new RefreshTokenUseCase(tokenIssuer),
   }
 }
 
@@ -109,11 +112,11 @@ describe("Auth API", () => {
       expect(body.refresh_token).toBeDefined()
 
       // Verify tokens are valid JWTs
-      const accessPayload = await verifyToken(body.access_token)
+      const accessPayload = await tokenIssuer.verifyToken(body.access_token)
       expect(accessPayload.type).toBe("access")
       expect(accessPayload.sub).toBe(body.user.id)
 
-      const refreshPayload = await verifyToken(body.refresh_token)
+      const refreshPayload = await tokenIssuer.verifyToken(body.refresh_token)
       expect(refreshPayload.type).toBe("refresh")
     })
 
@@ -131,6 +134,19 @@ describe("Auth API", () => {
 
       const body = await res.json()
       expect(body.error).toBe("Email already registered")
+    })
+
+    it("returns 409 for case-insensitive duplicate email", async () => {
+      await app.request(
+        "/api/auth/register",
+        json({ email: "alice@example.com", password: "Password1", display_name: "Alice" }),
+      )
+
+      const res = await app.request(
+        "/api/auth/register",
+        json({ email: "ALICE@EXAMPLE.COM", password: "Password2", display_name: "Alice2" }),
+      )
+      expect(res.status).toBe(409)
     })
 
     it("returns 400 for invalid email", async () => {
@@ -256,7 +272,7 @@ describe("Auth API", () => {
       const body = await res.json()
       expect(body.access_token).toBeDefined()
 
-      const payload = await verifyToken(body.access_token)
+      const payload = await tokenIssuer.verifyToken(body.access_token)
       expect(payload.type).toBe("access")
     })
 

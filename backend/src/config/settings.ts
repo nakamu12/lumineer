@@ -37,6 +37,10 @@ export function getSettings(): Settings {
 
   const jwtSecret = process.env["JWT_SECRET"] ?? "dev-secret-change-in-prod-min-16chars"
 
+  if (appEnv === "prod" && !process.env["JWT_SECRET"]) {
+    throw new Error("JWT_SECRET is required in production")
+  }
+
   cachedSettings = {
     APP_ENV: appEnv,
     PORT: port,
