@@ -81,6 +81,43 @@ git worktree remove ../worktree/{worktree_dir}
 git branch -d LM{NNNN}-{type}/{scope}-{detail}
 ```
 
+## 検証方法: インフラとアプリを分離
+
+worktree で Docker Compose を起動するとポート競合が発生する。インフラとアプリを分離して検証する。
+
+### 原則
+
+| 層 | どこで動かすか | 方法 |
+|---|---|---|
+| **インフラ** (PostgreSQL, Qdrant) | メインリポジトリ (lumineer/) | `docker compose up postgres qdrant -d` |
+| **アプリ** (backend, frontend, ai) | worktree | `bun dev` / `uv run python main.py` で直接起動 |
+
+### 検証レベル
+
+| レベル | タイミング | 方法 | Docker 必要 |
+|---|---|---|---|
+| lint + typecheck + unit test | 毎回（PR 前に必須） | worktree 内で実行 | 不要 |
+| 手動 API テスト | 必要な時だけ | worktree から `bun dev` + curl | インフラのみ |
+| フル統合テスト | develop マージ後 | develop で `docker compose up` | 全コンテナ |
+
+### 手動検証の手順
+
+```bash
+# 1. メインリポジトリでインフラだけ起動（常時）
+cd lumineer
+docker compose up postgres qdrant -d
+
+# 2. worktree で静的検証（Docker 不要）
+cd ../worktree/LM{NNNN}-{type}-{scope}-{detail}
+cd backend && bun run lint && bun run typecheck && bun test
+
+# 3. 手動検証が必要な場合、worktree からアプリを直接起動
+cd backend && bun dev          # localhost:3001
+cd frontend && bun dev         # localhost:5173
+cd ai && uv run python main.py # localhost:8001
+# → curl やブラウザで動作確認、終わったら Ctrl+C
+```
+
 ## タスク管理
 
 - 全タスクは GitHub Issues で採番
