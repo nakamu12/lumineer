@@ -26,7 +26,7 @@ export function getSettings(): Settings {
     throw new Error(`Invalid APP_ENV: "${appEnv}". Must be "dev" or "prod".`);
   }
 
-  const portRaw = process.env["PORT"] ?? "8000";
+  const portRaw = process.env["PORT"] ?? "3001";
   const port = parseInt(portRaw, 10);
   if (isNaN(port)) {
     throw new Error(`Invalid PORT: "${portRaw}". Must be a number.`);
