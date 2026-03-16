@@ -13,7 +13,7 @@ const passwordHasher = new BcryptPasswordHasher()
 const DEMO_USERS = [
   {
     email: "demo@lumineer.app",
-    password: "demo1234",
+    password: "Demo1234",
     displayName: "Demo User",
   },
 ]

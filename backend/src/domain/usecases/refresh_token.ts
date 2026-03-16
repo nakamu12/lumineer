@@ -17,7 +17,7 @@ export class RefreshTokenUseCase {
       throw new AuthenticationError("Invalid token type")
     }
 
-    const accessToken = await this.tokenIssuer.signToken(payload.sub, "access")
+    const accessToken = await this.tokenIssuer.issueAccessToken(payload.sub)
     return { accessToken }
   }
 }

@@ -13,7 +13,11 @@ function getSecret(): Uint8Array {
 }
 
 export class JoseTokenIssuer implements TokenIssuerPort {
-  async signToken(userId: string, type: TokenType): Promise<string> {
+  async issueAccessToken(userId: string): Promise<string> {
+    return this.signToken(userId, "access")
+  }
+
+  private async signToken(userId: string, type: TokenType): Promise<string> {
     const { JWT_ACCESS_EXPIRES, JWT_REFRESH_EXPIRES } = getSettings()
     const expiresIn = type === "access" ? JWT_ACCESS_EXPIRES : JWT_REFRESH_EXPIRES
 

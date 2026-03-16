@@ -17,6 +17,6 @@ export interface PasswordHasherPort {
 
 export interface TokenIssuerPort {
   issueTokenPair(userId: string): Promise<TokenPair>
-  signToken(userId: string, type: TokenType): Promise<string>
+  issueAccessToken(userId: string): Promise<string>
   verifyToken(token: string): Promise<TokenPayload>
 }

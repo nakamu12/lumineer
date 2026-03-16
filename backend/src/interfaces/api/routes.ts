@@ -220,6 +220,10 @@ const registerRoute = createRoute({
       content: { "application/json": { schema: AuthResponseSchema } },
       description: "User registered successfully",
     },
+    400: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Invalid request body",
+    },
     409: {
       content: { "application/json": { schema: ErrorResponseSchema } },
       description: "Email already registered",
@@ -242,6 +246,10 @@ const loginRoute = createRoute({
     200: {
       content: { "application/json": { schema: AuthResponseSchema } },
       description: "Login successful",
+    },
+    400: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Invalid request body",
     },
     401: {
       content: { "application/json": { schema: ErrorResponseSchema } },
