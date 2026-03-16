@@ -1,12 +1,17 @@
 import type { MiddlewareHandler } from "hono"
 import { verifyToken } from "../../../infrastructure/auth/jwt.ts"
 
-const PUBLIC_PATHS = ["/health", "/docs", "/openapi.json"]
-const PUBLIC_PREFIXES = ["/api/auth/"]
+const PUBLIC_PATHS = [
+  "/health",
+  "/docs",
+  "/openapi.json",
+  "/api/auth/register",
+  "/api/auth/login",
+  "/api/auth/refresh",
+]
 
 function isPublicPath(path: string): boolean {
-  if (PUBLIC_PATHS.includes(path)) return true
-  return PUBLIC_PREFIXES.some((prefix) => path.startsWith(prefix))
+  return PUBLIC_PATHS.includes(path)
 }
 
 export const authMiddleware: MiddlewareHandler = async (c, next) => {
