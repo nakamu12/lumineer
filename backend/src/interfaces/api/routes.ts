@@ -1,11 +1,11 @@
-import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
-import { swaggerUI } from "@hono/swagger-ui";
-import type { Container } from "../../config/container.ts";
-import { errorHandler } from "./middleware/error_handler.ts";
-import { authMiddleware } from "./middleware/auth.ts";
-import { verifyToken } from "../../infrastructure/auth/jwt.ts";
+import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi"
+import { swaggerUI } from "@hono/swagger-ui"
+import type { Container } from "../../config/container.ts"
+import { errorHandler } from "./middleware/error_handler.ts"
+import { authMiddleware } from "./middleware/auth.ts"
+import { verifyToken } from "../../infrastructure/auth/jwt.ts"
 
-type AppVariables = { userId: string };
+type AppVariables = { userId: string }
 
 // ── Schemas ────────────────────────────────────────────────────────────────
 
@@ -24,7 +24,7 @@ const SearchRequestSchema = z
       .openapi({ example: ["Python", "TensorFlow"] }),
     limit: z.number().int().min(1).max(50).optional().openapi({ example: 10 }),
   })
-  .openapi("SearchRequest");
+  .openapi("SearchRequest")
 
 const CourseSchema = z
   .object({
@@ -41,7 +41,7 @@ const CourseSchema = z
     schedule: z.string(),
     modules: z.string(),
   })
-  .openapi("Course");
+  .openapi("Course")
 
 const SearchResponseSchema = z
   .object({
@@ -49,14 +49,14 @@ const SearchResponseSchema = z
     summary: z.string(),
     total: z.number(),
   })
-  .openapi("SearchResponse");
+  .openapi("SearchResponse")
 
 const ChatRequestSchema = z
   .object({
     message: z.string().min(1).openapi({ example: "I want to become a data scientist" }),
     session_id: z.string().optional().openapi({ example: "sess_abc123" }),
   })
-  .openapi("ChatRequest");
+  .openapi("ChatRequest")
 
 const ChatResponseSchema = z
   .object({
@@ -64,21 +64,21 @@ const ChatResponseSchema = z
     courses: z.array(CourseSchema).optional(),
     session_id: z.string(),
   })
-  .openapi("ChatResponse");
+  .openapi("ChatResponse")
 
 const HealthResponseSchema = z
   .object({
     status: z.literal("ok"),
     timestamp: z.string(),
   })
-  .openapi("HealthResponse");
+  .openapi("HealthResponse")
 
 const ErrorResponseSchema = z
   .object({
     error: z.string(),
     status: z.number(),
   })
-  .openapi("ErrorResponse");
+  .openapi("ErrorResponse")
 
 // ── Auth schemas ─────────────────────────────────────────────────────────────
 
@@ -88,20 +88,20 @@ const RegisterRequestSchema = z
     password: z.string().min(8).openapi({ example: "password123" }),
     display_name: z.string().min(1).max(100).openapi({ example: "Alice" }),
   })
-  .openapi("RegisterRequest");
+  .openapi("RegisterRequest")
 
 const LoginRequestSchema = z
   .object({
     email: z.string().email().openapi({ example: "user@example.com" }),
     password: z.string().min(1).openapi({ example: "password123" }),
   })
-  .openapi("LoginRequest");
+  .openapi("LoginRequest")
 
 const RefreshRequestSchema = z
   .object({
     refresh_token: z.string().min(1).openapi({ example: "eyJhbGciOiJIUzI1NiJ9..." }),
   })
-  .openapi("RefreshRequest");
+  .openapi("RefreshRequest")
 
 const AuthResponseSchema = z
   .object({
@@ -113,7 +113,7 @@ const AuthResponseSchema = z
     access_token: z.string(),
     refresh_token: z.string(),
   })
-  .openapi("AuthResponse");
+  .openapi("AuthResponse")
 
 const MeResponseSchema = z
   .object({
@@ -122,7 +122,7 @@ const MeResponseSchema = z
     display_name: z.string(),
     created_at: z.string(),
   })
-  .openapi("MeResponse");
+  .openapi("MeResponse")
 
 // ── Route definitions ──────────────────────────────────────────────────────
 
@@ -137,7 +137,7 @@ const healthRoute = createRoute({
       description: "Service is healthy",
     },
   },
-});
+})
 
 const searchRoute = createRoute({
   method: "post",
@@ -166,7 +166,7 @@ const searchRoute = createRoute({
       description: "AI Processing Layer unavailable",
     },
   },
-});
+})
 
 const chatRoute = createRoute({
   method: "post",
@@ -195,7 +195,7 @@ const chatRoute = createRoute({
       description: "AI Processing Layer unavailable",
     },
   },
-});
+})
 
 const registerRoute = createRoute({
   method: "post",
@@ -218,7 +218,7 @@ const registerRoute = createRoute({
       description: "Email already registered",
     },
   },
-});
+})
 
 const loginRoute = createRoute({
   method: "post",
@@ -241,7 +241,7 @@ const loginRoute = createRoute({
       description: "Invalid credentials",
     },
   },
-});
+})
 
 const refreshRoute = createRoute({
   method: "post",
@@ -268,7 +268,7 @@ const refreshRoute = createRoute({
       description: "Invalid refresh token",
     },
   },
-});
+})
 
 const meRoute = createRoute({
   method: "get",
@@ -285,15 +285,15 @@ const meRoute = createRoute({
       description: "Unauthorized",
     },
   },
-});
+})
 
 // ── Router factory ─────────────────────────────────────────────────────────
 
 export function createRouter(container: Container): OpenAPIHono<{ Variables: AppVariables }> {
-  const app = new OpenAPIHono<{ Variables: AppVariables }>();
+  const app = new OpenAPIHono<{ Variables: AppVariables }>()
 
-  app.use("*", errorHandler);
-  app.use("*", authMiddleware);
+  app.use("*", errorHandler)
+  app.use("*", authMiddleware)
 
   // OpenAPI spec
   app.doc("/openapi.json", {
@@ -305,110 +305,109 @@ export function createRouter(container: Container): OpenAPIHono<{ Variables: App
         "Intelligent Course Discovery System — AI-powered course search, skill gap analysis, and learning path generation.",
     },
     servers: [{ url: "http://localhost:8000", description: "Local development" }],
-  });
+  })
 
   // Swagger UI
-  app.get("/docs", swaggerUI({ url: "/openapi.json" }));
+  app.get("/docs", swaggerUI({ url: "/openapi.json" }))
 
   // Health
   app.openapi(healthRoute, (c) =>
-    c.json({ status: "ok" as const, timestamp: new Date().toISOString() }, 200)
-  );
+    c.json({ status: "ok" as const, timestamp: new Date().toISOString() }, 200),
+  )
 
   // Course search
   app.openapi(searchRoute, async (c) => {
-    const { query, level, organization, min_rating, skills, limit } =
-      c.req.valid("json");
+    const { query, level, organization, min_rating, skills, limit } = c.req.valid("json")
     const result = await container.searchCoursesUseCase.execute(query, {
       level,
       organization,
       min_rating,
       skills,
       limit,
-    });
-    return c.json(result, 200);
-  });
+    })
+    return c.json(result, 200)
+  })
 
   // Chat
   app.openapi(chatRoute, async (c) => {
-    const { message, session_id } = c.req.valid("json");
-    const result = await container.chatUseCase.execute(message, session_id);
-    return c.json(result, 200);
-  });
+    const { message, session_id } = c.req.valid("json")
+    const result = await container.chatUseCase.execute(message, session_id)
+    return c.json(result, 200)
+  })
 
   // Auth: register
   app.openapi(registerRoute, async (c) => {
-    const { email, password, display_name } = c.req.valid("json");
+    const { email, password, display_name } = c.req.valid("json")
     try {
       const { user, tokens } = await container.registerUserUseCase.execute({
         email,
         password,
         displayName: display_name,
-      });
+      })
       return c.json(
         {
           user: { id: user.id, email: user.email, display_name: user.displayName },
           access_token: tokens.accessToken,
           refresh_token: tokens.refreshToken,
         },
-        201
-      );
+        201,
+      )
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Registration failed";
+      const message = err instanceof Error ? err.message : "Registration failed"
       if (message === "Email already registered") {
-        return c.json({ error: message, status: 409 }, 409);
+        return c.json({ error: message, status: 409 }, 409)
       }
-      throw err;
+      throw err
     }
-  });
+  })
 
   // Auth: login
   app.openapi(loginRoute, async (c) => {
-    const { email, password } = c.req.valid("json");
+    const { email, password } = c.req.valid("json")
     try {
       const { user, tokens } = await container.loginUserUseCase.execute({
         email,
         password,
-      });
+      })
       return c.json(
         {
           user: { id: user.id, email: user.email, display_name: user.displayName },
           access_token: tokens.accessToken,
           refresh_token: tokens.refreshToken,
         },
-        200
-      );
+        200,
+      )
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Login failed";
+      const message = err instanceof Error ? err.message : "Login failed"
       if (message === "Invalid email or password") {
-        return c.json({ error: message, status: 401 }, 401);
+        return c.json({ error: message, status: 401 }, 401)
       }
-      throw err;
+      throw err
     }
-  });
+  })
 
   // Auth: refresh
   app.openapi(refreshRoute, async (c) => {
-    const { refresh_token } = c.req.valid("json");
+    const { refresh_token } = c.req.valid("json")
     try {
-      const payload = await verifyToken(refresh_token);
+      const payload = await verifyToken(refresh_token)
       if (payload.type !== "refresh") {
-        return c.json({ error: "Invalid token type", status: 401 }, 401);
+        return c.json({ error: "Invalid token type", status: 401 }, 401)
       }
-      const { signToken } = await import("../../infrastructure/auth/jwt.ts");
-      const accessToken = await signToken(payload.sub, "access");
-      return c.json({ access_token: accessToken }, 200);
+      const { signToken } = await import("../../infrastructure/auth/jwt.ts")
+      const accessToken = await signToken(payload.sub, "access")
+      return c.json({ access_token: accessToken }, 200)
     } catch {
-      return c.json({ error: "Invalid or expired refresh token", status: 401 }, 401);
+      return c.json({ error: "Invalid or expired refresh token", status: 401 }, 401)
     }
-  });
+  })
 
   // Auth: me
   app.openapi(meRoute, async (c) => {
-    const userId = c.get("userId");
-    const user = await container.userRepository.findById(userId);
+    const userId = c.get("userId")
+    const user = await container.userRepository.findById(userId)
     if (!user) {
-      return c.json({ error: "User not found", status: 401 }, 401);
+      return c.json({ error: "User not found", status: 401 }, 401)
     }
     return c.json(
       {
@@ -417,9 +416,9 @@ export function createRouter(container: Container): OpenAPIHono<{ Variables: App
         display_name: user.displayName,
         created_at: user.createdAt.toISOString(),
       },
-      200
-    );
-  });
+      200,
+    )
+  })
 
-  return app;
+  return app
 }

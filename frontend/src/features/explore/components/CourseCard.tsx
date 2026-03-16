@@ -71,11 +71,7 @@ export function CourseCard({ course }: CourseCardProps) {
         {visibleSkills.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {visibleSkills.map((skill) => (
-              <Badge
-                key={skill}
-                variant="secondary"
-                className="text-xs px-2 py-0.5"
-              >
+              <Badge key={skill} variant="secondary" className="text-xs px-2 py-0.5">
                 {skill}
               </Badge>
             ))}
@@ -89,12 +85,7 @@ export function CourseCard({ course }: CourseCardProps) {
       </CardContent>
 
       <CardFooter className="pt-0">
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full gap-1.5"
-          asChild
-        >
+        <Button variant="outline" size="sm" className="w-full gap-1.5" asChild>
           <a href={course.url} target="_blank" rel="noopener noreferrer">
             View Course
             <ExternalLink className="h-3.5 w-3.5" />

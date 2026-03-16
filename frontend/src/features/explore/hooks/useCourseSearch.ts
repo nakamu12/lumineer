@@ -97,7 +97,7 @@ export function useCourseSearch({
         }
       }
     },
-    [debouncedQuery, level, minRating]
+    [debouncedQuery, level, minRating],
   )
 
   // Reset and re-fetch when query or filters change

@@ -39,7 +39,12 @@ export function ChatPage() {
           </p>
         </div>
         {messages.length > 0 && (
-          <Button variant="ghost" size="sm" onClick={clearChat} className="gap-2 text-muted-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearChat}
+            className="gap-2 text-muted-foreground"
+          >
             <Trash2 className="h-4 w-4" />
             Clear
           </Button>

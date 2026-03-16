@@ -80,8 +80,8 @@ export function ExplorePage() {
           <span className="font-medium text-foreground">{total.toLocaleString()}</span> results
           {query && (
             <>
-              {" "}for{" "}
-              <span className="font-medium text-foreground">&ldquo;{query}&rdquo;</span>
+              {" "}
+              for <span className="font-medium text-foreground">&ldquo;{query}&rdquo;</span>
             </>
           )}
         </p>
@@ -111,11 +111,7 @@ export function ExplorePage() {
           {/* Load more / pagination */}
           {hasMore && !isLoading && (
             <div className="flex justify-center pt-2">
-              <Button
-                variant="outline"
-                onClick={loadMore}
-                className="min-w-[160px]"
-              >
+              <Button variant="outline" onClick={loadMore} className="min-w-[160px]">
                 Load more courses
               </Button>
             </div>
@@ -134,9 +130,7 @@ export function ExplorePage() {
         <div className="flex flex-col items-center gap-3 py-16 text-center text-muted-foreground">
           <BookOpen className="h-12 w-12 opacity-30" />
           <p className="text-lg font-medium">No courses found</p>
-          <p className="text-sm max-w-xs">
-            Try a different keyword or adjust your filters.
-          </p>
+          <p className="text-sm max-w-xs">Try a different keyword or adjust your filters.</p>
           <Button variant="outline" size="sm" onClick={handleClearFilters}>
             Clear filters
           </Button>

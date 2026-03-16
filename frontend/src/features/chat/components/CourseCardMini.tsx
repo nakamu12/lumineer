@@ -14,8 +14,7 @@ interface CourseCardMiniProps {
 }
 
 export function CourseCardMini({ course }: CourseCardMiniProps) {
-  const formatEnrolled = (n: number) =>
-    n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n)
+  const formatEnrolled = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n))
 
   return (
     <div className="flex items-center gap-3 rounded-lg border bg-background p-3 hover:bg-muted/30 transition-colors">
@@ -24,7 +23,9 @@ export function CourseCardMini({ course }: CourseCardMiniProps) {
         <p className="text-xs text-muted-foreground mt-0.5">{course.organization}</p>
         <div className="flex items-center gap-2 mt-1 flex-wrap">
           {course.level && (
-            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${levelVariant[course.level] ?? "bg-gray-100 text-gray-700"}`}>
+            <span
+              className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${levelVariant[course.level] ?? "bg-gray-100 text-gray-700"}`}
+            >
               {course.level}
             </span>
           )}
@@ -32,7 +33,9 @@ export function CourseCardMini({ course }: CourseCardMiniProps) {
             <Star className="h-3 w-3 fill-current" />
             {course.rating.toFixed(1)}
           </span>
-          <span className="text-xs text-muted-foreground">{formatEnrolled(course.enrolled)} enrolled</span>
+          <span className="text-xs text-muted-foreground">
+            {formatEnrolled(course.enrolled)} enrolled
+          </span>
         </div>
       </div>
       <Button asChild variant="ghost" size="sm" className="shrink-0 h-7 px-2 text-xs">

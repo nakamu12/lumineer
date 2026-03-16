@@ -14,110 +14,109 @@ export function useChat() {
   const [isStreaming, setIsStreaming] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
 
-  const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || isLoading || isStreaming) return
+  const sendMessage = useCallback(
+    async (text: string) => {
+      if (!text.trim() || isLoading || isStreaming) return
 
-    const userMessage: ChatMessageData = {
-      id: generateId(),
-      role: "user",
-      content: text.trim(),
-      timestamp: new Date(),
-    }
-
-    const assistantId = generateId()
-    const assistantMessage: ChatMessageData = {
-      id: assistantId,
-      role: "assistant",
-      content: "",
-      timestamp: new Date(),
-    }
-
-    setMessages((prev) => [...prev, userMessage, assistantMessage])
-    setIsLoading(true)
-
-    abortRef.current?.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
-
-    try {
-      const res = await fetch(`${API_URL}/api/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text.trim() }),
-        signal: controller.signal,
-      })
-
-      if (!res.ok || !res.body) {
-        throw new Error(`HTTP ${res.status}`)
+      const userMessage: ChatMessageData = {
+        id: generateId(),
+        role: "user",
+        content: text.trim(),
+        timestamp: new Date(),
       }
 
-      setIsLoading(false)
-      setIsStreaming(true)
+      const assistantId = generateId()
+      const assistantMessage: ChatMessageData = {
+        id: assistantId,
+        role: "assistant",
+        content: "",
+        timestamp: new Date(),
+      }
 
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ""
+      setMessages((prev) => [...prev, userMessage, assistantMessage])
+      setIsLoading(true)
 
-      while (true) {
-        const { value, done } = await reader.read()
-        if (done) break
+      abortRef.current?.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
 
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split("\n")
-        buffer = lines.pop() ?? ""
+      try {
+        const res = await fetch(`${API_URL}/api/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text.trim() }),
+          signal: controller.signal,
+        })
 
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue
-          const raw = line.slice(6).trim()
-          if (!raw || raw === "[DONE]") continue
+        if (!res.ok || !res.body) {
+          throw new Error(`HTTP ${res.status}`)
+        }
 
-          try {
-            const event = JSON.parse(raw) as {
-              type: "text" | "courses" | "done"
-              content?: string
-              courses?: Course[]
-            }
+        setIsLoading(false)
+        setIsStreaming(true)
 
-            if (event.type === "text" && event.content) {
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId
-                    ? { ...m, content: m.content + event.content }
-                    : m
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ""
+
+        while (true) {
+          const { value, done } = await reader.read()
+          if (done) break
+
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split("\n")
+          buffer = lines.pop() ?? ""
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue
+            const raw = line.slice(6).trim()
+            if (!raw || raw === "[DONE]") continue
+
+            try {
+              const event = JSON.parse(raw) as {
+                type: "text" | "courses" | "done"
+                content?: string
+                courses?: Course[]
+              }
+
+              if (event.type === "text" && event.content) {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId ? { ...m, content: m.content + event.content } : m,
+                  ),
                 )
-              )
-            } else if (event.type === "courses" && event.courses) {
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId ? { ...m, courses: event.courses } : m
+              } else if (event.type === "courses" && event.courses) {
+                setMessages((prev) =>
+                  prev.map((m) => (m.id === assistantId ? { ...m, courses: event.courses } : m)),
                 )
-              )
-            } else if (event.type === "done") {
-              break
+              } else if (event.type === "done") {
+                break
+              }
+            } catch {
+              // skip malformed SSE lines
             }
-          } catch {
-            // skip malformed SSE lines
           }
         }
-      }
-    } catch (err) {
-      if ((err as Error).name === "AbortError") return
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return
 
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === assistantId
-            ? {
-                ...m,
-                content: m.content || "Sorry, something went wrong. Please try again.",
-              }
-            : m
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? {
+                  ...m,
+                  content: m.content || "Sorry, something went wrong. Please try again.",
+                }
+              : m,
+          ),
         )
-      )
-    } finally {
-      setIsLoading(false)
-      setIsStreaming(false)
-    }
-  }, [isLoading, isStreaming])
+      } finally {
+        setIsLoading(false)
+        setIsStreaming(false)
+      }
+    },
+    [isLoading, isStreaming],
+  )
 
   const clearChat = useCallback(() => {
     abortRef.current?.abort()

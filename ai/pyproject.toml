@@ -43,3 +43,8 @@ select = ["E", "F", "I", "UP"]
 python_version = "3.12"
 strict = true
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disable_error_code = ["operator", "union-attr", "arg-type", "unused-ignore", "misc", "no-untyped-call", "no-untyped-def"]

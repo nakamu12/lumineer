@@ -41,14 +41,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
       <div
         className={cn(
           "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          isUser ? "bg-primary text-primary-foreground" : "bg-primary/10"
+          isUser ? "bg-primary text-primary-foreground" : "bg-primary/10",
         )}
       >
-        {isUser ? (
-          <User className="h-4 w-4" />
-        ) : (
-          <Sparkles className="h-4 w-4 text-primary" />
-        )}
+        {isUser ? <User className="h-4 w-4" /> : <Sparkles className="h-4 w-4 text-primary" />}
       </div>
 
       {/* Bubble */}
@@ -58,7 +54,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             "rounded-2xl px-4 py-3 text-sm leading-relaxed",
             isUser
               ? "rounded-tr-sm bg-primary text-primary-foreground"
-              : "rounded-tl-sm bg-muted text-foreground"
+              : "rounded-tl-sm bg-muted text-foreground",
           )}
         >
           {renderContent(message.content)}
