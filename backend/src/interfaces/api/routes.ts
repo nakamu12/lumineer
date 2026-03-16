@@ -2,8 +2,9 @@ import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi"
 import { swaggerUI } from "@hono/swagger-ui"
 import type { Container } from "../../config/container.ts"
 import { errorHandler } from "./middleware/error_handler.ts"
-import { authMiddleware } from "./middleware/auth.ts"
-import { verifyToken } from "../../infrastructure/auth/jwt.ts"
+import { createAuthMiddleware } from "./middleware/auth.ts"
+import { ConflictError } from "../../domain/errors.ts"
+import { AuthenticationError } from "../../domain/errors.ts"
 
 type AppVariables = { userId: string }
 
@@ -85,7 +86,13 @@ const ErrorResponseSchema = z
 const RegisterRequestSchema = z
   .object({
     email: z.string().email().openapi({ example: "user@example.com" }),
-    password: z.string().min(8).openapi({ example: "password123" }),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .openapi({ example: "MySecret42" }),
     display_name: z.string().min(1).max(100).openapi({ example: "Alice" }),
   })
   .openapi("RegisterRequest")
@@ -93,7 +100,7 @@ const RegisterRequestSchema = z
 const LoginRequestSchema = z
   .object({
     email: z.string().email().openapi({ example: "user@example.com" }),
-    password: z.string().min(1).openapi({ example: "password123" }),
+    password: z.string().min(1).openapi({ example: "MySecret42" }),
   })
   .openapi("LoginRequest")
 
@@ -213,6 +220,10 @@ const registerRoute = createRoute({
       content: { "application/json": { schema: AuthResponseSchema } },
       description: "User registered successfully",
     },
+    400: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Invalid request body",
+    },
     409: {
       content: { "application/json": { schema: ErrorResponseSchema } },
       description: "Email already registered",
@@ -235,6 +246,10 @@ const loginRoute = createRoute({
     200: {
       content: { "application/json": { schema: AuthResponseSchema } },
       description: "Login successful",
+    },
+    400: {
+      content: { "application/json": { schema: ErrorResponseSchema } },
+      description: "Invalid request body",
     },
     401: {
       content: { "application/json": { schema: ErrorResponseSchema } },
@@ -293,7 +308,7 @@ export function createRouter(container: Container): OpenAPIHono<{ Variables: App
   const app = new OpenAPIHono<{ Variables: AppVariables }>()
 
   app.use("*", errorHandler)
-  app.use("*", authMiddleware)
+  app.use("*", createAuthMiddleware(container.tokenIssuer))
 
   // OpenAPI spec
   app.doc("/openapi.json", {
@@ -353,9 +368,8 @@ export function createRouter(container: Container): OpenAPIHono<{ Variables: App
         201,
       )
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Registration failed"
-      if (message === "Email already registered") {
-        return c.json({ error: message, status: 409 }, 409)
+      if (err instanceof ConflictError) {
+        return c.json({ error: err.message, status: 409 }, 409)
       }
       throw err
     }
@@ -378,9 +392,8 @@ export function createRouter(container: Container): OpenAPIHono<{ Variables: App
         200,
       )
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Login failed"
-      if (message === "Invalid email or password") {
-        return c.json({ error: message, status: 401 }, 401)
+      if (err instanceof AuthenticationError) {
+        return c.json({ error: err.message, status: 401 }, 401)
       }
       throw err
     }
@@ -390,15 +403,13 @@ export function createRouter(container: Container): OpenAPIHono<{ Variables: App
   app.openapi(refreshRoute, async (c) => {
     const { refresh_token } = c.req.valid("json")
     try {
-      const payload = await verifyToken(refresh_token)
-      if (payload.type !== "refresh") {
-        return c.json({ error: "Invalid token type", status: 401 }, 401)
-      }
-      const { signToken } = await import("../../infrastructure/auth/jwt.ts")
-      const accessToken = await signToken(payload.sub, "access")
+      const { accessToken } = await container.refreshTokenUseCase.execute(refresh_token)
       return c.json({ access_token: accessToken }, 200)
-    } catch {
-      return c.json({ error: "Invalid or expired refresh token", status: 401 }, 401)
+    } catch (err) {
+      if (err instanceof AuthenticationError) {
+        return c.json({ error: err.message, status: 401 }, 401)
+      }
+      throw err
     }
   })
 
