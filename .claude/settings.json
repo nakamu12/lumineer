@@ -2,16 +2,55 @@
   "permissions": {
     "allow": [
       "Bash(bun *)",
+      "Bash(bunx *)",
       "Bash(uv *)",
       "Bash(docker compose *)",
       "Bash(ruff *)",
       "Bash(mypy *)",
       "Bash(pytest *)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(chmod *)"
     ],
     "deny": [
       "Bash(rm -rf *)",
       "Bash(git push --force *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-edit-format.sh",
+            "timeout": 15
+          }
+        ],
+        "description": "Auto-format TS/Python files after edits (Prettier + ruff)"
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-edit-typecheck.sh",
+            "timeout": 30
+          }
+        ],
+        "description": "TypeScript type check after editing .ts/.tsx files (warn only)"
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-edit-console-warn.sh",
+            "timeout": 5
+          }
+        ],
+        "description": "Warn about console.log/print() in production code"
+      }
     ]
   }
 }
