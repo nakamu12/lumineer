@@ -11,7 +11,9 @@ export function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Pipeline Settings</CardTitle>
-            <CardDescription>Adjust reranker strategy, context format, and search parameters</CardDescription>
+            <CardDescription>
+              Adjust reranker strategy, context format, and search parameters
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">Settings configuration coming soon</p>

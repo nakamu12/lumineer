@@ -31,7 +31,7 @@ export function Header() {
                 "px-3 py-2 text-sm rounded-md transition-colors hover:text-primary",
                 location.pathname === item.href
                   ? "text-primary font-medium"
-                  : "text-muted-foreground"
+                  : "text-muted-foreground",
               )}
             >
               {item.label}

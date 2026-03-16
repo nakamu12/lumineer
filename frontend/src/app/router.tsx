@@ -9,22 +9,42 @@ import { SettingsPage } from "@/features/settings/SettingsPage"
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <PageLayout><HomePage /></PageLayout>,
+    element: (
+      <PageLayout>
+        <HomePage />
+      </PageLayout>
+    ),
   },
   {
     path: "/explore",
-    element: <PageLayout><ExplorePage /></PageLayout>,
+    element: (
+      <PageLayout>
+        <ExplorePage />
+      </PageLayout>
+    ),
   },
   {
     path: "/chat",
-    element: <PageLayout><ChatPage /></PageLayout>,
+    element: (
+      <PageLayout>
+        <ChatPage />
+      </PageLayout>
+    ),
   },
   {
     path: "/path",
-    element: <PageLayout><MyPathPage /></PageLayout>,
+    element: (
+      <PageLayout>
+        <MyPathPage />
+      </PageLayout>
+    ),
   },
   {
     path: "/settings",
-    element: <PageLayout><SettingsPage /></PageLayout>,
+    element: (
+      <PageLayout>
+        <SettingsPage />
+      </PageLayout>
+    ),
   },
 ])

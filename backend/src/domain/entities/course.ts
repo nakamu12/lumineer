@@ -4,34 +4,34 @@
  */
 
 export type Course = {
-  id: string;
-  title: string;
-  description: string;
-  level: "Beginner" | "Intermediate" | "Advanced" | null;
-  organization: string;
-  rating: number;
-  enrolled: number;
-  skills: string[];
-  url: string;
-  instructor: string;
-  schedule: string;
-  modules: string;
-};
+  id: string
+  title: string
+  description: string
+  level: "Beginner" | "Intermediate" | "Advanced" | null
+  organization: string
+  rating: number
+  enrolled: number
+  skills: string[]
+  url: string
+  instructor: string
+  schedule: string
+  modules: string
+}
 
 type CourseInput = {
-  id: string;
-  title: string;
-  description: string;
-  level?: "Beginner" | "Intermediate" | "Advanced" | null;
-  organization: string;
-  rating: number;
-  enrolled: number;
-  skills?: string[];
-  url: string;
-  instructor?: string;
-  schedule?: string;
-  modules?: string;
-};
+  id: string
+  title: string
+  description: string
+  level?: "Beginner" | "Intermediate" | "Advanced" | null
+  organization: string
+  rating: number
+  enrolled: number
+  skills?: string[]
+  url: string
+  instructor?: string
+  schedule?: string
+  modules?: string
+}
 
 /**
  * Factory for creating Course entities with validation.
@@ -40,16 +40,16 @@ type CourseInput = {
 export const CourseFactory = {
   create(input: CourseInput): Course {
     if (!input.id) {
-      throw new Error("Course id is required");
+      throw new Error("Course id is required")
     }
     if (!input.title) {
-      throw new Error("Course title is required");
+      throw new Error("Course title is required")
     }
     if (input.rating < 0 || input.rating > 5) {
-      throw new Error(`Invalid rating: ${input.rating}. Must be between 0 and 5.`);
+      throw new Error(`Invalid rating: ${input.rating}. Must be between 0 and 5.`)
     }
     if (input.enrolled < 0) {
-      throw new Error(`Invalid enrolled count: ${input.enrolled}. Must be non-negative.`);
+      throw new Error(`Invalid enrolled count: ${input.enrolled}. Must be non-negative.`)
     }
 
     return {
@@ -65,6 +65,6 @@ export const CourseFactory = {
       instructor: input.instructor ?? "",
       schedule: input.schedule ?? "",
       modules: input.modules ?? "",
-    };
+    }
   },
-};
+}

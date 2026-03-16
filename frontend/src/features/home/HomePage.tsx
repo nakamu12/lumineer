@@ -27,8 +27,7 @@ const features = [
   {
     icon: Map,
     title: "Learning Path Generation",
-    description:
-      "Get a structured learning roadmap tailored to your timeline and objectives.",
+    description: "Get a structured learning roadmap tailored to your timeline and objectives.",
     iconColor: "text-teal-400",
     glowColor: "group-hover:shadow-teal-400/20",
     borderColor: "hover:border-teal-400/30",
@@ -88,8 +87,8 @@ export function HomePage() {
         </h1>
 
         <p className="max-w-xl text-lg text-muted-foreground">
-          Discover the perfect courses from 6,645+ Coursera offerings. AI-powered search, skill
-          gap analysis, and personalized learning paths — all in one place.
+          Discover the perfect courses from 6,645+ Coursera offerings. AI-powered search, skill gap
+          analysis, and personalized learning paths — all in one place.
         </p>
 
         {/* CTA buttons */}
@@ -132,7 +131,9 @@ export function HomePage() {
       {/* Features */}
       <section className="flex flex-col gap-8">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold tracking-tight">Everything you need to learn smarter</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Everything you need to learn smarter
+          </h2>
           <p className="mt-2 text-muted-foreground">
             Three AI agents working together to accelerate your growth
           </p>

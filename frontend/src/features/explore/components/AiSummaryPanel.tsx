@@ -38,7 +38,7 @@ export function AiSummaryPanel({ text, isStreaming = false }: AiSummaryPanelProp
       <div
         className={cn(
           "text-sm text-foreground leading-relaxed overflow-hidden transition-all duration-200",
-          isCollapsed ? "max-h-0 md:max-h-none" : "max-h-none"
+          isCollapsed ? "max-h-0 md:max-h-none" : "max-h-none",
         )}
       >
         {isStreaming && !text ? (

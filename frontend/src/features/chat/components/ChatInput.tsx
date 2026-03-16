@@ -35,12 +35,14 @@ export function ChatInput({ value, onChange, onSubmit, disabled, isStreaming }: 
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={isStreaming ? "AI is thinking..." : "Ask about courses, skills, or learning paths..."}
+        placeholder={
+          isStreaming ? "AI is thinking..." : "Ask about courses, skills, or learning paths..."
+        }
         disabled={disabled}
         rows={1}
         className={cn(
           "flex-1 resize-none bg-transparent px-2 py-1 text-sm outline-none placeholder:text-muted-foreground",
-          "min-h-[36px] max-h-32 scrollbar-thin disabled:cursor-not-allowed disabled:opacity-50"
+          "min-h-[36px] max-h-32 scrollbar-thin disabled:cursor-not-allowed disabled:opacity-50",
         )}
       />
       <Button
