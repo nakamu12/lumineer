@@ -1,4 +1,5 @@
 """Port definition for embedding model operations."""
+
 from abc import ABC, abstractmethod
 
 

@@ -44,6 +44,10 @@ class Settings(BaseSettings):
     TOP_K: int = 10
     SIMILARITY_THRESHOLD: float = 0.7
 
+    # Agent settings
+    AGENT_MODEL: str = "gpt-4o-mini"
+    AGENT_MAX_TURNS: int = 10
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8001

@@ -1,4 +1,5 @@
 """Port definition for vector store operations."""
+
 from abc import ABC, abstractmethod
 from typing import Any
 

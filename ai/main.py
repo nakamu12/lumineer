@@ -1,4 +1,5 @@
 """AI Processing Service entrypoint."""
+
 import uvicorn
 
 from app.config.settings import get_settings

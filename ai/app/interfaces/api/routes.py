@@ -2,17 +2,27 @@
 
 from __future__ import annotations
 
+import json
+import logging
+import os
+from collections.abc import AsyncGenerator
 from dataclasses import dataclass
 
+from agents import ItemHelpers, Runner
+from agents.exceptions import InputGuardrailTripwireTriggered
 from litestar import Litestar, get, post
 from litestar.config.cors import CORSConfig
 from litestar.exceptions import HTTPException
+from litestar.response import Stream
 
+from app.agents import create_triage_agent
 from app.config.container import build_container, get_container
 from app.config.settings import get_settings
 from app.domain.usecases.search_courses import SearchCoursesUseCase, SearchQuery, SearchResult
 from app.infrastructure.formatters import create_formatter
 from app.infrastructure.reranking import create_reranker
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Request / Response schemas
@@ -56,6 +66,12 @@ class SearchResponse:
     formatter_applied: str
 
 
+@dataclass
+class ChatRequest:
+    message: str
+    session_id: str | None = None
+
+
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
@@ -73,7 +89,7 @@ async def health_check() -> dict[str, str]:
 
 
 @post("/search")
-async def search_courses(data: SearchRequest) -> SearchResponse:
+async def search_courses_endpoint(data: SearchRequest) -> SearchResponse:
     """
     Hybrid RAG search endpoint.
 
@@ -135,6 +151,63 @@ async def search_courses(data: SearchRequest) -> SearchResponse:
     )
 
 
+def _sse_event(event_type: str, content: str) -> str:
+    """Format a single SSE event line."""
+    payload = json.dumps({"type": event_type, "content": content})
+    return f"data: {payload}\n\n"
+
+
+async def _stream_agent_response(message: str) -> AsyncGenerator[str, None]:
+    """Run the Triage Agent and yield SSE events."""
+    settings = get_settings()
+
+    try:
+        triage = create_triage_agent()
+        result = Runner.run_streamed(
+            triage,
+            input=message,
+            max_turns=settings.AGENT_MAX_TURNS,
+        )
+
+        async for event in result.stream_events():
+            if event.type == "raw_response_event":
+                continue
+
+            if event.type == "agent_updated_stream_event":
+                yield _sse_event("handoff", event.new_agent.name)
+
+            elif event.type == "run_item_stream_event":
+                if event.item.type == "tool_call_item":
+                    tool_name = getattr(event.item.raw_item, "name", None) or "unknown"
+                    yield _sse_event("tool_call", tool_name)
+                elif event.item.type == "tool_call_output_item":
+                    yield _sse_event("tool_result", str(event.item.output)[:200])
+                elif event.item.type == "message_output_item":
+                    text = ItemHelpers.text_message_output(event.item)
+                    yield _sse_event("text_delta", text)
+
+        yield _sse_event("done", "")
+
+    except InputGuardrailTripwireTriggered:
+        yield _sse_event(
+            "error",
+            "Your message was blocked by our safety filters. Please rephrase and try again.",
+        )
+    except Exception:
+        logger.exception("Agent chat error")
+        yield _sse_event("error", "An unexpected error occurred. Please try again.")
+
+
+@post("/agents/chat")
+async def agent_chat(data: ChatRequest) -> Stream:
+    """Chat endpoint: runs Triage Agent with SSE streaming."""
+    return Stream(
+        _stream_agent_response(data.message),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
 # ---------------------------------------------------------------------------
 # App factory
 # ---------------------------------------------------------------------------
@@ -144,10 +217,14 @@ def create_app() -> Litestar:
     """Create and configure the Litestar application."""
     cors_config = CORSConfig(allow_origins=["*"])
 
+    # Ensure Agents SDK can read the API key from environment
+    settings = get_settings()
+    os.environ.setdefault("OPENAI_API_KEY", settings.OPENAI_API_KEY)
+
     # Wire up DI container at startup
     build_container()
 
     return Litestar(
-        route_handlers=[health_check, search_courses],
+        route_handlers=[health_check, search_courses_endpoint, agent_chat],
         cors_config=cors_config,
     )
