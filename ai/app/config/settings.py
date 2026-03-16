@@ -1,17 +1,22 @@
 """Application settings managed by Pydantic Settings."""
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Resolve .env.local from project root (two levels up from ai/app/config/)
+_PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+_ENV_FILE = _PROJECT_ROOT / ".env.local"
 
 
 class Settings(BaseSettings):
     """Application configuration loaded from environment variables."""
 
     model_config = SettingsConfigDict(
-        env_file=".env.local",
+        env_file=str(_ENV_FILE),
         env_file_encoding="utf-8",
         extra="ignore",
     )
