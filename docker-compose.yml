@@ -17,6 +17,22 @@ services:
     depends_on:
       - backend
 
+  postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=lumineer
+      - POSTGRES_PASSWORD=lumineer
+      - POSTGRES_DB=lumineer
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lumineer"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -30,8 +46,13 @@ services:
     environment:
       - APP_ENV=dev
       - AI_SERVICE_URL=http://ai:8001
+      - DATABASE_URL=postgres://lumineer:lumineer@postgres:5432/lumineer
+      - JWT_SECRET=dev-secret-change-in-prod-min-16chars
     depends_on:
-      - ai
+      postgres:
+        condition: service_healthy
+      ai:
+        condition: service_started
 
   ai:
     build:
@@ -111,5 +132,6 @@ services:
 
 volumes:
   qdrant_data:
+  postgres_data:
   grafana_data:
   langfuse_db_data:

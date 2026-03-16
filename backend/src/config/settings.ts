@@ -8,6 +8,10 @@ export type Settings = {
   APP_ENV: "dev" | "prod";
   PORT: number;
   AI_PROCESSING_URL: string;
+  DATABASE_URL: string;
+  JWT_SECRET: string;
+  JWT_ACCESS_EXPIRES: string;
+  JWT_REFRESH_EXPIRES: string;
 };
 
 let cachedSettings: Settings | null = null;
@@ -28,11 +32,21 @@ export function getSettings(): Settings {
     throw new Error(`Invalid PORT: "${portRaw}". Must be a number.`);
   }
 
+  const databaseUrl =
+    process.env["DATABASE_URL"] ??
+    "postgres://lumineer:lumineer@localhost:5432/lumineer";
+
+  const jwtSecret = process.env["JWT_SECRET"] ?? "dev-secret-change-in-prod-min-16chars";
+
   cachedSettings = {
     APP_ENV: appEnv,
     PORT: port,
     AI_PROCESSING_URL:
       process.env["AI_PROCESSING_URL"] ?? "http://ai-processing:8000",
+    DATABASE_URL: databaseUrl,
+    JWT_SECRET: jwtSecret,
+    JWT_ACCESS_EXPIRES: process.env["JWT_ACCESS_EXPIRES"] ?? "15m",
+    JWT_REFRESH_EXPIRES: process.env["JWT_REFRESH_EXPIRES"] ?? "7d",
   };
 
   return cachedSettings;
