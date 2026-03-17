@@ -106,7 +106,7 @@ jobs:
             --image ${{ steps.images.outputs.api }} \
             --region ${{ env.REGION }} \
             --ingress internal \
-            --update-env-vars "AI_SERVICE_URL=${AI_URL}" \
+            --update-env-vars "AI_PROCESSING_URL=${AI_URL}" \
             --no-allow-unauthenticated \
             --quiet
 
@@ -121,7 +121,7 @@ jobs:
             --image ${{ steps.images.outputs.gateway }} \
             --region ${{ env.REGION }} \
             --ingress all \
-            --update-env-vars "BACKEND_URL=${BACKEND_URL},ALLOWED_ORIGINS=${{ secrets.FIREBASE_URL }}" \
+            --update-env-vars "BACKEND_URL=${BACKEND_URL},ALLOWED_ORIGINS=https://lumineer-frontend.web.app" \
             --allow-unauthenticated \
             --quiet
 

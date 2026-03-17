@@ -46,3 +46,13 @@ output "qdrant_url" {
   description = "Qdrant HTTP API URL for AI Processing service"
   value       = "http://${google_compute_address.qdrant.address}:6333"
 }
+
+output "cloudsql_connection_name" {
+  description = "Cloud SQL instance connection name (project:region:instance)"
+  value       = google_sql_database_instance.main.connection_name
+}
+
+output "cloudsql_instance_name" {
+  description = "Cloud SQL instance name"
+  value       = google_sql_database_instance.main.name
+}

@@ -66,13 +66,26 @@ resource "google_cloud_run_v2_service_iam_member" "api_invokes_ai" {
 }
 
 # =============================================================================
-# IAM — API service account (per-secret access)
+# IAM — API service account (per-secret access + Cloud SQL)
 # =============================================================================
 
 resource "google_secret_manager_secret_iam_member" "api_reads_jwt_secret" {
   secret_id = google_secret_manager_secret.app_secrets["jwt_secret"].secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.cloud_run_api.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "api_reads_database_url" {
+  secret_id = google_secret_manager_secret.database_url.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.cloud_run_api.email}"
+}
+
+# Cloud SQL Auth Proxy: API service account needs cloudsql.client to connect
+resource "google_project_iam_member" "api_cloudsql_client" {
+  project = var.project_id
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.cloud_run_api.email}"
 }
 
 # =============================================================================

@@ -13,6 +13,7 @@ resource "google_project_service" "services" {
     "sts.googleapis.com",
     "firebase.googleapis.com",
     "firebasehosting.googleapis.com",
+    "sqladmin.googleapis.com",
   ])
 
   service            = each.value
@@ -95,6 +96,11 @@ resource "google_cloud_run_v2_service" "api" {
   template {
     service_account = google_service_account.cloud_run_api.email
 
+    # Cloud SQL Auth Proxy: secure connection via Unix socket (no VPC needed)
+    annotations = {
+      "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.main.connection_name
+    }
+
     scaling {
       min_instance_count = var.api_min_instances
       max_instance_count = var.api_max_instances
@@ -129,6 +135,17 @@ resource "google_cloud_run_v2_service" "api" {
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.app_secrets["jwt_secret"].secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      # Database connection URL (Cloud SQL Auth Proxy Unix socket)
+      env {
+        name = "DATABASE_URL"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.database_url.secret_id
             version = "latest"
           }
         }
