@@ -60,8 +60,7 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def validate_prod(self) -> "Settings":
         """Enforce production-only required fields."""
-        if self.APP_ENV == "prod" and not self.QDRANT_API_KEY:
-            raise ValueError("QDRANT_API_KEY is required in production")
+        # QDRANT_API_KEY is no longer required — GCE Qdrant uses firewall-only protection
         return self
 
 

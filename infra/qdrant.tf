@@ -15,9 +15,14 @@ resource "google_project_service" "compute" {
 # Static external IP (stable across instance restarts)
 # =============================================================================
 
+locals {
+  # Derive region from zone (e.g., "asia-northeast2-a" → "asia-northeast2")
+  qdrant_region = join("-", slice(split("-", var.qdrant_zone), 0, 2))
+}
+
 resource "google_compute_address" "qdrant" {
   name   = "${var.app_name}-qdrant-ip"
-  region = var.region
+  region = local.qdrant_region
 
   depends_on = [google_project_service.compute]
 }
@@ -39,7 +44,7 @@ resource "google_service_account" "qdrant" {
 resource "google_compute_instance" "qdrant" {
   name         = "${var.app_name}-qdrant"
   machine_type = var.qdrant_machine_type
-  zone         = "${var.region}-a"
+  zone         = var.qdrant_zone
 
   boot_disk {
     initialize_params {

@@ -66,6 +66,16 @@ resource "google_cloud_run_v2_service_iam_member" "api_invokes_ai" {
 }
 
 # =============================================================================
+# IAM — API service account (per-secret access)
+# =============================================================================
+
+resource "google_secret_manager_secret_iam_member" "api_reads_jwt_secret" {
+  secret_id = google_secret_manager_secret.app_secrets["jwt_secret"].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.cloud_run_api.email}"
+}
+
+# =============================================================================
 # IAM — AI Processing service account (per-secret access)
 # =============================================================================
 

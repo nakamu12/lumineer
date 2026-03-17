@@ -119,8 +119,19 @@ resource "google_cloud_run_v2_service" "api" {
       }
 
       env {
-        name  = "AI_SERVICE_URL"
+        name  = "AI_PROCESSING_URL"
         value = google_cloud_run_v2_service.ai.uri
+      }
+
+      # JWT signing secret from Secret Manager
+      env {
+        name = "JWT_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.app_secrets["jwt_secret"].secret_id
+            version = "latest"
+          }
+        }
       }
 
       # Liveness probe

@@ -148,6 +148,12 @@ variable "qdrant_disk_size_gb" {
   default     = 20
 }
 
+variable "qdrant_zone" {
+  description = "GCE zone for Qdrant instance (override if primary region has no capacity)"
+  type        = string
+  default     = "asia-northeast1-a"
+}
+
 # =============================================================================
 # Firebase
 # =============================================================================
