@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/lib/utils"
-import { BookOpen } from "lucide-react"
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -16,9 +15,12 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
-        <Link to="/" className="flex items-center gap-2 font-semibold">
-          <BookOpen className="h-5 w-5 text-teal-500" />
-          <span className="bg-gradient-to-r from-teal-500 to-blue-500 bg-clip-text text-transparent">
+        <Link to="/" className="flex items-center gap-1.5">
+          <img src="/logo.png" alt="Lumineer" className="h-6 w-6" />
+          <span
+            className="bg-gradient-to-r from-teal-500 to-blue-500 bg-clip-text text-transparent font-semibold"
+            style={{ fontFamily: "'Outfit', sans-serif" }}
+          >
             Lumineer
           </span>
         </Link>
