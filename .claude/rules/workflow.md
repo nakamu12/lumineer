@@ -135,16 +135,16 @@ cd ai && uv run python main.py    # localhost:8001
 
 ### ローカル起動用 .env.local の設定
 
-worktree からアプリを直接起動する場合、各サービスのディレクトリに `.env.local` を作成する:
+`.env.local` はルートに 1 つだけ置く（サービスごとに作らない）。
+
+- `backend/bun dev` は `--env-file=../.env.local` でルートの `.env.local` を読む
+- `ai/uv run python main.py` は Pydantic Settings がルートの `.env.local` を絶対パスで読む
 
 ```bash
-# backend/.env.local （backend/.env.example をコピーして編集）
-cp backend/.env.example backend/.env.local
-# DATABASE_URL のポートを POSTGRES_PORT に合わせて編集
-
-# ai/.env.local （ai/.env.example をコピーして編集）
-cp ai/.env.example ai/.env.local
-# QDRANT_URL のポートを QDRANT_PORT に合わせて編集
+# ルートの .env.local に QDRANT_URL / DATABASE_URL を追記するだけ
+# （ポートを変更した場合はここで調整）
+QDRANT_URL=http://localhost:6333
+DATABASE_URL=postgres://lumineer:lumineer@localhost:5432/lumineer
 ```
 
 ## タスク管理

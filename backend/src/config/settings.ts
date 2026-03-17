@@ -40,7 +40,7 @@ export function getSettings(): Settings {
   cachedSettings = {
     APP_ENV: appEnv,
     PORT: port,
-    AI_PROCESSING_URL: process.env["AI_PROCESSING_URL"] ?? "http://ai-processing:8000",
+    AI_PROCESSING_URL: process.env["AI_PROCESSING_URL"] ?? "http://localhost:8001",
     DATABASE_URL: databaseUrl,
     JWT_SECRET: jwtSecret,
     JWT_ACCESS_EXPIRES: process.env["JWT_ACCESS_EXPIRES"] ?? "15m",
