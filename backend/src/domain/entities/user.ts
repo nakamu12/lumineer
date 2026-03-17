@@ -24,7 +24,7 @@ type CreateUserWithHashParams = CreateUserParams & {
 
 export const UserFactory = {
   create(params: CreateUserParams): UserEntity {
-    if (!params.email || !params.email.includes("@")) {
+    if (!params.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(params.email)) {
       throw new Error("Invalid email address")
     }
     if (!params.displayName || params.displayName.trim().length === 0) {

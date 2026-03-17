@@ -2,7 +2,7 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi"
 import { swaggerUI } from "@hono/swagger-ui"
 import type { Container } from "../../config/container.ts"
 import { errorHandler } from "./middleware/error_handler.ts"
-import { authMiddleware } from "./middleware/auth.ts"
+import { createAuthMiddleware } from "./middleware/auth.ts"
 import { HealthResponseSchema } from "./schemas/common.ts"
 import { registerAuthRoutes } from "./routes/auth_routes.ts"
 import { registerSearchRoutes } from "./routes/search_routes.ts"
@@ -28,7 +28,7 @@ export function createRouter(container: Container): OpenAPIHono<{ Variables: App
   const app = new OpenAPIHono<{ Variables: AppVariables }>()
 
   app.use("*", errorHandler)
-  app.use("*", authMiddleware)
+  app.use("*", createAuthMiddleware(container.tokenIssuer))
 
   // OpenAPI spec
   app.doc("/openapi.json", {
@@ -39,7 +39,7 @@ export function createRouter(container: Container): OpenAPIHono<{ Variables: App
       description:
         "Intelligent Course Discovery System — AI-powered course search, skill gap analysis, and learning path generation.",
     },
-    servers: [{ url: "http://localhost:8000", description: "Local development" }],
+    servers: [{ url: "http://localhost:3001", description: "Local development" }],
   })
 
   // Swagger UI

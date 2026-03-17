@@ -3,7 +3,13 @@ import { z } from "@hono/zod-openapi"
 export const RegisterRequestSchema = z
   .object({
     email: z.string().email().openapi({ example: "user@example.com" }),
-    password: z.string().min(8).openapi({ example: "password123" }),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .openapi({ example: "MySecret42" }),
     display_name: z.string().min(1).max(100).openapi({ example: "Alice" }),
   })
   .openapi("RegisterRequest")

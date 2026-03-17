@@ -1,27 +1,12 @@
 export class DomainError extends Error {
   constructor(message: string) {
     super(message)
-    this.name = "DomainError"
+    this.name = this.constructor.name
   }
 }
 
-export class NotFoundError extends DomainError {
-  constructor(message: string) {
-    super(message)
-    this.name = "NotFoundError"
-  }
-}
+export class NotFoundError extends DomainError {}
 
-export class ConflictError extends DomainError {
-  constructor(message: string) {
-    super(message)
-    this.name = "ConflictError"
-  }
-}
+export class ConflictError extends DomainError {}
 
-export class UnauthorizedError extends DomainError {
-  constructor(message: string) {
-    super(message)
-    this.name = "UnauthorizedError"
-  }
-}
+export class AuthenticationError extends DomainError {}

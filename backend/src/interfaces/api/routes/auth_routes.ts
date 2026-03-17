@@ -1,8 +1,7 @@
 import { createRoute } from "@hono/zod-openapi"
 import type { OpenAPIHono } from "@hono/zod-openapi"
 import type { Container } from "../../../config/container.ts"
-import { verifyToken, signToken } from "../../../infrastructure/auth/jwt.ts"
-import { ConflictError, UnauthorizedError } from "../../../domain/errors.ts"
+import { ConflictError, AuthenticationError } from "../../../domain/errors.ts"
 import {
   RegisterRequestSchema,
   LoginRequestSchema,
@@ -141,7 +140,7 @@ export function registerAuthRoutes(
         200,
       )
     } catch (err) {
-      if (err instanceof UnauthorizedError) {
+      if (err instanceof AuthenticationError) {
         return c.json({ error: err.message, status: 401 }, 401)
       }
       throw err
@@ -151,14 +150,13 @@ export function registerAuthRoutes(
   app.openapi(refreshRoute, async (c) => {
     const { refresh_token } = c.req.valid("json")
     try {
-      const payload = await verifyToken(refresh_token)
-      if (payload.type !== "refresh") {
-        return c.json({ error: "Invalid token type", status: 401 }, 401)
-      }
-      const accessToken = await signToken(payload.sub, "access")
+      const { accessToken } = await container.refreshTokenUseCase.execute(refresh_token)
       return c.json({ access_token: accessToken }, 200)
-    } catch {
-      return c.json({ error: "Invalid or expired refresh token", status: 401 }, 401)
+    } catch (err) {
+      if (err instanceof AuthenticationError) {
+        return c.json({ error: err.message, status: 401 }, 401)
+      }
+      throw err
     }
   })
 
