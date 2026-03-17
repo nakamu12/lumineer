@@ -53,6 +53,16 @@ class Settings(BaseSettings):
     AGENT_MODEL: str = "gpt-4o-mini"
     AGENT_MAX_TURNS: int = 10
 
+    # Rate Limiting (L5)
+    RATE_LIMIT_MAX_REQUESTS: int = 30
+    RATE_LIMIT_WINDOW_SECONDS: int = 60
+
+    # Token Budget (L5)
+    MAX_INPUT_TOKENS: int = 10_000
+    MAX_OUTPUT_TOKENS: int = 4_000
+    MAX_TOTAL_TOKENS: int = 14_000
+    MAX_CORRECTIVE_RAG_RETRIES: int = 3
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8001
