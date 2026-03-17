@@ -126,11 +126,12 @@ cd ../worktree/LM{NNNN}-{type}-{scope}-{detail}
 cd backend && bun run lint && bun run typecheck && bun test
 
 # 3. 手動検証が必要な場合、worktree からアプリを直接起動
-#    backend/.env.local に DATABASE_URL=postgres://lumineer:lumineer@localhost:5432/lumineer を設定
+#    Gateway → Backend → AI の順に起動（Frontend は Vite proxy で Gateway 経由）
+cd gateway && BACKEND_URL=http://localhost:3001 bun dev  # localhost:3000
 cd backend && bun dev             # localhost:3001
-cd frontend && bun dev            # localhost:5173
+cd frontend && bun dev            # localhost:5173 (Vite proxy → :3000)
 cd ai && uv run python main.py    # localhost:8001
-# → curl やブラウザで動作確認、終わったら Ctrl+C
+# → ブラウザで localhost:5173 を開いて動作確認、終わったら Ctrl+C
 ```
 
 ### ローカル起動用 .env.local の設定
