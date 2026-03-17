@@ -65,6 +65,18 @@ class TestPrivacyPatternDetection:
         text = 'Traceback (most recent call last):\n  File "/app/main.py", line 10'
         assert _detect_privacy_patterns(text) is True
 
+    def test_file_path_in_stack_trace_detected(self) -> None:
+        from app.guardrails.output.privacy_filter import _detect_privacy_patterns
+
+        text = 'File "/app/guardrails/output/privacy_filter.py", line 42, in privacy_guardrail'
+        assert _detect_privacy_patterns(text) is True
+
+    def test_normal_course_url_not_detected(self) -> None:
+        from app.guardrails.output.privacy_filter import _detect_privacy_patterns
+
+        text = "You can enroll at https://www.coursera.org/learn/machine-learning"
+        assert _detect_privacy_patterns(text) is False
+
 
 class TestPrivacyGuardrail:
     @pytest.mark.asyncio
@@ -142,6 +154,25 @@ class TestPrivacyGuardrail:
             )
 
         assert result.tripwire_triggered is False
+
+    @pytest.mark.asyncio
+    async def test_stage1_short_circuits_before_llm(self) -> None:
+        """Stage 1 pattern match must NOT invoke Stage 2 LLM call."""
+        from app.guardrails.output.privacy_filter import privacy_guardrail
+
+        with patch(
+            "app.guardrails.output.privacy_filter.Runner.run",
+            new_callable=AsyncMock,
+        ) as mock_runner:
+            result = await privacy_guardrail.guardrail_function(
+                MagicMock(),
+                MagicMock(),
+                "postgres://admin:secret@db:5432/lumineer",
+            )
+
+        # Stage 1 must have blocked — LLM must not have been called
+        mock_runner.assert_not_called()
+        assert result.tripwire_triggered is True
 
 
 class TestPrivacyPrompt:
