@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>Lumineer Font Final — 3 Candidates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Sora:wght@500;600&family=Outfit:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1920px;
+    height: 1080px;
+    background: #f8fafb;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .blob-main {
+    position: absolute;
+    right: -200px;
+    bottom: -350px;
+    width: 1100px;
+    height: 1100px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 42% 32%,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.95) 18%,
+      rgba(255, 255, 255, 0.8) 25%,
+      rgba(153, 246, 228, 0.4) 35%,
+      rgba(45, 212, 191, 0.5) 45%,
+      rgba(59, 130, 246, 0.45) 58%,
+      rgba(99, 102, 241, 0.25) 72%,
+      transparent 90%
+    );
+    filter: blur(30px);
+  }
+
+  .blob-secondary {
+    position: absolute;
+    right: 30px;
+    bottom: -50px;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(45, 212, 191, 0.2) 0%,
+      rgba(59, 130, 246, 0.2) 40%,
+      rgba(99, 102, 241, 0.1) 65%,
+      transparent 85%
+    );
+    filter: blur(50px);
+  }
+
+  .blob-accent {
+    position: absolute;
+    right: 350px;
+    bottom: 120px;
+    width: 550px;
+    height: 550px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(94, 234, 212, 0.1) 0%,
+      rgba(59, 130, 246, 0.05) 50%,
+      transparent 75%
+    );
+    filter: blur(45px);
+  }
+
+  .container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    gap: 80px;
+    padding: 60px 120px;
+  }
+
+  .title {
+    font-family: -apple-system, sans-serif;
+    font-size: 18px;
+    color: #94a3b8;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .font-row {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .font-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 40px 60px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    min-width: 480px;
+  }
+
+  .font-label {
+    font-family: -apple-system, sans-serif;
+    font-size: 14px;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .logo-icon {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+  }
+
+  .logo-icon-lg {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+  }
+
+  .font-text-gradient {
+    font-size: 56px;
+    background: linear-gradient(135deg, #2A9D8F, #14B8A6, #3B82F6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+  }
+
+  .font-text-dark {
+    font-size: 56px;
+    color: #0f172a;
+    white-space: nowrap;
+  }
+
+  .f1 { font-family: 'Great Vibes', cursive; }
+  .f2 { font-family: 'Sora', sans-serif; font-weight: 600; }
+  .f3 { font-family: 'Outfit', sans-serif; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="blob-accent"></div>
+  <div class="blob-secondary"></div>
+  <div class="blob-main"></div>
+
+  <div class="container">
+    <div class="title">Final Font Comparison</div>
+
+    <div class="font-row">
+      <!-- Great Vibes -->
+      <div class="font-card">
+        <div class="font-label">Great Vibes — Formal Script</div>
+        <div class="logo-row">
+          <img src="logo-clean.png" class="logo-icon-lg" alt="logo">
+          <span class="font-text-gradient f1">Lumineer</span>
+        </div>
+        <div class="logo-row">
+          <img src="logo-clean.png" class="logo-icon-lg" alt="logo">
+          <span class="font-text-dark f1">Lumineer</span>
+        </div>
+      </div>
+
+      <!-- Sora -->
+      <div class="font-card">
+        <div class="font-label">Sora 600 — Geometric Sans</div>
+        <div class="logo-row">
+          <img src="logo-clean.png" class="logo-icon-lg" alt="logo">
+          <span class="font-text-gradient f2">Lumineer</span>
+        </div>
+        <div class="logo-row">
+          <img src="logo-clean.png" class="logo-icon-lg" alt="logo">
+          <span class="font-text-dark f2">Lumineer</span>
+        </div>
+      </div>
+
+      <!-- Outfit -->
+      <div class="font-card">
+        <div class="font-label">Outfit 600 — Rounded Modern</div>
+        <div class="logo-row">
+          <img src="logo-clean.png" class="logo-icon-lg" alt="logo">
+          <span class="font-text-gradient f3">Lumineer</span>
+        </div>
+        <div class="logo-row">
+          <img src="logo-clean.png" class="logo-icon-lg" alt="logo">
+          <span class="font-text-dark f3">Lumineer</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

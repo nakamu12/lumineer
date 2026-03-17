@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=600, height=120">
+<title>Lumineer Logo — Outfit Gradient</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 600px;
+    height: 120px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .logo-icon {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+  }
+  .logo-text {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 56px;
+    background: linear-gradient(135deg, #2A9D8F, #14B8A6, #3B82F6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+  <div class="logo-row">
+    <img src="logo-clean.png" class="logo-icon" alt="logo">
+    <span class="logo-text">Lumineer</span>
+  </div>
+</body>
+</html>

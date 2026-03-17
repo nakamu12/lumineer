@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 960px;
+    height: 540px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    background:
+      radial-gradient(ellipse 900px 700px at 85% 95%, rgba(42,157,143,0.18) 0%, rgba(20,184,166,0.10) 30%, rgba(59,130,246,0.06) 60%, transparent 100%),
+      radial-gradient(ellipse 400px 300px at 90% 85%, rgba(59,130,246,0.10) 0%, transparent 100%),
+      linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+  }
+  .label { font-family: sans-serif; font-size: 14px; color: #94a3b8; }
+  img { height: 64px; }
+</style>
+</head>
+<body>
+  <div style="text-align:center">
+    <div class="label">Gradient</div>
+    <img src="logo-gradient.png" alt="gradient">
+  </div>
+  <div style="text-align:center">
+    <div class="label">Dark</div>
+    <img src="logo-dark.png" alt="dark">
+  </div>
+</body>
+</html>
