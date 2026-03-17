@@ -1,11 +1,13 @@
 import { createBrowserRouter } from "react-router-dom"
 import { PageLayout } from "@/lib/layout/PageLayout"
+import { ProtectedRoute } from "@/lib/auth/ProtectedRoute"
 import { HomePage } from "@/features/home/HomePage"
 import { ExplorePage } from "@/features/explore/ExplorePage"
 import { ChatPage } from "@/features/chat/ChatPage"
 import { MyPathPage } from "@/features/path/MyPathPage"
 import { SettingsPage } from "@/features/settings/SettingsPage"
 import { CourseDetailPage } from "@/features/course/CourseDetailPage"
+import { LoginPage } from "@/features/auth/LoginPage"
 
 export const router = createBrowserRouter([
   {
@@ -25,10 +27,16 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
     path: "/chat",
     element: (
       <PageLayout>
-        <ChatPage />
+        <ProtectedRoute>
+          <ChatPage />
+        </ProtectedRoute>
       </PageLayout>
     ),
   },
@@ -36,7 +44,9 @@ export const router = createBrowserRouter([
     path: "/path",
     element: (
       <PageLayout>
-        <MyPathPage />
+        <ProtectedRoute>
+          <MyPathPage />
+        </ProtectedRoute>
       </PageLayout>
     ),
   },
@@ -52,7 +62,9 @@ export const router = createBrowserRouter([
     path: "/settings",
     element: (
       <PageLayout>
-        <SettingsPage />
+        <ProtectedRoute>
+          <SettingsPage />
+        </ProtectedRoute>
       </PageLayout>
     ),
   },
