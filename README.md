@@ -147,13 +147,45 @@ cd backend && bun run db:generate && bun run db:migrate
 
 ## Documentation
 
+### Getting Started
+
 | Document | Description |
 |----------|-------------|
 | [docs/SETUP.md](docs/SETUP.md) | Detailed local development setup |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guide, branching, PR rules |
-| [docs/API.md](docs/API.md) | REST API endpoint reference |
-| [docs/requirements.md](docs/requirements.md) | Full product requirements (Japanese) |
+| [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | End-user guide for all pages and features |
+
+### Architecture & Design
+
+| Document | Description |
+|----------|-------------|
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture, sequence diagrams, ER diagram, ADR index |
+| [docs/AGENTS.md](docs/AGENTS.md) | Agent map, tool signatures, guardrail design |
+| [docs/RAG_PIPELINE.md](docs/RAG_PIPELINE.md) | Full RAG pipeline — ingestion, hybrid search, reranking, formatting |
+| [docs/DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md) | Qdrant payload schema, PostgreSQL tables, entity types, JWT claims |
 | [docs/adr.md](docs/adr.md) | Architecture Decision Records ADR-001–013 |
+| [docs/requirements.md](docs/requirements.md) | Full product requirements (Japanese) |
+
+### API & Integration
+
+| Document | Description |
+|----------|-------------|
+| [docs/API.md](docs/API.md) | REST API endpoint reference with request/response examples |
+
+### Operations & Deployment
+
+| Document | Description |
+|----------|-------------|
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Step-by-step GCP deployment guide, CI/CD pipeline, cost estimate |
+| [docs/INFRA.md](docs/INFRA.md) | Terraform IaC reference — resources, variables, IAM design |
+| [docs/OPERATIONS.md](docs/OPERATIONS.md) | Monitoring, alerting, incident response, RAG quality monitoring |
+| [SECURITY.md](SECURITY.md) | Auth design, secret management, OWASP mitigations, LLM security |
+
+### Testing
+
+| Document | Description |
+|----------|-------------|
+| [docs/TESTING.md](docs/TESTING.md) | 3-layer test strategy, Golden Dataset, DeepEval metrics, CI/CD gates |
 
 ---
 
@@ -161,7 +193,7 @@ cd backend && bun run db:generate && bun run db:migrate
 
 Production runs on **GCP Cloud Run** + **Firebase Hosting** + **Qdrant Cloud** at ~$6/month.
 
-See [docs/requirements.md § 15](docs/requirements.md) for infrastructure details and [ADR-011](docs/adr.md) for deployment strategy.
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the full deployment guide and [docs/INFRA.md](docs/INFRA.md) for Terraform reference.
 
 ---
 
