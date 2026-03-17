@@ -54,3 +54,6 @@ disable_error_code = ["operator", "union-attr", "arg-type", "unused-ignore", "mi
 module = "evals.*"
 disallow_untyped_defs = false
 disable_error_code = ["attr-defined", "no-untyped-call", "no-untyped-def"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
