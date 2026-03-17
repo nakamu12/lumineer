@@ -133,6 +133,22 @@ variable "ai_cpu" {
 }
 
 # =============================================================================
+# GCE — Qdrant
+# =============================================================================
+
+variable "qdrant_machine_type" {
+  description = "Machine type for Qdrant GCE instance"
+  type        = string
+  default     = "e2-micro"
+}
+
+variable "qdrant_disk_size_gb" {
+  description = "Boot disk size in GB for Qdrant instance"
+  type        = number
+  default     = 20
+}
+
+# =============================================================================
 # Firebase
 # =============================================================================
 

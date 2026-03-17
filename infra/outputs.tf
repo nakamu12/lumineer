@@ -36,3 +36,13 @@ output "artifact_registry_url" {
   description = "Artifact Registry repository URL for pushing Docker images"
   value       = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.images.repository_id}"
 }
+
+output "qdrant_external_ip" {
+  description = "Qdrant GCE instance external IP"
+  value       = google_compute_address.qdrant.address
+}
+
+output "qdrant_url" {
+  description = "Qdrant HTTP API URL for AI Processing service"
+  value       = "http://${google_compute_address.qdrant.address}:6333"
+}

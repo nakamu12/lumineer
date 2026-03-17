@@ -75,18 +75,6 @@ resource "google_secret_manager_secret_iam_member" "ai_reads_openai_key" {
   member    = "serviceAccount:${google_service_account.cloud_run_ai.email}"
 }
 
-resource "google_secret_manager_secret_iam_member" "ai_reads_qdrant_url" {
-  secret_id = google_secret_manager_secret.app_secrets["qdrant_url"].secret_id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.cloud_run_ai.email}"
-}
-
-resource "google_secret_manager_secret_iam_member" "ai_reads_qdrant_key" {
-  secret_id = google_secret_manager_secret.app_secrets["qdrant_api_key"].secret_id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.cloud_run_ai.email}"
-}
-
 # =============================================================================
 # IAM — GitHub Actions service account
 # =============================================================================

@@ -187,25 +187,12 @@ resource "google_cloud_run_v2_service" "ai" {
         }
       }
 
-      # Qdrant connection
+      # Qdrant connection (GCE instance — Terraform-managed static IP)
+      # Not a secret: no API key, public Coursera data only.
+      # TODO: move to VPC internal networking for tighter security
       env {
-        name = "QDRANT_URL"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.app_secrets["qdrant_url"].secret_id
-            version = "latest"
-          }
-        }
-      }
-
-      env {
-        name = "QDRANT_API_KEY"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.app_secrets["qdrant_api_key"].secret_id
-            version = "latest"
-          }
-        }
+        name  = "QDRANT_URL"
+        value = "http://${google_compute_address.qdrant.address}:6333"
       }
 
       liveness_probe {
