@@ -28,10 +28,19 @@ from app.infrastructure.reranking import create_reranker
 
 logger = logging.getLogger(__name__)
 
+# GPT-4o-mini pricing (USD per token) — last verified 2026-03-17
+# https://platform.openai.com/docs/pricing
+_LLM_INPUT_COST_PER_TOKEN = 0.15 / 1_000_000  # $0.15 per 1M input tokens
+_LLM_OUTPUT_COST_PER_TOKEN = 0.60 / 1_000_000  # $0.60 per 1M output tokens
+
 
 # ---------------------------------------------------------------------------
 # Request / Response schemas
 # ---------------------------------------------------------------------------
+
+
+_MAX_QUERY_LENGTH = 4096
+_MAX_SEARCH_LIMIT = 100
 
 
 @dataclass
@@ -45,6 +54,12 @@ class SearchRequest:
     threshold: float | None = None
     reranker: str | None = None
     formatter: str | None = None
+
+    def __post_init__(self) -> None:
+        if len(self.query) > _MAX_QUERY_LENGTH:
+            raise ValueError(f"query must be at most {_MAX_QUERY_LENGTH} characters")
+        if self.limit > _MAX_SEARCH_LIMIT:
+            raise ValueError(f"limit must be at most {_MAX_SEARCH_LIMIT}")
 
 
 @dataclass
@@ -76,6 +91,10 @@ class SearchResponse:
 class ChatRequest:
     message: str
     session_id: str | None = None
+
+    def __post_init__(self) -> None:
+        if len(self.message) > _MAX_QUERY_LENGTH:
+            raise ValueError(f"message must be at most {_MAX_QUERY_LENGTH} characters")
 
 
 # ---------------------------------------------------------------------------
@@ -236,6 +255,9 @@ async def _stream_agent_response(message: str) -> AsyncGenerator[str, None]:
     # Create a Langfuse trace for this chat request
     trace = tracer.create_trace(name="agent-chat")
 
+    result = None
+    llm_status = "success"
+
     try:
         # L1 Guard: Mask PII before agent processing
         pii_result = mask_pii(message)
@@ -271,30 +293,10 @@ async def _stream_agent_response(message: str) -> AsyncGenerator[str, None]:
                     text = ItemHelpers.text_message_output(event.item)
                     yield _sse_event("text_delta", text)
 
-        # Record token usage and LLM metrics from the completed run
-        llm_duration = time.monotonic() - start
-        metrics.record_llm_request(agent=previous_agent_name, status="success")
-        metrics.record_llm_latency(agent=previous_agent_name, duration=llm_duration)
-
-        usage = getattr(result, "usage", None)
-        if usage is not None:
-            input_tok = getattr(usage, "input_tokens", 0)
-            output_tok = getattr(usage, "output_tokens", 0)
-            token_tracker.track(
-                input_tokens=input_tok,
-                output_tokens=output_tok,
-                model=settings.AGENT_MODEL,
-                trace=trace,
-                generation_name="agent-chat",
-            )
-            # Estimate cost (GPT-4o-mini: $0.15/1M input, $0.60/1M output)
-            cost = (input_tok * 0.15 + output_tok * 0.60) / 1_000_000
-            metrics.record_llm_cost(model=settings.AGENT_MODEL, cost_usd=cost)
-
         yield _sse_event("done", "")
 
     except InputGuardrailTripwireTriggered:
-        metrics.record_llm_request(agent=previous_agent_name, status="error")
+        llm_status = "error"
         metrics.record_guardrail_trigger(guardrail_type="input_tripwire")
         metrics.record_request_error(endpoint="/agents/chat", method="POST")
         yield _sse_event(
@@ -302,13 +304,34 @@ async def _stream_agent_response(message: str) -> AsyncGenerator[str, None]:
             "Your message was blocked by our safety filters. Please rephrase and try again.",
         )
     except Exception:
+        llm_status = "error"
         logger.exception("Agent chat error")
-        metrics.record_llm_request(agent=previous_agent_name, status="error")
         metrics.record_request_error(endpoint="/agents/chat", method="POST")
         yield _sse_event("error", "An unexpected error occurred. Please try again.")
     finally:
         duration = time.monotonic() - start
         metrics.record_request_duration(endpoint="/agents/chat", method="POST", duration=duration)
+        metrics.record_llm_request(agent=previous_agent_name, status=llm_status)
+        metrics.record_llm_latency(agent=previous_agent_name, duration=duration)
+
+        # Record token usage even on error paths (SDK may have consumed tokens)
+        if result is not None:
+            usage = getattr(result, "usage", None)
+            if usage is not None:
+                input_tok = getattr(usage, "input_tokens", 0)
+                output_tok = getattr(usage, "output_tokens", 0)
+                token_tracker.track(
+                    input_tokens=input_tok,
+                    output_tokens=output_tok,
+                    model=settings.AGENT_MODEL,
+                    trace=trace,
+                    generation_name="agent-chat",
+                )
+                cost = (
+                    input_tok * _LLM_INPUT_COST_PER_TOKEN + output_tok * _LLM_OUTPUT_COST_PER_TOKEN
+                )
+                metrics.record_llm_cost(model=settings.AGENT_MODEL, cost_usd=cost)
+
         tracer.flush()
 
 
