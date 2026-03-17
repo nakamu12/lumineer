@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react"
+import { useState, useEffect, type FormEvent } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useAuth } from "@/lib/auth/AuthContext"
 import { Button } from "@/lib/ui/button"
@@ -20,13 +20,18 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? "/"
+  const state = location.state as unknown
+  const from =
+    typeof state === "object" && state !== null && "from" in state
+      ? ((state as { from?: { pathname?: string } }).from?.pathname ?? "/")
+      : "/"
 
   // Redirect if already authenticated
-  if (isAuthenticated) {
-    navigate(from, { replace: true })
-    return null
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true })
+    }
+  }, [isAuthenticated, from, navigate])
 
   const switchMode = (newMode: AuthMode) => {
     setMode(newMode)

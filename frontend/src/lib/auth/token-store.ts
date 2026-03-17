@@ -3,7 +3,7 @@ const REFRESH_TOKEN_KEY = "lumineer_refresh_token"
 let accessToken: string | null = null
 let refreshPromise: Promise<string | null> | null = null
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? ""
+export const API_BASE_URL = import.meta.env.VITE_API_URL ?? ""
 
 export function getAccessToken(): string | null {
   return accessToken

@@ -25,16 +25,6 @@ function renderLoginPage() {
   )
 }
 
-function getSubmitButton(): HTMLButtonElement {
-  return screen.getByRole("button", { name: /sign in|create account|please wait/i }).closest("form")
-    ? (screen
-        .getAllByRole("button")
-        .find((b) => b.getAttribute("type") === "submit") as HTMLButtonElement)
-    : (screen
-        .getAllByRole("button")
-        .find((b) => b.getAttribute("type") === "submit") as HTMLButtonElement)
-}
-
 describe("LoginPage", () => {
   beforeEach(() => {
     vi.clearAllMocks()

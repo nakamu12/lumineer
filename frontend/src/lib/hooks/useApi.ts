@@ -1,8 +1,11 @@
 import { useState, useCallback } from "react"
 import type { ApiError } from "@/lib/types/api"
-import { getAuthHeaders, getRefreshToken, tryRefreshToken } from "@/lib/auth/token-store"
-
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? ""
+import {
+  getAuthHeaders,
+  getRefreshToken,
+  tryRefreshToken,
+  API_BASE_URL,
+} from "@/lib/auth/token-store"
 
 interface UseApiState<T> {
   data: T | null
@@ -61,17 +64,19 @@ export function useApi<T = unknown>(): UseApiReturn<T> {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw {
-          message: (errorData as { message?: string }).message ?? "Request failed",
-          code: String(response.status),
-        }
+        const message = (errorData as { message?: string }).message ?? "Request failed"
+        const error = new Error(message) as Error & { code?: string }
+        error.code = String(response.status)
+        throw error
       }
 
       const data = (await response.json()) as T
       setState({ data, loading: false, error: null })
       return data
     } catch (err) {
-      const error = err as ApiError
+      const message = err instanceof Error ? err.message : "An unexpected error occurred"
+      const code = (err as { code?: string }).code ?? "UNKNOWN"
+      const error: ApiError = { message, code }
       setState({ data: null, loading: false, error })
       return null
     }
