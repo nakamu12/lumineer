@@ -84,7 +84,10 @@ export function registerChatRoutes(
   container: Container,
 ): void {
   app.openapi(listSessionsRoute, async (c) => {
-    const userId = c.get("userId")
+    const userId = c.get("userId") as string | undefined
+    if (!userId) {
+      return c.json([], 200)
+    }
     const sessions = await container.listChatSessionsUseCase.execute(userId)
     return c.json(
       sessions.map((s) => ({

@@ -7,6 +7,7 @@ function createMockAIProcessing(overrides: Partial<AIProcessingPort> = {}): AIPr
   return {
     search: vi.fn(),
     chat: vi.fn(),
+    chatStream: vi.fn(),
     getCourseById: vi.fn(),
     ...overrides,
   }

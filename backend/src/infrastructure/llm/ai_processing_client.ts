@@ -68,6 +68,20 @@ export class AIProcessingClient implements AIProcessingPort {
     }
   }
 
+  async chatStream(message: string, sessionId?: string): Promise<Response> {
+    const response = await fetch(`${this.baseUrl}/agents/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, session_id: sessionId }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`AI Processing chat stream failed: ${response.status} ${response.statusText}`)
+    }
+
+    return response
+  }
+
   async getCourseById(id: string): Promise<Course | null> {
     const response = await fetch(`${this.baseUrl}/courses/${encodeURIComponent(id)}`)
 

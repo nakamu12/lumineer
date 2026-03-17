@@ -2,6 +2,7 @@ import type { MiddlewareHandler } from "hono"
 import type { TokenIssuerPort } from "../../../domain/ports/auth.ts"
 
 // /api/auth/me is intentionally absent — it requires authentication
+// /api/chat and /api/search are public until frontend auth is implemented
 const PUBLIC_PATHS = [
   "/health",
   "/docs",
@@ -9,10 +10,12 @@ const PUBLIC_PATHS = [
   "/api/auth/register",
   "/api/auth/login",
   "/api/auth/refresh",
+  "/api/chat",
+  "/api/search",
 ]
 
 function isPublicPath(path: string): boolean {
-  return PUBLIC_PATHS.includes(path)
+  return PUBLIC_PATHS.some((p) => path === p || path.startsWith(`${p}/`))
 }
 
 export function createAuthMiddleware(tokenIssuer: TokenIssuerPort): MiddlewareHandler {
