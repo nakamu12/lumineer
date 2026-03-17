@@ -81,6 +81,73 @@ git worktree remove ../worktree/{worktree_dir}
 git branch -d LM{NNNN}-{type}/{scope}-{detail}
 ```
 
+## 検証方法: インフラとアプリを分離
+
+worktree で `docker compose up` するとプロジェクト名が変わり、ポート競合・コンテナ重複が発生する。
+`docker-compose.yml` に `name: lumineer` を設定し、アプリサービスを `profiles: [app]` で分離することで解決する。
+
+### Docker Compose コマンド早見表
+
+```bash
+# インフラのみ起動（worktree 作業中は常にこれ）
+docker compose up -d                       # postgres + qdrant のみ起動
+
+# フルスタック起動（develop でのフル統合テスト時）
+docker compose --profile app up -d         # 全サービス起動
+
+# Observability も含めて起動
+docker compose --profile app --profile observability up -d
+```
+
+### 原則
+
+| 層 | どこで動かすか | 方法 |
+|---|---|---|
+| **インフラ** (PostgreSQL, Qdrant) | メインリポジトリ (lumineer/) | `docker compose up -d` |
+| **アプリ** (backend, frontend, ai) | worktree | `bun dev` / `uv run python main.py` で直接起動 |
+
+### 検証レベル
+
+| レベル | タイミング | 方法 | Docker 必要 |
+|---|---|---|---|
+| lint + typecheck + unit test | 毎回（PR 前に必須） | worktree 内で実行 | 不要 |
+| 手動 API テスト | 必要な時だけ | worktree から `bun dev` + curl | インフラのみ |
+| フル統合テスト | develop マージ後 | develop で `docker compose --profile app up -d` | 全コンテナ |
+
+### 手動検証の手順
+
+```bash
+# 1. メインリポジトリでインフラだけ起動（常時維持）
+cd lumineer
+docker compose up -d   # postgres + qdrant のみ。名前が lumineer-* に固定される
+
+# 2. worktree で静的検証（Docker 不要）
+cd ../worktree/LM{NNNN}-{type}-{scope}-{detail}
+cd backend && bun run lint && bun run typecheck && bun test
+
+# 3. 手動検証が必要な場合、worktree からアプリを直接起動
+#    Gateway → Backend → AI の順に起動（Frontend は Vite proxy で Gateway 経由）
+cd gateway && BACKEND_URL=http://localhost:3001 bun dev  # localhost:3000
+cd backend && bun dev             # localhost:3001
+cd frontend && bun dev            # localhost:5173 (Vite proxy → :3000)
+cd ai && uv run python main.py    # localhost:8001
+# → ブラウザで localhost:5173 を開いて動作確認、終わったら Ctrl+C
+```
+
+### ローカル起動用 .env.local の設定
+
+`.env.local` はルートに 1 つだけ置く（サービスごとに作らない）。
+
+- `backend/bun dev` は `--env-file=../.env.local` でルートの `.env.local` を読む
+- `ai/uv run python main.py` は Pydantic Settings がルートの `.env.local` を絶対パスで読む
+
+```bash
+# ルートの .env.local に QDRANT_URL / DATABASE_URL を追記するだけ
+# （ポートを変更した場合はここで調整）
+QDRANT_URL=http://localhost:6333
+DATABASE_URL=postgres://lumineer:lumineer@localhost:5432/lumineer
+```
+
 ## タスク管理
 
 - 全タスクは GitHub Issues で採番

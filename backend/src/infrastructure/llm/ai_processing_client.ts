@@ -1,3 +1,4 @@
+import type { Course } from "../../domain/entities/course.ts"
 import { CourseFactory } from "../../domain/entities/course.ts"
 import type {
   AIProcessingPort,
@@ -5,6 +6,7 @@ import type {
   SearchFilters,
   SearchResult,
 } from "../../domain/ports/ai_processing.ts"
+import { CourseSchema } from "../../interfaces/api/schemas/search.ts"
 import { getSettings } from "../../config/settings.ts"
 
 export class AIProcessingClient implements AIProcessingPort {
@@ -64,5 +66,37 @@ export class AIProcessingClient implements AIProcessingPort {
       ),
       session_id: data.session_id,
     }
+  }
+
+  async chatStream(message: string, sessionId?: string): Promise<Response> {
+    const response = await fetch(`${this.baseUrl}/agents/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, session_id: sessionId }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`AI Processing chat stream failed: ${response.status} ${response.statusText}`)
+    }
+
+    return response
+  }
+
+  async getCourseById(id: string): Promise<Course | null> {
+    const response = await fetch(`${this.baseUrl}/courses/${encodeURIComponent(id)}`)
+
+    if (response.status === 404) {
+      return null
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `AI Processing getCourseById failed: ${response.status} ${response.statusText}`,
+      )
+    }
+
+    const raw: unknown = await response.json()
+    const data = CourseSchema.parse(raw)
+    return CourseFactory.create(data)
   }
 }

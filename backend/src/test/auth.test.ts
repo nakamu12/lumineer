@@ -61,16 +61,31 @@ class InMemoryUserRepository implements UserRepositoryPort {
 const passwordHasher = new BcryptPasswordHasher()
 const tokenIssuer = new JoseTokenIssuer()
 
+const notImplemented = { execute: () => Promise.reject(new Error("not implemented")) } as never
+const notImplementedRepo = {} as never
+
 function createTestContainer(userRepository: InMemoryUserRepository): Container {
   return {
-    searchCoursesUseCase: { execute: () => Promise.reject(new Error("not implemented")) } as never,
-    chatUseCase: { execute: () => Promise.reject(new Error("not implemented")) } as never,
+    searchCoursesUseCase: notImplemented,
+    chatUseCase: notImplemented,
+    getCourseDetailUseCase: notImplemented,
     userRepository,
     passwordHasher,
     tokenIssuer,
     registerUserUseCase: new RegisterUserUseCase(userRepository, passwordHasher, tokenIssuer),
     loginUserUseCase: new LoginUserUseCase(userRepository, passwordHasher, tokenIssuer),
     refreshTokenUseCase: new RefreshTokenUseCase(tokenIssuer),
+    // CRUD repos (not tested here)
+    chatSessionRepository: notImplementedRepo,
+    listChatSessionsUseCase: notImplemented,
+    createChatSessionUseCase: notImplemented,
+    listChatMessagesUseCase: notImplemented,
+    learningPathRepository: notImplementedRepo,
+    listLearningPathsUseCase: notImplemented,
+    createLearningPathUseCase: notImplemented,
+    userSettingsRepository: notImplementedRepo,
+    getUserSettingsUseCase: notImplemented,
+    updateUserSettingsUseCase: notImplemented,
   }
 }
 

@@ -27,4 +27,6 @@ export type ChatResult = {
 export interface AIProcessingPort {
   search(query: string, filters?: SearchFilters): Promise<SearchResult>
   chat(message: string, sessionId?: string): Promise<ChatResult>
+  chatStream(message: string, sessionId?: string): Promise<Response>
+  getCourseById(id: string): Promise<Course | null>
 }

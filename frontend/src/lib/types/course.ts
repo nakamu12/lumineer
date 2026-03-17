@@ -8,9 +8,9 @@ export interface Course {
   enrolled: number
   skills: string[]
   url: string
-  instructor: string
-  schedule: string
-  modules: string
+  instructor: string | null
+  schedule: string | null
+  modules: string | null
 }
 
 export interface CourseSearchResult {
