@@ -3,7 +3,7 @@ import type { ChatMessageData } from "../components/ChatMessage"
 import type { Course } from "@/lib/types/course"
 import { getAuthHeaders } from "@/lib/auth/token-store"
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001"
+const API_URL = import.meta.env.VITE_API_URL ?? ""
 
 function generateId() {
   return Math.random().toString(36).slice(2)

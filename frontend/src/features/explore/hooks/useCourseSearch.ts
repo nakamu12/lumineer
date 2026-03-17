@@ -4,7 +4,7 @@ import { useDebounce } from "@/lib/hooks/useDebounce"
 import type { ApiError } from "@/lib/types/api"
 import { getAuthHeaders } from "@/lib/auth/token-store"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001"
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? ""
 const LIMIT = 12
 
 interface UseCourseSearchParams {

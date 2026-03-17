@@ -2,7 +2,7 @@ import { useState, useCallback } from "react"
 import type { ApiError } from "@/lib/types/api"
 import { getAuthHeaders, getRefreshToken, tryRefreshToken } from "@/lib/auth/token-store"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001"
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? ""
 
 interface UseApiState<T> {
   data: T | null
