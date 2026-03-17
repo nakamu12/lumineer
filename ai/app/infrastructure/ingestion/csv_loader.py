@@ -44,6 +44,16 @@ def _parse_rating(raw: str | float) -> float:
         return 0.0
 
 
+def _normalize_level(raw: object) -> str | None:
+    """Normalize level field: 'Beginner level' -> 'Beginner', NaN -> None."""
+    raw_str = str(raw or "").strip()
+    if not raw_str or raw_str in ("nan", "None", ""):
+        return None
+    # Remove trailing ' level' suffix (e.g. 'Beginner level' -> 'Beginner')
+    normalized = re.sub(r"\s+level$", "", raw_str, flags=re.IGNORECASE)
+    return normalized or None
+
+
 def load_courses(data_path: str | Path) -> list[dict[str, Any]]:
     """Load Coursera parquet/CSV and return list of raw course dicts."""
     path = Path(data_path)
@@ -82,7 +92,7 @@ def load_courses(data_path: str | Path) -> list[dict[str, Any]]:
                 "title": str(row.get("title", "")).strip(),
                 "description": description,
                 "skills": _parse_skills(str(row.get("Skills", "[]"))),
-                "level": str(row.get("Level", "") or "").strip() or None,
+                "level": _normalize_level(row.get("Level", "")),
                 "organization": str(row.get("Organization", "")).strip(),
                 "rating": _parse_rating(row.get("rating", "0")),
                 "enrolled": _parse_enrolled(row.get("enrolled", 0)),
