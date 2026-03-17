@@ -61,7 +61,7 @@ def load_dataset(name: str) -> list[dict[str, Any]]:
     if not path.exists():
         raise FileNotFoundError(f"Dataset not found: {path}")
     with open(path, encoding="utf-8") as f:
-        data: list[dict[str, Any]] = json.loads(f.read())
+        data: list[dict[str, Any]] = json.load(f)
     return data
 
 
