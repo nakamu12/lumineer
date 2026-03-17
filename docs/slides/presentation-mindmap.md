@@ -107,7 +107,7 @@ Qdrant / OpenAI
 | AI Processing | Python + Litestar | AI エコシステムが Python に集中（Agents SDK, DeepEval, Qdrant client） |
 | Agent Framework | OpenAI Agents SDK | RAG の中身を理解して実装するため（LangChain は棄却） |
 | VectorDB | Qdrant | Hybrid Search ネイティブ対応（ChromaDB は Sparse Vector 非対応で棄却） |
-| Embedding | text-embedding-3-large | コスト差 $0.22 で精度を妥協する理由がない |
+| Embedding | text-embedding-3-large | 対象 6,645 件と小規模。large と small のコスト差は $0.22。精度を妥協する理由がない |
 | RDB | PostgreSQL + Drizzle ORM | アプリデータ管理。SQL に近い記法 × 型安全 |
 | LLM | GPT-4o-mini | コスト・速度・精度のバランス |
 
@@ -115,6 +115,11 @@ Qdrant / OpenAI
 - LangChain 棄却：「RAG の内部を理解していることを示したかった」
 - Qdrant 採用：「Hybrid Search がネイティブ対応。自前実装不要」
 - Modular Monolith（ADR-001）：「1人開発でマイクロサービスは Anti-pattern。ただしモジュール境界は明確で将来の分離が容易」
+- **Embedding モデル選定（Model Selection）**：
+  - 対象データは 6,645 件と小規模。再 Embedding が必要になっても数分 + 数十セントで完了
+  - small と large のコスト差はわずか $0.22（一回きり）
+  - MTEB 精度：large 64.6% vs small 62.3%
+  - 「スケールが小さいからこそ、コストを気にせず最高精度のモデルを選べる」← SMB の強み
 
 ---
 
@@ -135,8 +140,15 @@ Qdrant / OpenAI
 - Domain 層は外部依存ゼロ
 - LLM・VectorDB・Embedding を Port で抽象化
 - 「OpenAI → Claude への切り替えはアダプタ 1 つの変更のみ」
-- 認証：JWT（jose）+ bcrypt
 - ORM：Drizzle ORM
+
+**認証（Auth integration）**
+- JWT（jose）+ bcrypt で実装
+- Access Token（15分）+ Refresh Token（7日）の 2 トークン設計
+- Gateway から Backend への転送時に JWT 検証を必須化
+  - `Authorization: Bearer <token>` ヘッダーを Hono Middleware で検証
+  - 検証失敗時は 401 を返し、Backend 内部には到達させない
+- パスワードは bcrypt（cost factor 12）でハッシュ化。平文保存禁止
 
 ### AI Processing
 - Python + Litestar
@@ -183,6 +195,15 @@ Qdrant / OpenAI
 - L4 Output：ハルシネーション検出（DB 照合 $0 + LLM Verifier 並列）
 - L5 Economic：トークン制限・レート制限・コスト追跡 ← **独自拡張**
 - 全ガードレールは `@input_guardrail` / `@output_guardrail` デコレータで並列実行
+
+### モニタリング & デバッグ（Observability）
+- **Langfuse** でエージェントの全実行をトレーシング
+  - プロンプト入出力・トークン消費・レイテンシをリクエスト単位で記録
+  - どのガードレールが発動したか、どのエージェントに handoff したかを可視化
+  - 「何かおかしい」と思ったとき、Langfuse を見れば原因が分かる設計
+- **Prometheus + Grafana** でインフラメトリクスを監視
+  - API レスポンスタイム・エラー率・Qdrant 検索レイテンシ
+- 「動いているだけ」ではなく「**なぜそう動いたかを説明できる**」構成
 
 ---
 
@@ -240,6 +261,18 @@ Qdrant / OpenAI
 - カラー：Teal → Blue グラデーション（色の意味も設計）
 - UI・スライド・favicon まで一貫したブランド体験
 - 「プロダクトとして完結させた」という意識
+
+### 仕様の乖離と顧客の真意（Ambiguity handling）
+- キャプストーン要件には「Web アプリケーション」と記載されていた
+- しかしペルソナ設計を深掘りする中で「**本当に必要なのは Web アプリだけではない**」という気づきがあった
+  - Kenji のような「既存ツールに組み込みたい」ニーズは、Web UI では解決できない
+  - 要件の文字通りではなく、**顧客が達成したいゴール**を起点に設計を判断した
+- この判断プロセス：
+  1. ペルソナの「行動パターン」を観察 → AI ツールを日常的に使っている
+  2. 「なぜ Coursera は AI から呼べないのか？」という問いが生まれた
+  3. MCP という解決策が、Clean Architecture の設計上 **ゼロコストで追加可能**と判断
+  4. 要件を超えた価値提供として MCP を設計・実装方針を決定
+- 「要件に忠実に作る」よりも「**顧客の真の課題を解く**」を優先した判断
 
 ### MCP（Kenji の真の課題を回収） ← ここで伏線を回収する
 
@@ -303,6 +336,8 @@ $6/month infra | $1.36 data cost | ~50% token savings (TOON)
 | ハルシネーション対策は？ | 2 段構成：DB 照合（コスト $0）+ LLM Verifier（並列 @output_guardrail） |
 | インフラコストは？ | $6/月。Cloud Run 無料枠 + Qdrant Cloud 無料枠の組み合わせ |
 | MCP は実装済みか？ | ADR-012-11 で設計済み。Clean Architecture によりインターフェース追加のみで対応可能 |
+| なぜ text-embedding-3-large か？ | 対象 6,645 件と小規模。small との精度差 2.3%、コスト差 $0.22。精度を妥協する理由がない |
+| エージェントのデバッグはどうするか？ | Langfuse でプロンプト入出力・トークン消費・ガードレール発動を全トレース。原因箇所を即座に特定できる |
 
 ---
 
