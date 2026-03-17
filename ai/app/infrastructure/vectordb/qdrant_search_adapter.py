@@ -94,8 +94,9 @@ class QdrantSearchAdapter(VectorStorePort):
         sparse_vector = self._build_sparse_vector(query_text)
         qdrant_filter = self._build_filter(filters)
 
-        # Fetch more results than needed to account for chunk deduplication
-        fetch_limit = limit * 3
+        # Fetch more results than needed to account for chunk deduplication.
+        # Capped to prefetch_limit * 2 since fusion can't exceed prefetch results.
+        fetch_limit = min(limit * 3, self._prefetch_limit * 2)
 
         results = await self._client.query_points(
             collection_name=self._collection,
@@ -124,7 +125,7 @@ class QdrantSearchAdapter(VectorStorePort):
             payload = dict(point.payload or {})
             payload["_id"] = str(point.id)
             payload["_score"] = point.score
-            course_key = payload.get("course_url") or payload.get("url", "")
+            course_key = payload.get("course_url") or payload.get("url") or payload["_id"]
             if course_key not in seen_courses:
                 seen_courses[course_key] = payload
 
