@@ -28,9 +28,9 @@ export const CourseSchema = z
     enrolled: z.number(),
     skills: z.array(z.string()),
     url: z.string(),
-    instructor: z.string(),
-    schedule: z.string(),
-    modules: z.string(),
+    instructor: z.string().nullable(),
+    schedule: z.string().nullable(),
+    modules: z.string().nullable(),
   })
   .openapi("Course")
 

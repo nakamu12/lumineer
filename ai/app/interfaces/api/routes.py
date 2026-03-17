@@ -18,6 +18,7 @@ from litestar.response import Stream
 from app.agents import create_triage_agent
 from app.config.container import build_container, get_container
 from app.config.settings import get_settings
+from app.domain.usecases.get_course_detail import CourseNotFoundError, GetCourseDetailUseCase
 from app.domain.usecases.search_courses import SearchCoursesUseCase, SearchQuery, SearchResult
 from app.infrastructure.formatters import create_formatter
 from app.infrastructure.reranking import create_reranker
@@ -55,6 +56,7 @@ class CourseResponse:
     description: str
     schedule: str | None
     instructor: str | None
+    modules: str | None = None
 
 
 @dataclass
@@ -141,6 +143,7 @@ async def search_courses_endpoint(data: SearchRequest) -> SearchResponse:
                 description=c.description,
                 schedule=c.schedule,
                 instructor=c.instructor,
+                modules=c.modules,
             )
             for c in result.courses
         ],
@@ -148,6 +151,33 @@ async def search_courses_endpoint(data: SearchRequest) -> SearchResponse:
         total_hits=result.total_hits,
         reranker_applied=result.reranker_applied,
         formatter_applied=result.formatter_applied,
+    )
+
+
+@get("/courses/{course_id:str}")
+async def get_course_detail(course_id: str) -> CourseResponse:
+    """Retrieve a single course by its Qdrant point ID."""
+    container = get_container()
+    usecase = GetCourseDetailUseCase(vector_store=container.vector_store)
+
+    try:
+        course = await usecase.execute(course_id)
+    except CourseNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    return CourseResponse(
+        id=course.id,
+        title=course.title,
+        organization=course.organization,
+        level=course.level,
+        rating=course.rating,
+        enrolled=course.enrolled,
+        skills=course.skills,
+        url=course.url,
+        description=course.description,
+        schedule=course.schedule,
+        instructor=course.instructor,
+        modules=course.modules,
     )
 
 
@@ -225,6 +255,6 @@ def create_app() -> Litestar:
     build_container()
 
     return Litestar(
-        route_handlers=[health_check, search_courses_endpoint, agent_chat],
+        route_handlers=[health_check, search_courses_endpoint, get_course_detail, agent_chat],
         cors_config=cors_config,
     )

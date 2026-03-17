@@ -1,6 +1,8 @@
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
-import { BookOpen } from "lucide-react"
+import { useAuth } from "@/lib/auth/AuthContext"
+import { Button } from "@/lib/ui/button"
+import { BookOpen, LogOut } from "lucide-react"
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -12,6 +14,13 @@ const navItems = [
 
 export function Header() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, isAuthenticated, logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+    navigate("/")
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -37,6 +46,21 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+
+          <div className="ml-2 flex items-center gap-2 border-l pl-3">
+            {isAuthenticated ? (
+              <>
+                <span className="text-sm text-muted-foreground">{user?.display_name}</span>
+                <Button variant="ghost" size="sm" onClick={handleLogout} title="Sign out">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <Button variant="default" size="sm" asChild>
+                <Link to="/login">Sign In</Link>
+              </Button>
+            )}
+          </div>
         </nav>
       </div>
     </header>

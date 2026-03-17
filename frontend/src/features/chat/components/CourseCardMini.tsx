@@ -1,4 +1,5 @@
-import { ExternalLink, Star } from "lucide-react"
+import { Link } from "react-router-dom"
+import { Star } from "lucide-react"
 
 import { Button } from "@/lib/ui/button"
 import type { Course } from "@/lib/types/course"
@@ -17,9 +18,15 @@ export function CourseCardMini({ course }: CourseCardMiniProps) {
   const formatEnrolled = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n))
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border bg-background p-3 hover:bg-muted/30 transition-colors">
+    <Link
+      to={`/course/${course.id}`}
+      state={{ course }}
+      className="flex items-center gap-3 rounded-lg border bg-background p-3 hover:bg-muted/30 transition-colors"
+    >
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm leading-tight line-clamp-1">{course.title}</p>
+        <p className="font-medium text-sm leading-tight line-clamp-1 hover:text-primary transition-colors">
+          {course.title}
+        </p>
         <p className="text-xs text-muted-foreground mt-0.5">{course.organization}</p>
         <div className="flex items-center gap-2 mt-1 flex-wrap">
           {course.level && (
@@ -38,12 +45,9 @@ export function CourseCardMini({ course }: CourseCardMiniProps) {
           </span>
         </div>
       </div>
-      <Button asChild variant="ghost" size="sm" className="shrink-0 h-7 px-2 text-xs">
-        <a href={course.url} target="_blank" rel="noopener noreferrer">
-          <ExternalLink className="h-3 w-3 mr-1" />
-          View
-        </a>
+      <Button variant="ghost" size="sm" className="shrink-0 h-7 px-2 text-xs" asChild>
+        <span>View</span>
       </Button>
-    </div>
+    </Link>
   )
 }

@@ -46,7 +46,10 @@ frontend/src/
 - **Bun** でインストール・ビルド・テスト（npm / yarn 禁止）
 - `bun install`, `bun dev`, `bun test`, `bun run build`
 
-## API Layer との通信
+## API 通信（Gateway 経由）
 
 - REST + SSE（Server-Sent Events でストリーミング応答）
-- AI Processing Layer を直接呼ばない。必ず API Layer 経由
+- Backend / AI Processing を直接呼ばない。必ず Gateway 経由
+- **API ベース URL**: `API_BASE_URL` のデフォルトは空文字（同一オリジン）。Vite dev proxy または本番 Gateway が `/api/*` をルーティングする
+- **ローカル開発**: Vite proxy (`vite.config.ts`) が `/api/*` → Gateway (`localhost:3000`) に転送。Frontend から `http://localhost:3001` 等を直接指定しない
+- **本番**: Frontend → Gateway（同一ドメイン or CDN → Cloud Run）

@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import type { Course, CourseSearchResult } from "@/lib/types/course"
 import { useDebounce } from "@/lib/hooks/useDebounce"
 import type { ApiError } from "@/lib/types/api"
+import { getAuthHeaders } from "@/lib/auth/token-store"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000"
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? ""
 const LIMIT = 12
 
 interface UseCourseSearchParams {
@@ -65,7 +66,7 @@ export function useCourseSearch({
         if (minRating) params.set("min_rating", minRating)
 
         const response = await fetch(`${API_BASE_URL}/api/courses/search?${params.toString()}`, {
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         })
 
         if (!response.ok) {

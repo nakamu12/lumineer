@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback } from "react"
 import type { ChatMessageData } from "../components/ChatMessage"
 import type { Course } from "@/lib/types/course"
+import { getAuthHeaders } from "@/lib/auth/token-store"
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000"
+const API_URL = import.meta.env.VITE_API_URL ?? ""
 
 function generateId() {
   return Math.random().toString(36).slice(2)
@@ -53,7 +54,7 @@ export function useChat() {
       try {
         const res = await fetch(`${API_URL}/api/chat`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...getAuthHeaders() },
           body: JSON.stringify({
             message: text.trim(),
             session_id: sessionId ?? undefined,
