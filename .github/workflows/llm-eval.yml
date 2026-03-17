@@ -14,7 +14,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   llm-eval:
@@ -39,30 +38,3 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: uv run python scripts/run_evals.py --verbose
-
-      - name: Post eval summary to PR
-        if: always()
-        uses: actions/github-script@v7
-        env:
-          JOB_STATUS: ${{ job.status }}
-        with:
-          script: |
-            const status = process.env.JOB_STATUS;
-            const body = `### 🤖 LLM Eval (Stage 2)
-
-            **Status**: ${status}
-
-            Tier 1 thresholds:
-            | Metric | Threshold |
-            |--------|-----------|
-            | Faithfulness | ≥ 0.70 |
-            | Hallucination | ≤ 0.50 |
-
-            > Run locally: \`cd ai && uv run python scripts/run_evals.py --verbose\`
-            `;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body.trim()
-            });
