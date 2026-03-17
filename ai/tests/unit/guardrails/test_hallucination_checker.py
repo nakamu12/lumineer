@@ -25,9 +25,7 @@ class TestHallucinationGuardrail:
             "I found 3 great Python courses for beginners. "
             "The top pick is 'Python for Everybody' from the University of Michigan."
         )
-        result = await hallucination_guardrail.guardrail_function(
-            MagicMock(), MagicMock(), output
-        )
+        result = await hallucination_guardrail.guardrail_function(MagicMock(), MagicMock(), output)
 
         assert result.tripwire_triggered is False
 
@@ -84,9 +82,7 @@ class TestHallucinationCheckerContract:
 
         # Course name that was NOT in the retrieval results
         output = "I recommend 'Advanced Quantum Computing with PyTorch' from MIT."
-        result = await hallucination_guardrail.guardrail_function(
-            MagicMock(), MagicMock(), output
-        )
+        result = await hallucination_guardrail.guardrail_function(MagicMock(), MagicMock(), output)
 
         # Current skeleton: passes (False). Future: should be True.
         assert result.tripwire_triggered is False  # noqa: S101 — intentional skeleton check
@@ -101,8 +97,6 @@ class TestHallucinationCheckerContract:
             "'Machine Learning Specialization' by Andrew Ng on Coursera. "
             "It has a 4.9 rating and is suitable for beginners."
         )
-        result = await hallucination_guardrail.guardrail_function(
-            MagicMock(), MagicMock(), output
-        )
+        result = await hallucination_guardrail.guardrail_function(MagicMock(), MagicMock(), output)
 
         assert result.tripwire_triggered is False

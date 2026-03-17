@@ -117,7 +117,9 @@ class TestPiiRoundTrip:
         """Multiple PII types are all restored correctly."""
         mappings = (
             PiiMapping(original="Hanako Tanaka", masked="<PERSON>", entity_type="PERSON"),
-            PiiMapping(original="hanako@mail.com", masked="<EMAIL_ADDRESS>", entity_type="EMAIL_ADDRESS"),
+            PiiMapping(
+                original="hanako@mail.com", masked="<EMAIL_ADDRESS>", entity_type="EMAIL_ADDRESS"
+            ),
         )
         llm_output = "Hello <PERSON>, I sent the confirmation to <EMAIL_ADDRESS>."
         restored = restore_pii(llm_output, mappings)
