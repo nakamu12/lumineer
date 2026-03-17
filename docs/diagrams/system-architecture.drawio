@@ -1,0 +1,449 @@
+<mxfile host="app.diagrams.net" agent="Claude Code" version="26.0.0">
+  <diagram id="system-architecture" name="System Architecture">
+    <mxGraphModel dx="1800" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ==================== TITLE ==================== -->
+        <mxCell id="title" value="Lumineer — System Architecture" style="text;html=1;fontSize=24;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontFamily=Inter;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Intelligent Course Discovery System &amp;nbsp;|&amp;nbsp; 4-Layer Microservice Architecture" style="text;html=1;fontSize=13;align=center;verticalAlign=middle;whiteSpace=wrap;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="400" y="55" width="800" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== USER ==================== -->
+        <mxCell id="user" value="User / Browser" style="shape=mxgraph.basic.smiley;fillColor=#dbeafe;strokeColor=#3b82f6;strokeWidth=2;dx=0.5;whiteSpace=wrap;html=1;fontSize=10;fontFamily=Inter;fontColor=#1e40af;" vertex="1" parent="1">
+          <mxGeometry x="760" y="90" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== FRONTEND LAYER ==================== -->
+        <mxCell id="fe_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;strokeWidth=2;arcSize=8;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="560" y="190" width="480" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_badge" value="Frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3b82f6;fontColor=#ffffff;fontSize=11;fontStyle=1;strokeColor=none;fontFamily=Inter;arcSize=40;" vertex="1" parent="1">
+          <mxGeometry x="570" y="198" width="80" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_tech" value="Bun + React (Vite) + Shadcn UI + Tailwind CSS" style="text;html=1;fontSize=10;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="660" y="196" width="370" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_home" value="&lt;b&gt;Home&lt;/b&gt;&lt;br&gt;Landing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="580" y="232" width="70" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_explore" value="&lt;b&gt;Explore&lt;/b&gt;&lt;br&gt;Search + AI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="660" y="232" width="70" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_chat" value="&lt;b&gt;Chat&lt;/b&gt;&lt;br&gt;AI Dialog" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="740" y="232" width="70" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_path" value="&lt;b&gt;My Path&lt;/b&gt;&lt;br&gt;Learning" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="232" width="70" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_settings" value="&lt;b&gt;Settings&lt;/b&gt;&lt;br&gt;Pipeline" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#93c5fd;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="900" y="232" width="70" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_deploy" value="Firebase Hosting (CDN)" style="text;html=1;fontSize=9;align=right;verticalAlign=middle;fontFamily=Inter;fontColor=#9ca3af;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="880" y="196" width="150" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: User -> Frontend -->
+        <mxCell id="arrow_user_fe" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#94a3b8;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="user" target="fe_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_user_fe_label" value="HTTPS" style="edgeLabel;html=1;fontSize=9;fontFamily=Inter;fontColor=#94a3b8;" vertex="1" connectable="0" parent="arrow_user_fe">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== GATEWAY LAYER ==================== -->
+        <mxCell id="gw_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fefce8;strokeColor=#eab308;strokeWidth=2;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="330" width="480" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_badge" value="API Gateway" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eab308;fontColor=#ffffff;fontSize=11;fontStyle=1;strokeColor=none;fontFamily=Inter;arcSize=40;" vertex="1" parent="1">
+          <mxGeometry x="570" y="338" width="100" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_tech" value="Bun + Hono (TypeScript) &amp;nbsp;|&amp;nbsp; Port :3000" style="text;html=1;fontSize=10;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="680" y="336" width="250" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_cors" value="CORS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fcd34d;fontSize=10;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="590" y="370" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_log" value="Logging" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fcd34d;fontSize=10;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="660" y="370" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_rate" value="Rate Limit" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fcd34d;fontSize=10;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="730" y="370" width="70" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_proxy" value="Proxy /api/*" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fcd34d;fontSize=10;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="810" y="370" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_deploy" value="Cloud Run (public)" style="text;html=1;fontSize=9;align=right;verticalAlign=middle;fontFamily=Inter;fontColor=#9ca3af;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="900" y="336" width="130" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_note" value="Only public-facing entry point" style="text;html=1;fontSize=9;align=right;verticalAlign=middle;fontFamily=Inter;fontColor=#d97706;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="870" y="380" width="170" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Frontend -> Gateway -->
+        <mxCell id="arrow_fe_gw" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;strokeColor=#94a3b8;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="fe_group" target="gw_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_fe_gw_label" value="HTTP (REST + SSE)" style="edgeLabel;html=1;fontSize=9;fontFamily=Inter;fontColor=#94a3b8;" vertex="1" connectable="0" parent="arrow_fe_gw">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== BACKEND SERVICE LAYER ==================== -->
+        <mxCell id="be_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;strokeWidth=2;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="450" width="480" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="be_badge" value="Backend Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#22c55e;fontColor=#ffffff;fontSize=11;fontStyle=1;strokeColor=none;fontFamily=Inter;arcSize=40;" vertex="1" parent="1">
+          <mxGeometry x="570" y="458" width="120" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="be_tech" value="Bun + Hono (TypeScript) + Drizzle ORM &amp;nbsp;|&amp;nbsp; Port :3001" style="text;html=1;fontSize=10;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="700" y="456" width="330" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="be_auth" value="&lt;b&gt;Auth&lt;/b&gt;&lt;br&gt;JWT + bcrypt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="580" y="492" width="85" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="be_chat_api" value="&lt;b&gt;Chat API&lt;/b&gt;&lt;br&gt;Sessions &amp;amp; Messages" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="675" y="492" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="be_paths" value="&lt;b&gt;Learning Paths&lt;/b&gt;&lt;br&gt;CRUD" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="795" y="492" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="be_settings" value="&lt;b&gt;Settings&lt;/b&gt;&lt;br&gt;Pipeline Config" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#86efac;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="905" y="492" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="be_deploy" value="Cloud Run (internal)" style="text;html=1;fontSize=9;align=right;verticalAlign=middle;fontFamily=Inter;fontColor=#9ca3af;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="890" y="456" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="be_arch" value="Clean Architecture" style="text;html=1;fontSize=9;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#16a34a;fontStyle=3;" vertex="1" parent="1">
+          <mxGeometry x="580" y="544" width="120" height="16" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Gateway -> Backend -->
+        <mxCell id="arrow_gw_be" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;strokeColor=#94a3b8;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="gw_group" target="be_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_gw_be_label" value="proxy /api/*" style="edgeLabel;html=1;fontSize=9;fontFamily=Inter;fontColor=#94a3b8;" vertex="1" connectable="0" parent="arrow_gw_be">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== AI PROCESSING LAYER ==================== -->
+        <mxCell id="ai_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#faf5ff;strokeColor=#a855f7;strokeWidth=2;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="560" y="610" width="480" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="ai_badge" value="AI Processing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a855f7;fontColor=#ffffff;fontSize=11;fontStyle=1;strokeColor=none;fontFamily=Inter;arcSize=40;" vertex="1" parent="1">
+          <mxGeometry x="570" y="618" width="110" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="ai_tech" value="Python + Litestar + OpenAI Agents SDK &amp;nbsp;|&amp;nbsp; Port :8001" style="text;html=1;fontSize=10;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="690" y="616" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ai_deploy" value="Cloud Run (internal)" style="text;html=1;fontSize=9;align=right;verticalAlign=middle;fontFamily=Inter;fontColor=#9ca3af;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="890" y="616" width="140" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Agents sub-group -->
+        <mxCell id="agents_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e8ff;strokeColor=#c084fc;strokeWidth=1;dashed=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="575" y="650" width="220" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="agents_title" value="Agents (Triage Pattern)" style="text;html=1;fontSize=10;fontStyle=1;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#7c3aed;" vertex="1" parent="1">
+          <mxGeometry x="585" y="652" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="agent_triage" value="&lt;b&gt;Triage&lt;/b&gt;&lt;br&gt;Router" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#c084fc;fontSize=9;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="630" y="675" width="60" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="agent_search" value="&lt;b&gt;Search&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#c084fc;fontSize=9;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="585" y="725" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="agent_skill" value="&lt;b&gt;Skill Gap&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#c084fc;fontSize=9;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="655" y="725" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="agent_path" value="&lt;b&gt;Path&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#c084fc;fontSize=9;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="725" y="725" width="60" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Handoff arrows -->
+        <mxCell id="ho1" style="rounded=1;exitX=0;exitY=1;entryX=0.5;entryY=0;strokeColor=#c084fc;strokeWidth=1;endArrow=block;endFill=1;curved=1;" edge="1" parent="1" source="agent_triage" target="agent_search">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ho2" style="rounded=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#c084fc;strokeWidth=1;endArrow=block;endFill=1;" edge="1" parent="1" source="agent_triage" target="agent_skill">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ho3" style="rounded=1;exitX=1;exitY=1;entryX=0.5;entryY=0;strokeColor=#c084fc;strokeWidth=1;endArrow=block;endFill=1;curved=1;" edge="1" parent="1" source="agent_triage" target="agent_path">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ho_label" value="handoff()" style="text;html=1;fontSize=8;fontFamily=Inter;fontColor=#c084fc;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="700" y="712" width="50" height="14" as="geometry" />
+        </mxCell>
+
+        <!-- RAG Pipeline sub-group -->
+        <mxCell id="rag_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e8ff;strokeColor=#c084fc;strokeWidth=1;dashed=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="810" y="650" width="220" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="rag_title" value="RAG Pipeline" style="text;html=1;fontSize=10;fontStyle=1;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#7c3aed;" vertex="1" parent="1">
+          <mxGeometry x="820" y="652" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rag_hybrid" value="&lt;b&gt;Hybrid Search&lt;/b&gt;&lt;br&gt;Dense + Sparse" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#c084fc;fontSize=9;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="678" width="100" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="rag_rrf" value="&lt;b&gt;RRF&lt;/b&gt;&lt;br&gt;Score Fusion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#c084fc;fontSize=9;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="928" y="678" width="90" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="rag_rerank" value="&lt;b&gt;Reranker&lt;/b&gt;&lt;br&gt;Strategy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#c084fc;fontSize=9;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="726" width="80" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="rag_fmt" value="&lt;b&gt;Formatter&lt;/b&gt;&lt;br&gt;JSON / TOON" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#c084fc;fontSize=9;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="910" y="726" width="90" height="38" as="geometry" />
+        </mxCell>
+
+        <!-- Guardrails label -->
+        <mxCell id="guard_label" value="5-Layer Guardrails" style="text;html=1;fontSize=9;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#7c3aed;fontStyle=3;" vertex="1" parent="1">
+          <mxGeometry x="575" y="774" width="120" height="16" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Backend -> AI Processing -->
+        <mxCell id="arrow_be_ai" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;strokeColor=#94a3b8;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="be_group" target="ai_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_be_ai_label" value="HTTP (REST + SSE)" style="edgeLabel;html=1;fontSize=9;fontFamily=Inter;fontColor=#94a3b8;" vertex="1" connectable="0" parent="arrow_be_ai">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== DATA STORES ==================== -->
+        <!-- PostgreSQL -->
+        <mxCell id="pg_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#f97316;strokeWidth=2;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="450" width="280" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="pg_badge" value="PostgreSQL 16" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f97316;fontColor=#ffffff;fontSize=11;fontStyle=1;strokeColor=none;fontFamily=Inter;arcSize=40;" vertex="1" parent="1">
+          <mxGeometry x="90" y="458" width="110" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="pg_deploy" value="Cloud SQL" style="text;html=1;fontSize=9;align=right;verticalAlign=middle;fontFamily=Inter;fontColor=#9ca3af;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="260" y="458" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="pg_users" value="users" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fdba74;fontSize=10;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="95" y="492" width="60" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="pg_sessions" value="chat_sessions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fdba74;fontSize=9;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="163" y="492" width="80" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="pg_messages" value="chat_messages" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fdba74;fontSize=9;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="251" y="492" width="85" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="pg_lpaths" value="learning_paths" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fdba74;fontSize=9;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="95" y="528" width="85" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="pg_usettings" value="user_settings" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fdba74;fontSize=9;fontFamily=Inter;arcSize=16;" vertex="1" parent="1">
+          <mxGeometry x="188" y="528" width="80" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Backend -> PostgreSQL -->
+        <mxCell id="arrow_be_pg" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0;exitY=0.5;entryX=1;entryY=0.5;strokeColor=#f97316;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="be_group" target="pg_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_be_pg_label" value="SQL (Drizzle ORM)" style="edgeLabel;html=1;fontSize=9;fontFamily=Inter;fontColor=#f97316;" vertex="1" connectable="0" parent="arrow_be_pg">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Qdrant -->
+        <mxCell id="qd_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdf2f8;strokeColor=#ec4899;strokeWidth=2;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="670" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="qd_badge" value="Qdrant Cloud" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ec4899;fontColor=#ffffff;fontSize=11;fontStyle=1;strokeColor=none;fontFamily=Inter;arcSize=40;" vertex="1" parent="1">
+          <mxGeometry x="90" y="678" width="110" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="qd_deploy" value="Managed (1GB free)" style="text;html=1;fontSize=9;align=right;verticalAlign=middle;fontFamily=Inter;fontColor=#9ca3af;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="230" y="678" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="qd_col" value="&lt;b&gt;courses&lt;/b&gt; collection&lt;br&gt;6,645 docs &amp;times; 3072 dims" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f9a8d4;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="95" y="712" width="155" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="qd_meta" value="&lt;b&gt;Metadata&lt;/b&gt;&lt;br&gt;level, org, rating&lt;br&gt;skills, enrolled" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f9a8d4;fontSize=9;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="258" y="712" width="90" height="42" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: AI -> Qdrant -->
+        <mxCell id="arrow_ai_qd" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0;exitY=0.75;entryX=1;entryY=0.5;strokeColor=#ec4899;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="ai_group" target="qd_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_ai_qd_label" value="Hybrid Search (gRPC)" style="edgeLabel;html=1;fontSize=9;fontFamily=Inter;fontColor=#ec4899;" vertex="1" connectable="0" parent="arrow_ai_qd">
+          <mxGeometry x="-0.1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== EXTERNAL SERVICES ==================== -->
+        <!-- OpenAI -->
+        <mxCell id="openai_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f9ff;strokeColor=#0ea5e9;strokeWidth=2;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="640" width="220" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="openai_badge" value="OpenAI API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0ea5e9;fontColor=#ffffff;fontSize=11;fontStyle=1;strokeColor=none;fontFamily=Inter;arcSize=40;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="648" width="90" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="openai_llm" value="&lt;b&gt;GPT-4o-mini&lt;/b&gt;&lt;br&gt;Agent Reasoning" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#7dd3fc;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1155" y="682" width="95" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="openai_emb" value="&lt;b&gt;Embedding&lt;/b&gt;&lt;br&gt;3-large (3072d)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#7dd3fc;fontSize=10;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1258" y="682" width="90" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="openai_ext" value="External" style="text;html=1;fontSize=9;align=right;verticalAlign=middle;fontFamily=Inter;fontColor=#9ca3af;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="648" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="openai_cost" value="~$6/mo" style="text;html=1;fontSize=9;align=center;verticalAlign=middle;fontFamily=Inter;fontColor=#0ea5e9;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1155" y="730" width="50" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: AI -> OpenAI -->
+        <mxCell id="arrow_ai_openai" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.6;entryX=0;entryY=0.5;strokeColor=#0ea5e9;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="ai_group" target="openai_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_ai_openai_label" value="HTTPS" style="edgeLabel;html=1;fontSize=9;fontFamily=Inter;fontColor=#0ea5e9;" vertex="1" connectable="0" parent="arrow_ai_openai">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== OBSERVABILITY ==================== -->
+        <mxCell id="obs_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#64748b;strokeWidth=2;arcSize=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="390" width="220" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="obs_badge" value="Observability" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#64748b;fontColor=#ffffff;fontSize=11;fontStyle=1;strokeColor=none;fontFamily=Inter;arcSize=40;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="398" width="100" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="obs_langfuse" value="&lt;b&gt;Langfuse&lt;/b&gt;&lt;br&gt;LLM Tracing&lt;br&gt;Prompt I/O&lt;br&gt;Token &amp;amp; Cost" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontSize=9;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1155" y="432" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="obs_grafana" value="&lt;b&gt;Grafana&lt;/b&gt;&lt;br&gt;Dashboard&lt;br&gt;Alerts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontSize=9;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1258" y="432" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="obs_prom" value="&lt;b&gt;Prometheus&lt;/b&gt;&lt;br&gt;Metrics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontSize=9;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1155" y="502" width="90" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="obs_deepeval" value="&lt;b&gt;DeepEval&lt;/b&gt;&lt;br&gt;RAG Quality" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontSize=9;fontFamily=Inter;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1258" y="502" width="90" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="obs_note" value="Dev: Docker Compose&lt;br&gt;Prod: Cloud Run + GCP Monitoring" style="text;html=1;fontSize=8;align=center;verticalAlign=middle;fontFamily=Inter;fontColor=#9ca3af;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="1155" y="550" width="195" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- Dotted arrows: services -> observability -->
+        <mxCell id="arrow_ai_obs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.2;entryX=0;entryY=0.7;strokeColor=#94a3b8;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" edge="1" parent="1" source="ai_group" target="obs_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_be_obs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;entryX=0;entryY=0.3;strokeColor=#94a3b8;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" edge="1" parent="1" source="be_group" target="obs_group">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== SECURITY + COST INFO BOXES ==================== -->
+        <!-- Security Boundaries -->
+        <mxCell id="sec_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef2f2;strokeColor=#ef4444;strokeWidth=1;arcSize=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="190" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_title" value="Security Boundaries" style="text;html=1;fontSize=10;fontStyle=1;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#dc2626;" vertex="1" parent="1">
+          <mxGeometry x="95" y="195" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_1" value="Gateway: only public endpoint (HTTPS)" style="text;html=1;fontSize=9;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="95" y="218" width="250" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_2" value="Backend / AI: --no-allow-unauthenticated" style="text;html=1;fontSize=9;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="95" y="236" width="250" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_3" value="Auth: JWT (Access 15min + Refresh 7d)" style="text;html=1;fontSize=9;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="95" y="254" width="250" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_4" value="PII: Presidio mask/unmask (L1/L4 Guard)" style="text;html=1;fontSize=9;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="95" y="272" width="250" height="16" as="geometry" />
+        </mxCell>
+
+        <!-- Infrastructure Cost -->
+        <mxCell id="cost_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfdf5;strokeColor=#10b981;strokeWidth=1;arcSize=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="310" width="280" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="cost_title" value="Infrastructure Cost: ~$6/mo" style="text;html=1;fontSize=10;fontStyle=1;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#059669;" vertex="1" parent="1">
+          <mxGeometry x="95" y="315" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cost_1" value="Cloud Run: $0 (free tier 2M req/mo)" style="text;html=1;fontSize=9;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="95" y="336" width="250" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="cost_2" value="Firebase Hosting + Qdrant Cloud: $0 (free)" style="text;html=1;fontSize=9;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="95" y="352" width="250" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="cost_3" value="OpenAI API (GPT-4o-mini + Embedding): ~$6" style="text;html=1;fontSize=9;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="95" y="368" width="250" height="16" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== LEGEND ==================== -->
+        <mxCell id="legend_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#e5e7eb;strokeWidth=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="830" width="500" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_title" value="Legend" style="text;html=1;fontSize=11;fontStyle=1;align=left;verticalAlign=middle;fontFamily=Inter;fontColor=#374151;" vertex="1" parent="1">
+          <mxGeometry x="95" y="835" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="95" y="860" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1t" value="Frontend" style="text;html=1;fontSize=9;fontFamily=Inter;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="116" y="858" width="55" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fefce8;strokeColor=#eab308;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="95" y="885" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2t" value="Gateway" style="text;html=1;fontSize=9;fontFamily=Inter;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="116" y="883" width="55" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="185" y="860" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3t" value="Backend" style="text;html=1;fontSize=9;fontFamily=Inter;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="206" y="858" width="55" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#faf5ff;strokeColor=#a855f7;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="185" y="885" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4t" value="AI Processing" style="text;html=1;fontSize=9;fontFamily=Inter;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="206" y="883" width="75" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#f97316;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="295" y="860" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5t" value="PostgreSQL" style="text;html=1;fontSize=9;fontFamily=Inter;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="316" y="858" width="65" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg6" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdf2f8;strokeColor=#ec4899;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="295" y="885" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg6t" value="Qdrant" style="text;html=1;fontSize=9;fontFamily=Inter;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="316" y="883" width="55" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg7" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f9ff;strokeColor=#0ea5e9;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="395" y="860" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg7t" value="OpenAI API" style="text;html=1;fontSize=9;fontFamily=Inter;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="416" y="858" width="65" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg8" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#64748b;strokeWidth=2;arcSize=20;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="395" y="885" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg8t" value="Observability" style="text;html=1;fontSize=9;fontFamily=Inter;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="416" y="883" width="75" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== DEPENDENCY FLOW NOTE ==================== -->
+        <mxCell id="flow_note" value="&lt;b&gt;Dependency Flow:&lt;/b&gt;&amp;nbsp; Frontend &amp;rarr; Gateway &amp;rarr; Backend &amp;rarr; AI Processing &amp;rarr; Qdrant / OpenAI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f5f9;strokeColor=#cbd5e1;fontSize=10;fontFamily=Inter;fontColor=#475569;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="80" y="940" width="500" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
