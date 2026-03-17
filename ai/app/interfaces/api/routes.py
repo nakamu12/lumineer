@@ -271,20 +271,31 @@ async def _stream_agent_response(message: str) -> AsyncGenerator[str, None]:
                     text = ItemHelpers.text_message_output(event.item)
                     yield _sse_event("text_delta", text)
 
-        # Record token usage from the completed run
+        # Record token usage and LLM metrics from the completed run
+        llm_duration = time.monotonic() - start
+        metrics.record_llm_request(agent=previous_agent_name, status="success")
+        metrics.record_llm_latency(agent=previous_agent_name, duration=llm_duration)
+
         usage = getattr(result, "usage", None)
         if usage is not None:
+            input_tok = getattr(usage, "input_tokens", 0)
+            output_tok = getattr(usage, "output_tokens", 0)
             token_tracker.track(
-                input_tokens=getattr(usage, "input_tokens", 0),
-                output_tokens=getattr(usage, "output_tokens", 0),
+                input_tokens=input_tok,
+                output_tokens=output_tok,
                 model=settings.AGENT_MODEL,
                 trace=trace,
                 generation_name="agent-chat",
             )
+            # Estimate cost (GPT-4o-mini: $0.15/1M input, $0.60/1M output)
+            cost = (input_tok * 0.15 + output_tok * 0.60) / 1_000_000
+            metrics.record_llm_cost(model=settings.AGENT_MODEL, cost_usd=cost)
 
         yield _sse_event("done", "")
 
     except InputGuardrailTripwireTriggered:
+        metrics.record_llm_request(agent=previous_agent_name, status="error")
+        metrics.record_guardrail_trigger(guardrail_type="input_tripwire")
         metrics.record_request_error(endpoint="/agents/chat", method="POST")
         yield _sse_event(
             "error",
@@ -292,6 +303,7 @@ async def _stream_agent_response(message: str) -> AsyncGenerator[str, None]:
         )
     except Exception:
         logger.exception("Agent chat error")
+        metrics.record_llm_request(agent=previous_agent_name, status="error")
         metrics.record_request_error(endpoint="/agents/chat", method="POST")
         yield _sse_event("error", "An unexpected error occurred. Please try again.")
     finally:
