@@ -9,6 +9,7 @@ import { registerSearchRoutes } from "./routes/search_routes.ts"
 import { registerChatRoutes } from "./routes/chat_routes.ts"
 import { registerPathRoutes } from "./routes/path_routes.ts"
 import { registerSettingsRoutes } from "./routes/settings_routes.ts"
+import { registerCourseRoutes } from "./routes/course_routes.ts"
 import type { AppVariables } from "./types.ts"
 
 const healthRoute = createRoute({
@@ -53,6 +54,7 @@ export function createRouter(container: Container): OpenAPIHono<{ Variables: App
   // Domain routes
   registerAuthRoutes(app, container)
   registerSearchRoutes(app, container)
+  registerCourseRoutes(app, container)
   registerChatRoutes(app, container)
   registerPathRoutes(app, container)
   registerSettingsRoutes(app, container)

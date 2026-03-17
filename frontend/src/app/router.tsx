@@ -6,6 +6,7 @@ import { ExplorePage } from "@/features/explore/ExplorePage"
 import { ChatPage } from "@/features/chat/ChatPage"
 import { MyPathPage } from "@/features/path/MyPathPage"
 import { SettingsPage } from "@/features/settings/SettingsPage"
+import { CourseDetailPage } from "@/features/course/CourseDetailPage"
 import { LoginPage } from "@/features/auth/LoginPage"
 
 export const router = createBrowserRouter([
@@ -46,6 +47,14 @@ export const router = createBrowserRouter([
         <ProtectedRoute>
           <MyPathPage />
         </ProtectedRoute>
+      </PageLayout>
+    ),
+  },
+  {
+    path: "/course/:id",
+    element: (
+      <PageLayout>
+        <CourseDetailPage />
       </PageLayout>
     ),
   },

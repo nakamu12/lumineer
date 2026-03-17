@@ -1,31 +1,14 @@
-import { ExternalLink, Star, Users } from "lucide-react"
+import { Link } from "react-router-dom"
+import { Star, Users } from "lucide-react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/lib/ui/card"
 import { Badge } from "@/lib/ui/badge"
 import { Button } from "@/lib/ui/button"
 import { cn } from "@/lib/utils"
 import type { Course } from "@/lib/types/course"
+import { getLevelBadgeClass, formatEnrolled } from "@/lib/utils/course"
 
 interface CourseCardProps {
   course: Course
-}
-
-function formatEnrolled(count: number): string {
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}k`
-  return String(count)
-}
-
-function getLevelBadgeClass(level: Course["level"]): string {
-  switch (level) {
-    case "Beginner":
-      return "bg-green-100 text-green-800 border-green-200"
-    case "Intermediate":
-      return "bg-blue-100 text-blue-800 border-blue-200"
-    case "Advanced":
-      return "bg-orange-100 text-orange-800 border-orange-200"
-    default:
-      return "bg-gray-100 text-gray-600 border-gray-200"
-  }
 }
 
 export function CourseCard({ course }: CourseCardProps) {
@@ -37,12 +20,14 @@ export function CourseCard({ course }: CourseCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <h3
-              className="font-semibold text-base leading-snug line-clamp-2 mb-1"
+            <Link
+              to={`/course/${course.id}`}
+              state={{ course }}
+              className="font-semibold text-base leading-snug line-clamp-2 mb-1 hover:text-primary transition-colors"
               title={course.title}
             >
               {course.title}
-            </h3>
+            </Link>
             <p className="text-sm text-muted-foreground truncate">{course.organization}</p>
           </div>
           {course.level && (
@@ -86,10 +71,9 @@ export function CourseCard({ course }: CourseCardProps) {
 
       <CardFooter className="pt-0">
         <Button variant="outline" size="sm" className="w-full gap-1.5" asChild>
-          <a href={course.url} target="_blank" rel="noopener noreferrer">
-            View Course
-            <ExternalLink className="h-3.5 w-3.5" />
-          </a>
+          <Link to={`/course/${course.id}`} state={{ course }}>
+            View Details
+          </Link>
         </Button>
       </CardFooter>
     </Card>

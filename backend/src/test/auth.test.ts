@@ -68,6 +68,7 @@ function createTestContainer(userRepository: InMemoryUserRepository): Container 
   return {
     searchCoursesUseCase: notImplemented,
     chatUseCase: notImplemented,
+    getCourseDetailUseCase: notImplemented,
     userRepository,
     passwordHasher,
     tokenIssuer,

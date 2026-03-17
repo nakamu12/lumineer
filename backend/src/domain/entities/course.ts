@@ -13,9 +13,9 @@ export type Course = {
   enrolled: number
   skills: string[]
   url: string
-  instructor: string
-  schedule: string
-  modules: string
+  instructor: string | null
+  schedule: string | null
+  modules: string | null
 }
 
 type CourseInput = {
@@ -28,9 +28,9 @@ type CourseInput = {
   enrolled: number
   skills?: string[]
   url: string
-  instructor?: string
-  schedule?: string
-  modules?: string
+  instructor?: string | null
+  schedule?: string | null
+  modules?: string | null
 }
 
 /**
@@ -62,9 +62,9 @@ export const CourseFactory = {
       enrolled: input.enrolled,
       skills: input.skills ?? [],
       url: input.url,
-      instructor: input.instructor ?? "",
-      schedule: input.schedule ?? "",
-      modules: input.modules ?? "",
+      instructor: input.instructor ?? null,
+      schedule: input.schedule ?? null,
+      modules: input.modules ?? null,
     }
   },
 }
