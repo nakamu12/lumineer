@@ -15,6 +15,7 @@ from app.guardrails.input.offtopic_detector import offtopic_guardrail
 from app.guardrails.input.pii_sanitizer import pii_sanitizer_guardrail
 from app.guardrails.input.toxicity_filter import toxicity_guardrail
 from app.guardrails.output.hallucination_checker import hallucination_guardrail
+from app.guardrails.output.privacy_filter import privacy_guardrail
 
 _PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "triage.md"
 
@@ -37,6 +38,6 @@ def create_triage_agent() -> Agent:
             offtopic_guardrail,
             pii_sanitizer_guardrail,
         ],
-        output_guardrails=[hallucination_guardrail],
+        output_guardrails=[hallucination_guardrail, privacy_guardrail],
         model=settings.AGENT_MODEL,
     )
