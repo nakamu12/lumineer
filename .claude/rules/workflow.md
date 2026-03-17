@@ -148,6 +148,29 @@ QDRANT_URL=http://localhost:6333
 DATABASE_URL=postgres://lumineer:lumineer@localhost:5432/lumineer
 ```
 
+## 開発フロー（実装時の必須手順）
+
+コード実装タスクでは以下の順序を必ず守る:
+
+```
+1. TDD: RED → GREEN → REFACTOR（テストファースト）
+   - /tdd スキルで開始
+   - 先にテストを書いて失敗を確認（RED）
+   - 最小限の実装でテストを通す（GREEN）
+   - リファクタリング（REFACTOR）
+
+2. 実装完了後: テスト実行
+   - bun test / pytest で全テスト通過を確認
+
+3. 実装完了後: Code Review + Security Review（並列サブエージェント）
+   - code-reviewer サブエージェントで品質・アーキテクチャ準拠を確認
+   - security-reviewer サブエージェントで OWASP Top 10・秘密漏洩・PII を確認
+   - 2つは独立なので必ず並列実行する
+   - 指摘があれば修正してから PR を作成
+```
+
+**省略禁止**: テストだけ通して Review を飛ばさない。Review で指摘がなくても毎回実行する。
+
 ## タスク管理
 
 - 全タスクは GitHub Issues で採番
