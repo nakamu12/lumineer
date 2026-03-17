@@ -20,6 +20,7 @@ from app.config.container import build_container, get_container
 from app.config.settings import get_settings
 from app.domain.usecases.get_course_detail import CourseNotFoundError, GetCourseDetailUseCase
 from app.domain.usecases.search_courses import SearchCoursesUseCase, SearchQuery, SearchResult
+from app.guardrails.input.pii_sanitizer import mask_pii
 from app.infrastructure.formatters import create_formatter
 from app.infrastructure.reranking import create_reranker
 
@@ -188,14 +189,23 @@ def _sse_event(event_type: str, content: str) -> str:
 
 
 async def _stream_agent_response(message: str) -> AsyncGenerator[str, None]:
-    """Run the Triage Agent and yield SSE events."""
+    """Run the Triage Agent and yield SSE events.
+
+    PII in the user message is masked before sending to the agent.
+    The PII mappings are stored for restoration in Issue #62 (pii_restorer).
+    """
     settings = get_settings()
 
     try:
+        # L1 Guard: Mask PII before agent processing
+        pii_result = mask_pii(message)
+        masked_message = pii_result.masked_text
+        # pii_result.mappings will be used by pii_restorer in Issue #62
+
         triage = create_triage_agent()
         result = Runner.run_streamed(
             triage,
-            input=message,
+            input=masked_message,
             max_turns=settings.AGENT_MAX_TURNS,
         )
 
