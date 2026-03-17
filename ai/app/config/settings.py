@@ -63,6 +63,11 @@ class Settings(BaseSettings):
     MAX_TOTAL_TOKENS: int = 14_000
     MAX_CORRECTIVE_RAG_RETRIES: int = 3
 
+    # Langfuse (optional — disabled when keys are absent)
+    LANGFUSE_PUBLIC_KEY: str | None = None
+    LANGFUSE_SECRET_KEY: str | None = None
+    LANGFUSE_HOST: str = "http://localhost:3003"
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8001

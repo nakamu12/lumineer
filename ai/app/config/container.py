@@ -8,6 +8,9 @@ if TYPE_CHECKING:
     from app.domain.ports.embedding import EmbeddingPort
     from app.domain.ports.llm import LLMPort
     from app.domain.ports.vector_store import VectorStorePort
+    from app.observability.langfuse_tracer import LangfuseTracer
+    from app.observability.metrics import MetricsCollector
+    from app.observability.token_tracker import TokenTracker
 
 
 class Container:
@@ -50,6 +53,30 @@ class Container:
         result: LLMPort = self.resolve(LLMPort)
         return result
 
+    @property
+    def metrics(self) -> MetricsCollector:
+        """Return the registered MetricsCollector."""
+        from app.observability.metrics import MetricsCollector
+
+        result: MetricsCollector = self.resolve(MetricsCollector)
+        return result
+
+    @property
+    def tracer(self) -> LangfuseTracer:
+        """Return the registered LangfuseTracer."""
+        from app.observability.langfuse_tracer import LangfuseTracer
+
+        result: LangfuseTracer = self.resolve(LangfuseTracer)
+        return result
+
+    @property
+    def token_tracker(self) -> TokenTracker:
+        """Return the registered TokenTracker."""
+        from app.observability.token_tracker import TokenTracker
+
+        result: TokenTracker = self.resolve(TokenTracker)
+        return result
+
 
 _container: Container | None = None
 
@@ -69,6 +96,9 @@ def build_container() -> Container:
     from app.domain.ports.vector_store import VectorStorePort
     from app.infrastructure.embeddings.openai_embedding_adapter import OpenAIEmbeddingAdapter
     from app.infrastructure.vectordb.qdrant_search_adapter import QdrantSearchAdapter
+    from app.observability.langfuse_tracer import LangfuseTracer, create_langfuse_tracer
+    from app.observability.metrics import MetricsCollector, create_metrics_collector
+    from app.observability.token_tracker import TokenTracker
 
     settings = get_settings()
     container = get_container()
@@ -89,5 +119,18 @@ def build_container() -> Container:
             api_key=settings.QDRANT_API_KEY,
         ),
     )
+
+    # Observability
+    metrics = create_metrics_collector()
+    tracer = create_langfuse_tracer(
+        public_key=settings.LANGFUSE_PUBLIC_KEY,
+        secret_key=settings.LANGFUSE_SECRET_KEY,
+        host=settings.LANGFUSE_HOST,
+    )
+    token_tracker = TokenTracker(metrics=metrics, tracer=tracer)
+
+    container.register(MetricsCollector, metrics)
+    container.register(LangfuseTracer, tracer)
+    container.register(TokenTracker, token_tracker)
 
     return container

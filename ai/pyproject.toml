@@ -17,6 +17,8 @@ dependencies = [
     "tenacity>=9.0",
     "tqdm>=4.67",
     "uvicorn[standard]>=0.34",
+    "langfuse>=2.0,<4.0",
+    "prometheus-client>=0.21",
 ]
 
 [build-system]
