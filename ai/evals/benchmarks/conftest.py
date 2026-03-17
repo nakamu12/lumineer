@@ -36,9 +36,9 @@ def langfuse_client() -> Any:
         if not settings.LANGFUSE_PUBLIC_KEY or not settings.LANGFUSE_SECRET_KEY:
             logger.info("Langfuse keys absent — skipping eval result logging")
             return None
-        from langfuse import Langfuse  # type: ignore[import-not-found]
+        from langfuse import Langfuse
 
-        client = Langfuse(
+        client: Any = Langfuse(
             public_key=settings.LANGFUSE_PUBLIC_KEY,
             secret_key=settings.LANGFUSE_SECRET_KEY,
             host=settings.LANGFUSE_HOST,
@@ -51,7 +51,7 @@ def langfuse_client() -> Any:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def flush_langfuse(langfuse_client: Any) -> Any:  # type: ignore[return]
+def flush_langfuse(langfuse_client: Any) -> Any:
     """Flush Langfuse after all benchmarks complete."""
     yield
     if langfuse_client is not None:

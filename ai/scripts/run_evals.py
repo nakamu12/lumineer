@@ -51,6 +51,8 @@ class _LangfuseEvalLogger:
     Disabled automatically when LANGFUSE_PUBLIC_KEY is absent.
     """
 
+    _client: Any  # Langfuse or None — typed as Any to avoid SDK version drift
+
     def __init__(self) -> None:
         from app.config.settings import get_settings
 
@@ -60,7 +62,7 @@ class _LangfuseEvalLogger:
             self._client = None
             return
         try:
-            from langfuse import Langfuse  # type: ignore[import-not-found]
+            from langfuse import Langfuse
 
             self._client = Langfuse(
                 public_key=settings.LANGFUSE_PUBLIC_KEY,
