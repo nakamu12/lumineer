@@ -2,6 +2,11 @@
 # Outputs — values needed after terraform apply
 # =============================================================================
 
+output "gateway_service_url" {
+  description = "Cloud Run URL for the Gateway (Hono) service — public entry point"
+  value       = google_cloud_run_v2_service.gateway.uri
+}
+
 output "api_service_url" {
   description = "Cloud Run URL for the API (Hono) service"
   value       = google_cloud_run_v2_service.api.uri

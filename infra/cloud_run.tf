@@ -26,7 +26,64 @@ resource "time_sleep" "api_propagation" {
 }
 
 # =============================================================================
-# Cloud Run — API (Bun + Hono)
+# Cloud Run — Gateway (Bun + Hono) — sole public entry point
+# =============================================================================
+
+resource "google_cloud_run_v2_service" "gateway" {
+  name     = "${var.app_name}-gateway"
+  location = var.region
+
+  template {
+    service_account = google_service_account.cloud_run_gateway.email
+
+    scaling {
+      min_instance_count = var.gateway_min_instances
+      max_instance_count = var.gateway_max_instances
+    }
+
+    containers {
+      image = var.gateway_image
+
+      resources {
+        limits = {
+          memory = var.gateway_memory
+          cpu    = var.gateway_cpu
+        }
+        cpu_idle          = true
+        startup_cpu_boost = true
+      }
+
+      env {
+        name  = "APP_ENV"
+        value = var.environment
+      }
+
+      # Gateway proxies to Backend (API) service
+      env {
+        name  = "BACKEND_URL"
+        value = google_cloud_run_v2_service.api.uri
+      }
+
+      liveness_probe {
+        http_get { path = "/health" }
+        initial_delay_seconds = 3
+        period_seconds        = 30
+      }
+
+      startup_probe {
+        http_get { path = "/health" }
+        initial_delay_seconds = 2
+        period_seconds        = 5
+        failure_threshold     = 10
+      }
+    }
+  }
+
+  depends_on = [time_sleep.api_propagation]
+}
+
+# =============================================================================
+# Cloud Run — API (Bun + Hono) — internal only (via Gateway)
 # =============================================================================
 
 resource "google_cloud_run_v2_service" "api" {
@@ -167,17 +224,16 @@ resource "google_cloud_run_v2_service" "ai" {
 }
 
 # =============================================================================
-# Cloud Run — public access (controlled by Bearer token via API Gateway later)
-# For demo: allow unauthenticated (toggle with min_instances=1 for warm-up)
+# Cloud Run — public access: Gateway only
 # =============================================================================
 
-resource "google_cloud_run_v2_service_iam_member" "api_public" {
+resource "google_cloud_run_v2_service_iam_member" "gateway_public" {
   project  = var.project_id
   location = var.region
-  name     = google_cloud_run_v2_service.api.name
+  name     = google_cloud_run_v2_service.gateway.name
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
 
-# AI Processing is NOT public — only API can invoke it
-# (see iam.tf: api_invokes_ai)
+# API and AI Processing are NOT public — access via service accounts only
+# (see iam.tf: gateway_invokes_api, api_invokes_ai)

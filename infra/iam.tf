@@ -15,6 +15,12 @@ resource "google_artifact_registry_repository" "images" {
 # Service Accounts
 # =============================================================================
 
+resource "google_service_account" "cloud_run_gateway" {
+  account_id   = "${var.app_name}-gw-sa"
+  display_name = "Lumineer Gateway Cloud Run SA"
+  description  = "Service account for Cloud Run Gateway (Hono) service"
+}
+
 resource "google_service_account" "cloud_run_api" {
   account_id   = "${var.app_name}-api-sa"
   display_name = "Lumineer API Cloud Run SA"
@@ -31,6 +37,19 @@ resource "google_service_account" "github_actions" {
   account_id   = "${var.app_name}-gh-actions-sa"
   display_name = "Lumineer GitHub Actions SA"
   description  = "Service account for GitHub Actions CI/CD (deploy + push images)"
+}
+
+# =============================================================================
+# IAM — Gateway service account
+# =============================================================================
+
+# Allow Gateway to invoke API (Backend) Cloud Run service
+resource "google_cloud_run_v2_service_iam_member" "gateway_invokes_api" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.api.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.cloud_run_gateway.email}"
 }
 
 # =============================================================================
@@ -92,6 +111,19 @@ resource "google_service_account_iam_member" "gh_actions_act_as_ai_sa" {
   service_account_id = google_service_account.cloud_run_ai.name
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+resource "google_service_account_iam_member" "gh_actions_act_as_gateway_sa" {
+  service_account_id = google_service_account.cloud_run_gateway.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+# Deploy to Firebase Hosting
+resource "google_project_iam_member" "gh_actions_firebase_admin" {
+  project = var.project_id
+  role    = "roles/firebasehosting.admin"
+  member  = "serviceAccount:${google_service_account.github_actions.email}"
 }
 
 # =============================================================================

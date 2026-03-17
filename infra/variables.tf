@@ -34,6 +34,39 @@ variable "environment" {
 }
 
 # =============================================================================
+# Cloud Run — Gateway (Hono)
+# =============================================================================
+
+variable "gateway_image" {
+  description = "Docker image for Gateway (Hono) service"
+  type        = string
+}
+
+variable "gateway_min_instances" {
+  description = "Minimum number of Gateway instances (0 for cost savings, 1 for demo warm-up)"
+  type        = number
+  default     = 0
+}
+
+variable "gateway_max_instances" {
+  description = "Maximum number of Gateway instances"
+  type        = number
+  default     = 3
+}
+
+variable "gateway_memory" {
+  description = "Memory limit for Gateway instances"
+  type        = string
+  default     = "256Mi"
+}
+
+variable "gateway_cpu" {
+  description = "CPU limit for Gateway instances"
+  type        = string
+  default     = "1"
+}
+
+# =============================================================================
 # Cloud Run — API (Hono)
 # =============================================================================
 

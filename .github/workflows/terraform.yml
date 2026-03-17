@@ -57,10 +57,12 @@ jobs:
         run: |
           terraform plan -no-color -input=false \
             -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
+            -var="gateway_image=${{ secrets.GATEWAY_IMAGE }}" \
             -var="api_image=${{ secrets.API_IMAGE }}" \
             -var="ai_image=${{ secrets.AI_IMAGE }}" \
             2>&1 \
             | sed 's/${{ secrets.GCP_PROJECT_ID }}/[PROJECT_ID]/g' \
+            | sed 's/${{ secrets.GATEWAY_IMAGE }}/[GATEWAY_IMAGE]/g' \
             | sed 's/${{ secrets.API_IMAGE }}/[API_IMAGE]/g' \
             | sed 's/${{ secrets.AI_IMAGE }}/[AI_IMAGE]/g' \
             | tee plan_output.txt
@@ -122,5 +124,6 @@ jobs:
         run: |
           terraform apply -auto-approve -input=false \
             -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
+            -var="gateway_image=${{ secrets.GATEWAY_IMAGE }}" \
             -var="api_image=${{ secrets.API_IMAGE }}" \
             -var="ai_image=${{ secrets.AI_IMAGE }}"
