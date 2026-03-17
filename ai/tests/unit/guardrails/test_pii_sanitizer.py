@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from app.guardrails.input.pii_sanitizer import PiiMaskResult, PiiMapping, mask_pii
+from app.guardrails.input.pii_sanitizer import PiiMapping, PiiMaskResult, mask_pii
 
 
 class TestMaskPii:
@@ -65,16 +65,16 @@ class TestMaskPii:
         assert isinstance(result, PiiMaskResult)
 
     def test_pii_mapping_is_frozen(self) -> None:
-        mapping = PiiMapping(original="john@example.com", masked="<EMAIL_ADDRESS>", entity_type="EMAIL_ADDRESS")
+        mapping = PiiMapping(
+            original="john@example.com", masked="<EMAIL_ADDRESS>", entity_type="EMAIL_ADDRESS"
+        )
         with pytest.raises(FrozenInstanceError):
             mapping.original = "other@example.com"  # type: ignore[misc]
 
     def test_mappings_contain_original_value(self) -> None:
         """Mapping records must hold enough info to restore original PII."""
         result = mask_pii("Email me at hello@test.com")
-        email_mapping = next(
-            (m for m in result.mappings if m.entity_type == "EMAIL_ADDRESS"), None
-        )
+        email_mapping = next((m for m in result.mappings if m.entity_type == "EMAIL_ADDRESS"), None)
         assert email_mapping is not None
         assert email_mapping.original == "hello@test.com"
         assert email_mapping.masked == "<EMAIL_ADDRESS>"
