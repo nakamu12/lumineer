@@ -83,11 +83,102 @@
           "legendFormat": "{{from_agent}} → {{to_agent}}"
         }
       ]
+    },
+    {
+      "title": "Qdrant — gRPC Request Latency (p95)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(app_grpc_responses_duration_seconds_bucket{job=\"qdrant\"}[5m])) by (le, endpoint))",
+          "legendFormat": "p95 — {{endpoint}}"
+        }
+      ]
+    },
+    {
+      "title": "Qdrant — Collections & Points",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "app_info_collections_total{job=\"qdrant\"}",
+          "legendFormat": "Collections"
+        },
+        {
+          "expr": "app_info_points_total{job=\"qdrant\"}",
+          "legendFormat": "Points"
+        }
+      ]
+    },
+    {
+      "title": "PostgreSQL — Active Connections",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 15 }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "pg_stat_activity_count{job=\"postgres\", datname=\"lumineer\"}",
+          "legendFormat": "{{state}}"
+        }
+      ]
+    },
+    {
+      "title": "PostgreSQL — Database Size",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "pg_database_size_bytes{job=\"postgres\", datname=\"lumineer\"}",
+          "legendFormat": "lumineer"
+        }
+      ]
+    },
+    {
+      "title": "PostgreSQL — Transactions (per second)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 18, "x": 6, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "rate(pg_stat_database_xact_commit{job=\"postgres\", datname=\"lumineer\"}[5m])",
+          "legendFormat": "commits/s"
+        },
+        {
+          "expr": "rate(pg_stat_database_xact_rollback{job=\"postgres\", datname=\"lumineer\"}[5m])",
+          "legendFormat": "rollbacks/s"
+        }
+      ]
     }
   ],
   "refresh": "10s",
   "schemaVersion": 39,
-  "tags": ["lumineer", "ai-processing"],
+  "tags": ["lumineer", "ai-processing", "qdrant", "postgres"],
   "templating": {
     "list": [
       {
@@ -99,6 +190,6 @@
     ]
   },
   "time": { "from": "now-1h", "to": "now" },
-  "title": "Lumineer AI Processing",
+  "title": "Lumineer Observability",
   "uid": "lumineer-ai-processing"
 }

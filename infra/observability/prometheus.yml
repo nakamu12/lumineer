@@ -16,3 +16,10 @@ scrape_configs:
       - targets: ["qdrant:6333"]
         labels:
           service: "qdrant"
+
+  - job_name: "postgres"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["postgres-exporter:9187"]
+        labels:
+          service: "postgres"
