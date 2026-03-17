@@ -5,6 +5,7 @@ import { ExplorePage } from "@/features/explore/ExplorePage"
 import { ChatPage } from "@/features/chat/ChatPage"
 import { MyPathPage } from "@/features/path/MyPathPage"
 import { SettingsPage } from "@/features/settings/SettingsPage"
+import { CourseDetailPage } from "@/features/course/CourseDetailPage"
 
 export const router = createBrowserRouter([
   {
@@ -36,6 +37,14 @@ export const router = createBrowserRouter([
     element: (
       <PageLayout>
         <MyPathPage />
+      </PageLayout>
+    ),
+  },
+  {
+    path: "/course/:id",
+    element: (
+      <PageLayout>
+        <CourseDetailPage />
       </PageLayout>
     ),
   },

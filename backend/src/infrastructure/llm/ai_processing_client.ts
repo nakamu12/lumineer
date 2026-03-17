@@ -1,3 +1,4 @@
+import type { Course } from "../../domain/entities/course.ts"
 import { CourseFactory } from "../../domain/entities/course.ts"
 import type {
   AIProcessingPort,
@@ -64,5 +65,22 @@ export class AIProcessingClient implements AIProcessingPort {
       ),
       session_id: data.session_id,
     }
+  }
+
+  async getCourseById(id: string): Promise<Course | null> {
+    const response = await fetch(`${this.baseUrl}/courses/${encodeURIComponent(id)}`)
+
+    if (response.status === 404) {
+      return null
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `AI Processing getCourseById failed: ${response.status} ${response.statusText}`,
+      )
+    }
+
+    const data = (await response.json()) as Record<string, unknown>
+    return CourseFactory.create(data as Parameters<typeof CourseFactory.create>[0])
   }
 }

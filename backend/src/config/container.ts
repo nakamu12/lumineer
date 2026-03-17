@@ -17,6 +17,7 @@ import { ListLearningPathsUseCase } from "../domain/usecases/list_learning_paths
 import { CreateLearningPathUseCase } from "../domain/usecases/create_learning_path.ts"
 import { GetUserSettingsUseCase } from "../domain/usecases/get_user_settings.ts"
 import { UpdateUserSettingsUseCase } from "../domain/usecases/update_user_settings.ts"
+import { GetCourseDetailUseCase } from "../domain/usecases/get_course_detail.ts"
 import type { UserRepositoryPort } from "../domain/ports/user_repository.ts"
 import type { PasswordHasherPort, TokenIssuerPort } from "../domain/ports/auth.ts"
 import type { ChatSessionRepositoryPort } from "../domain/ports/chat_session_repository.ts"
@@ -27,6 +28,7 @@ export type Container = {
   // Infrastructure
   searchCoursesUseCase: SearchCoursesUseCase
   chatUseCase: ChatUseCase
+  getCourseDetailUseCase: GetCourseDetailUseCase
   userRepository: UserRepositoryPort
   passwordHasher: PasswordHasherPort
   tokenIssuer: TokenIssuerPort
@@ -62,6 +64,7 @@ export function createContainer(): Container {
     // Infrastructure
     searchCoursesUseCase: new SearchCoursesUseCase(aiProcessingClient),
     chatUseCase: new ChatUseCase(aiProcessingClient),
+    getCourseDetailUseCase: new GetCourseDetailUseCase(aiProcessingClient),
     userRepository,
     passwordHasher,
     tokenIssuer,
