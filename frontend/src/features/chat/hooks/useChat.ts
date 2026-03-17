@@ -2,16 +2,26 @@ import { useState, useRef, useCallback } from "react"
 import type { ChatMessageData } from "../components/ChatMessage"
 import type { Course } from "@/lib/types/course"
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001"
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000"
 
 function generateId() {
   return Math.random().toString(36).slice(2)
+}
+
+type SSEEvent = {
+  type: "text" | "courses" | "done" | "error" | "session"
+  content?: string
+  courses?: Course[]
+  session_id?: string
 }
 
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessageData[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isStreaming, setIsStreaming] = useState(false)
+  const [sessionId, setSessionId] = useState<string | null>(() => {
+    return localStorage.getItem("lumineer_chat_session_id")
+  })
   const abortRef = useRef<AbortController | null>(null)
 
   const sendMessage = useCallback(
@@ -44,7 +54,10 @@ export function useChat() {
         const res = await fetch(`${API_URL}/api/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text.trim() }),
+          body: JSON.stringify({
+            message: text.trim(),
+            session_id: sessionId ?? undefined,
+          }),
           signal: controller.signal,
         })
 
@@ -73,13 +86,12 @@ export function useChat() {
             if (!raw || raw === "[DONE]") continue
 
             try {
-              const event = JSON.parse(raw) as {
-                type: "text" | "courses" | "done"
-                content?: string
-                courses?: Course[]
-              }
+              const event = JSON.parse(raw) as SSEEvent
 
-              if (event.type === "text" && event.content) {
+              if (event.type === "session" && event.session_id) {
+                setSessionId(event.session_id)
+                localStorage.setItem("lumineer_chat_session_id", event.session_id)
+              } else if (event.type === "text" && event.content) {
                 setMessages((prev) =>
                   prev.map((m) =>
                     m.id === assistantId ? { ...m, content: m.content + event.content } : m,
@@ -90,6 +102,15 @@ export function useChat() {
                   prev.map((m) => (m.id === assistantId ? { ...m, courses: event.courses } : m)),
                 )
               } else if (event.type === "done") {
+                break
+              } else if (event.type === "error") {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId
+                      ? { ...m, content: event.content ?? "An error occurred." }
+                      : m,
+                  ),
+                )
                 break
               }
             } catch {
@@ -115,15 +136,44 @@ export function useChat() {
         setIsStreaming(false)
       }
     },
-    [isLoading, isStreaming],
+    [isLoading, isStreaming, sessionId],
   )
 
   const clearChat = useCallback(() => {
     abortRef.current?.abort()
     setMessages([])
+    setSessionId(null)
+    localStorage.removeItem("lumineer_chat_session_id")
     setIsLoading(false)
     setIsStreaming(false)
   }, [])
 
-  return { messages, isLoading, isStreaming, sendMessage, clearChat }
+  const loadSession = useCallback(async (targetSessionId: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/chat/sessions/${targetSessionId}/messages`)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+      const data = (await res.json()) as Array<{
+        id: string
+        role: "user" | "assistant"
+        content: string
+        created_at: string
+      }>
+
+      const loaded: ChatMessageData[] = data.map((m) => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        timestamp: new Date(m.created_at),
+      }))
+
+      setMessages(loaded)
+      setSessionId(targetSessionId)
+      localStorage.setItem("lumineer_chat_session_id", targetSessionId)
+    } catch {
+      // session may not exist, start fresh
+    }
+  }, [])
+
+  return { messages, isLoading, isStreaming, sessionId, sendMessage, clearChat, loadSession }
 }

@@ -1,0 +1,30 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "backend",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "--watch", "--env-file=../.env.local", "src/index.ts"],
+      "port": 3001,
+      "cwd": "backend"
+    },
+    {
+      "name": "gateway",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "--watch", "src/index.ts"],
+      "port": 3000,
+      "cwd": "gateway",
+      "env": {
+        "BACKEND_URL": "http://localhost:3001",
+        "ALLOWED_ORIGINS": "http://localhost:5173"
+      }
+    },
+    {
+      "name": "frontend",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["dev"],
+      "port": 5173,
+      "cwd": "frontend"
+    }
+  ]
+}

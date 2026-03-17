@@ -10,6 +10,8 @@ function createMockRepository(
     create: vi.fn(),
     findByIdAndUserId: vi.fn(),
     findMessagesBySessionId: vi.fn(),
+    saveMessage: vi.fn(),
+    updateSessionTitle: vi.fn(),
     ...overrides,
   }
 }

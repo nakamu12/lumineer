@@ -3,7 +3,7 @@ import type { Course, CourseSearchResult } from "@/lib/types/course"
 import { useDebounce } from "@/lib/hooks/useDebounce"
 import type { ApiError } from "@/lib/types/api"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001"
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000"
 const LIMIT = 12
 
 interface UseCourseSearchParams {

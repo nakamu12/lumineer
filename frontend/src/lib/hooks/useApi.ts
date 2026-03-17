@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react"
 import type { ApiError } from "@/lib/types/api"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001"
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000"
 
 interface UseApiState<T> {
   data: T | null

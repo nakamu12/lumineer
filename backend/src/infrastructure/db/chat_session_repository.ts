@@ -76,4 +76,30 @@ export class DrizzleChatSessionRepository implements ChatSessionRepositoryPort {
       }),
     )
   }
+
+  async saveMessage(
+    sessionId: string,
+    role: "user" | "assistant",
+    content: string,
+  ): Promise<ChatMessageEntity> {
+    const db = getDb()
+    const rows = await db.insert(chatMessages).values({ sessionId, role, content }).returning()
+    const row = rows[0]
+    if (!row) throw new Error("Failed to save chat message")
+    return ChatMessageFactory.create({
+      id: row.id,
+      sessionId: row.sessionId,
+      role: row.role,
+      content: row.content,
+      createdAt: row.createdAt,
+    })
+  }
+
+  async updateSessionTitle(sessionId: string, title: string): Promise<void> {
+    const db = getDb()
+    await db
+      .update(chatSessions)
+      .set({ title: title.trim(), updatedAt: new Date() })
+      .where(eq(chatSessions.id, sessionId))
+  }
 }

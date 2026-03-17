@@ -61,7 +61,7 @@ export function createContainer(): Container {
   return {
     // Infrastructure
     searchCoursesUseCase: new SearchCoursesUseCase(aiProcessingClient),
-    chatUseCase: new ChatUseCase(aiProcessingClient),
+    chatUseCase: new ChatUseCase(aiProcessingClient, chatSessionRepository),
     userRepository,
     passwordHasher,
     tokenIssuer,
