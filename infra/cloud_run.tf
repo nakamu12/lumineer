@@ -32,6 +32,7 @@ resource "time_sleep" "api_propagation" {
 resource "google_cloud_run_v2_service" "gateway" {
   name     = "${var.app_name}-gateway"
   location = var.region
+  ingress  = "INGRESS_TRAFFIC_ALL" # Public entry point
 
   template {
     service_account = google_service_account.cloud_run_gateway.email
@@ -89,6 +90,7 @@ resource "google_cloud_run_v2_service" "gateway" {
 resource "google_cloud_run_v2_service" "api" {
   name     = "${var.app_name}-api"
   location = var.region
+  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY" # Internal only (via Gateway)
 
   template {
     service_account = google_service_account.cloud_run_api.email
@@ -147,6 +149,7 @@ resource "google_cloud_run_v2_service" "api" {
 resource "google_cloud_run_v2_service" "ai" {
   name     = "${var.app_name}-ai"
   location = var.region
+  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY" # Internal only (via Backend)
 
   template {
     service_account = google_service_account.cloud_run_ai.email

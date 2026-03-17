@@ -17,6 +17,11 @@ output "ai_service_url" {
   value       = google_cloud_run_v2_service.ai.uri
 }
 
+output "gateway_service_account_email" {
+  description = "Service account email used by Cloud Run Gateway service"
+  value       = google_service_account.cloud_run_gateway.email
+}
+
 output "api_service_account_email" {
   description = "Service account email used by Cloud Run API service"
   value       = google_service_account.cloud_run_api.email

@@ -56,13 +56,6 @@ resource "google_cloud_run_v2_service_iam_member" "gateway_invokes_api" {
 # IAM — API service account
 # =============================================================================
 
-# Allow API service to read secrets
-resource "google_project_iam_member" "api_secret_accessor" {
-  project = var.project_id
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${google_service_account.cloud_run_api.email}"
-}
-
 # Allow API to invoke AI Processing Cloud Run service
 resource "google_cloud_run_v2_service_iam_member" "api_invokes_ai" {
   project  = var.project_id
@@ -73,31 +66,63 @@ resource "google_cloud_run_v2_service_iam_member" "api_invokes_ai" {
 }
 
 # =============================================================================
-# IAM — AI Processing service account
+# IAM — AI Processing service account (per-secret access)
 # =============================================================================
 
-resource "google_project_iam_member" "ai_secret_accessor" {
-  project = var.project_id
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${google_service_account.cloud_run_ai.email}"
+resource "google_secret_manager_secret_iam_member" "ai_reads_openai_key" {
+  secret_id = google_secret_manager_secret.app_secrets["openai_api_key"].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.cloud_run_ai.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "ai_reads_qdrant_url" {
+  secret_id = google_secret_manager_secret.app_secrets["qdrant_url"].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.cloud_run_ai.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "ai_reads_qdrant_key" {
+  secret_id = google_secret_manager_secret.app_secrets["qdrant_api_key"].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.cloud_run_ai.email}"
 }
 
 # =============================================================================
 # IAM — GitHub Actions service account
 # =============================================================================
 
-# Push Docker images to Artifact Registry
-resource "google_project_iam_member" "gh_actions_artifact_writer" {
-  project = var.project_id
-  role    = "roles/artifactregistry.writer"
-  member  = "serviceAccount:${google_service_account.github_actions.email}"
+# Push Docker images to Artifact Registry (scoped to specific repository)
+resource "google_artifact_registry_repository_iam_member" "gh_actions_artifact_writer" {
+  project    = var.project_id
+  location   = var.region
+  repository = google_artifact_registry_repository.images.repository_id
+  role       = "roles/artifactregistry.writer"
+  member     = "serviceAccount:${google_service_account.github_actions.email}"
 }
 
-# Deploy to Cloud Run
-resource "google_project_iam_member" "gh_actions_run_developer" {
-  project = var.project_id
-  role    = "roles/run.developer"
-  member  = "serviceAccount:${google_service_account.github_actions.email}"
+# Deploy to Cloud Run (per-service binding)
+resource "google_cloud_run_v2_service_iam_member" "gh_actions_deploy_gateway" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.gateway.name
+  role     = "roles/run.developer"
+  member   = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "gh_actions_deploy_api" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.api.name
+  role     = "roles/run.developer"
+  member   = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "gh_actions_deploy_ai" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.ai.name
+  role     = "roles/run.developer"
+  member   = "serviceAccount:${google_service_account.github_actions.email}"
 }
 
 # Act as Cloud Run service accounts (required for deployment)
