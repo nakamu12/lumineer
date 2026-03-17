@@ -21,28 +21,10 @@ import { Separator } from "@/lib/ui/separator"
 import { Skeleton } from "@/lib/ui/skeleton"
 import { cn } from "@/lib/utils"
 import type { Course } from "@/lib/types/course"
+import { getLevelBadgeClass, formatEnrolled } from "@/lib/utils/course"
 import { useCourseDetail } from "./hooks/useCourseDetail"
 
 const DESCRIPTION_PREVIEW_LENGTH = 300
-
-function getLevelColor(level: Course["level"]): string {
-  switch (level) {
-    case "Beginner":
-      return "bg-green-100 text-green-800 border-green-200"
-    case "Intermediate":
-      return "bg-blue-100 text-blue-800 border-blue-200"
-    case "Advanced":
-      return "bg-orange-100 text-orange-800 border-orange-200"
-    default:
-      return "bg-gray-100 text-gray-600 border-gray-200"
-  }
-}
-
-function formatEnrolled(count: number): string {
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}k`
-  return String(count)
-}
 
 function CourseDetailSkeleton() {
   return (
@@ -67,7 +49,9 @@ function CourseDetailSkeleton() {
 export function CourseDetailPage() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
-  const initialCourse = (location.state as { course?: Course } | null)?.course ?? null
+  const state = location.state as Record<string, unknown> | null
+  const initialCourse =
+    state && typeof state === "object" && "course" in state ? (state.course as Course) : null
 
   const { course, isLoading, error } = useCourseDetail(id ?? "", initialCourse)
 
@@ -129,7 +113,7 @@ export function CourseDetailPage() {
               {course.level && (
                 <Badge
                   variant="outline"
-                  className={cn("shrink-0 text-sm mt-1", getLevelColor(course.level))}
+                  className={cn("shrink-0 text-sm mt-1", getLevelBadgeClass(course.level))}
                 >
                   {course.level}
                 </Badge>

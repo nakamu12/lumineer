@@ -6,6 +6,7 @@ import type {
   SearchFilters,
   SearchResult,
 } from "../../domain/ports/ai_processing.ts"
+import { CourseSchema } from "../../interfaces/api/schemas/search.ts"
 import { getSettings } from "../../config/settings.ts"
 
 export class AIProcessingClient implements AIProcessingPort {
@@ -80,7 +81,8 @@ export class AIProcessingClient implements AIProcessingPort {
       )
     }
 
-    const data = (await response.json()) as Record<string, unknown>
-    return CourseFactory.create(data as Parameters<typeof CourseFactory.create>[0])
+    const raw: unknown = await response.json()
+    const data = CourseSchema.parse(raw)
+    return CourseFactory.create(data)
   }
 }

@@ -42,7 +42,11 @@ export function useCourseDetail(
       const data = (await response.json()) as Course
       setCourse(data)
     } catch (err) {
-      setError(err as ApiError)
+      if (err instanceof Error) {
+        setError({ message: err.message })
+      } else {
+        setError(err as ApiError)
+      }
     } finally {
       setIsLoading(false)
     }
