@@ -50,6 +50,11 @@ async def injection_guardrail(
 
     is_injection = any(pattern in lower for pattern in _INJECTION_PATTERNS)
 
+    if is_injection:
+        run_ctx = ctx.context
+        if run_ctx is not None and run_ctx.metrics is not None:
+            run_ctx.metrics.record_guardrail_trigger(guardrail_type="injection")
+
     return GuardrailFunctionOutput(
         output_info={"injection_detected": is_injection, "input_preview": text[:100]},
         tripwire_triggered=is_injection,

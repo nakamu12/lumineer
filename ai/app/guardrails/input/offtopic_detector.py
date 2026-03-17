@@ -72,6 +72,11 @@ async def offtopic_guardrail(
         is_offtopic = False
         reason = "classifier_error"
 
+    if is_offtopic:
+        run_ctx = ctx.context
+        if run_ctx is not None and run_ctx.metrics is not None:
+            run_ctx.metrics.record_guardrail_trigger(guardrail_type="offtopic")
+
     return GuardrailFunctionOutput(
         output_info={"offtopic_detected": is_offtopic, "reason": reason},
         tripwire_triggered=is_offtopic,

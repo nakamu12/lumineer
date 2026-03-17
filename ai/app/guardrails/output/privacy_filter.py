@@ -77,6 +77,9 @@ async def privacy_guardrail(
 
     # Stage 1: Fast pattern matching
     if _detect_privacy_patterns(output):
+        run_ctx = ctx.context
+        if run_ctx is not None and run_ctx.metrics is not None:
+            run_ctx.metrics.record_guardrail_trigger(guardrail_type="privacy_violation")
         return GuardrailFunctionOutput(
             output_info={"privacy_violation": True, "reason": "pattern_detected"},
             tripwire_triggered=True,
@@ -97,6 +100,11 @@ async def privacy_guardrail(
         # Fail-open on LLM errors
         is_violation = False
         reason = "classifier_error"
+
+    if is_violation:
+        run_ctx = ctx.context
+        if run_ctx is not None and run_ctx.metrics is not None:
+            run_ctx.metrics.record_guardrail_trigger(guardrail_type="privacy_violation")
 
     return GuardrailFunctionOutput(
         output_info={"privacy_violation": is_violation, "reason": reason},

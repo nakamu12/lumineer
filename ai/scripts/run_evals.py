@@ -16,9 +16,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import sys
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Tier 1 thresholds (ADR-012-7)
@@ -33,6 +36,129 @@ DATASETS_DIR = Path(__file__).parent.parent / "evals" / "datasets"
 PROMPTS_DIR = Path(__file__).parent.parent / "app" / "prompts"
 
 CATEGORIES = ("search", "skill_gap", "path")
+
+
+# ---------------------------------------------------------------------------
+# Langfuse eval logger (optional — gracefully disabled when keys are absent)
+# ---------------------------------------------------------------------------
+
+
+class _LangfuseEvalLogger:
+    """Thin wrapper around Langfuse SDK for eval result logging.
+
+    Creates one Langfuse trace per eval run (category + run_id) and logs
+    individual test-case scores as child spans + Langfuse score events.
+    Disabled automatically when LANGFUSE_PUBLIC_KEY is absent.
+    """
+
+    def __init__(self) -> None:
+        from app.config.settings import get_settings
+
+        settings = get_settings()
+        if not settings.LANGFUSE_PUBLIC_KEY or not settings.LANGFUSE_SECRET_KEY:
+            logger.info("Langfuse keys absent — eval results will NOT be sent to Langfuse")
+            self._client = None
+            return
+        try:
+            from langfuse import Langfuse  # type: ignore[import-not-found]
+
+            self._client = Langfuse(
+                public_key=settings.LANGFUSE_PUBLIC_KEY,
+                secret_key=settings.LANGFUSE_SECRET_KEY,
+                host=settings.LANGFUSE_HOST,
+            )
+            logger.info("Langfuse eval logger initialised (host=%s)", settings.LANGFUSE_HOST)
+        except Exception:
+            logger.exception("Failed to initialise Langfuse client — continuing without it")
+            self._client = None
+
+    @property
+    def enabled(self) -> bool:
+        """Return True if Langfuse is available."""
+        return self._client is not None
+
+    def log_test_case(
+        self,
+        *,
+        category: str,
+        test_id: str,
+        query: str,
+        faithfulness: float,
+        hallucination: float,
+        passed: bool,
+    ) -> None:
+        """Log a single eval test-case result as a Langfuse trace + scores."""
+        if self._client is None:
+            return
+        try:
+            trace = self._client.trace(
+                name="eval-test-case",
+                metadata={
+                    "category": category,
+                    "test_id": test_id,
+                    "query": query[:200],
+                    "passed": passed,
+                },
+                tags=["eval", category],
+            )
+            self._client.score(
+                trace_id=trace.id,
+                name="faithfulness",
+                value=faithfulness,
+                comment=f"Tier 1 threshold >= {THRESHOLDS['faithfulness']['min']:.2f}",
+            )
+            self._client.score(
+                trace_id=trace.id,
+                name="hallucination",
+                value=hallucination,
+                comment=f"Tier 1 threshold <= {THRESHOLDS['hallucination']['max']:.2f}",
+            )
+        except Exception:
+            logger.exception("Langfuse score logging failed for %s/%s", category, test_id)
+
+    def log_category_summary(
+        self,
+        *,
+        category: str,
+        avg_faithfulness: float,
+        avg_hallucination: float,
+        passed: bool,
+    ) -> None:
+        """Log an aggregated category summary trace to Langfuse."""
+        if self._client is None:
+            return
+        try:
+            trace = self._client.trace(
+                name="eval-category-summary",
+                metadata={
+                    "category": category,
+                    "avg_faithfulness": avg_faithfulness,
+                    "avg_hallucination": avg_hallucination,
+                    "passed": passed,
+                },
+                tags=["eval", "summary", category],
+            )
+            self._client.score(
+                trace_id=trace.id,
+                name="avg_faithfulness",
+                value=avg_faithfulness,
+            )
+            self._client.score(
+                trace_id=trace.id,
+                name="avg_hallucination",
+                value=avg_hallucination,
+            )
+        except Exception:
+            logger.exception("Langfuse summary logging failed for %s", category)
+
+    def flush(self) -> None:
+        """Flush all pending Langfuse events."""
+        if self._client is not None:
+            try:
+                self._client.flush()
+            except Exception:
+                logger.exception("Langfuse flush failed")
+
 
 # Map category -> (prompt file, tool context header)
 CATEGORY_CONFIG: dict[str, tuple[str, str]] = {
@@ -91,6 +217,7 @@ def run_category_evals(
     category: str,
     dataset: list[dict[str, Any]],
     verbose: bool = False,
+    langfuse_logger: _LangfuseEvalLogger | None = None,
 ) -> dict[str, float]:
     """Run eval for a category and return average scores."""
     from deepeval.metrics import FaithfulnessMetric, HallucinationMetric
@@ -132,6 +259,11 @@ def run_category_evals(
         faithfulness_scores.append(f_score)
         hallucination_scores.append(h_score)
 
+        case_passed = (
+            f_score >= THRESHOLDS["faithfulness"]["min"]
+            and h_score <= THRESHOLDS["hallucination"]["max"]
+        )
+
         if verbose:
             print(f"         Faithfulness: {f_score:.2f}  Hallucination: {h_score:.2f}")
             if f_score < THRESHOLDS["faithfulness"]["min"]:
@@ -139,12 +271,36 @@ def run_category_evals(
             if h_score > THRESHOLDS["hallucination"]["max"]:
                 print("         [WARN] Hallucination above threshold")
 
+        # Log individual test-case result to Langfuse
+        if langfuse_logger is not None:
+            langfuse_logger.log_test_case(
+                category=category,
+                test_id=test_id,
+                query=query,
+                faithfulness=f_score,
+                hallucination=h_score,
+                passed=case_passed,
+            )
+
     avg_faithfulness = (
         sum(faithfulness_scores) / len(faithfulness_scores) if faithfulness_scores else 0
     )
     avg_hallucination = (
         sum(hallucination_scores) / len(hallucination_scores) if hallucination_scores else 0
     )
+
+    # Log category summary to Langfuse
+    if langfuse_logger is not None:
+        summary_passed = (
+            avg_faithfulness >= THRESHOLDS["faithfulness"]["min"]
+            and avg_hallucination <= THRESHOLDS["hallucination"]["max"]
+        )
+        langfuse_logger.log_category_summary(
+            category=category,
+            avg_faithfulness=avg_faithfulness,
+            avg_hallucination=avg_hallucination,
+            passed=summary_passed,
+        )
 
     return {
         "faithfulness": avg_faithfulness,
@@ -172,6 +328,13 @@ def main() -> None:
     print("Lumineer LLM Evaluation")
     print("=" * 60)
 
+    # Initialise Langfuse logger (no-op when keys are absent)
+    langfuse_logger = _LangfuseEvalLogger()
+    if langfuse_logger.enabled:
+        print("Langfuse: results will be logged")
+    else:
+        print("Langfuse: disabled (set LANGFUSE_PUBLIC_KEY to enable)")
+
     all_passed = True
     results: dict[str, dict[str, float]] = {}
 
@@ -182,7 +345,9 @@ def main() -> None:
         print(f"\n--- {label} Agent Eval ---")
         dataset = load_dataset(category)
         print(f"Loaded {len(dataset)} test cases")
-        scores = run_category_evals(category, dataset, verbose=args.verbose)
+        scores = run_category_evals(
+            category, dataset, verbose=args.verbose, langfuse_logger=langfuse_logger
+        )
         results[category] = scores
 
     # Print summary
@@ -218,6 +383,9 @@ def main() -> None:
     else:
         print("TIER 1 THRESHOLD FAILURE - Review results above")
     print("=" * 60)
+
+    # Flush any buffered Langfuse events before exit
+    langfuse_logger.flush()
 
     sys.exit(0 if all_passed else 1)
 

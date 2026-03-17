@@ -17,7 +17,7 @@ from litestar.exceptions import HTTPException
 from litestar.response import Stream
 from prometheus_client import generate_latest
 
-from app.agents import create_triage_agent
+from app.agents import AgentRunContext, create_triage_agent
 from app.config.container import build_container, get_container
 from app.config.settings import get_settings
 from app.domain.usecases.get_course_detail import CourseNotFoundError, GetCourseDetailUseCase
@@ -255,6 +255,14 @@ async def _stream_agent_response(message: str) -> AsyncGenerator[str, None]:
     # Create a Langfuse trace for this chat request
     trace = tracer.create_trace(name="agent-chat")
 
+    # Bundle observability handles into context — guardrails access via ctx.context
+    run_ctx = AgentRunContext(
+        metrics=metrics,
+        tracer=tracer,
+        token_tracker=token_tracker,
+        trace=trace,
+    )
+
     result = None
     llm_status = "success"
 
@@ -268,6 +276,7 @@ async def _stream_agent_response(message: str) -> AsyncGenerator[str, None]:
         result = Runner.run_streamed(
             triage,
             input=masked_message,
+            context=run_ctx,
             max_turns=settings.AGENT_MAX_TURNS,
         )
 
