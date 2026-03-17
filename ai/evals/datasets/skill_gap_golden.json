@@ -1,0 +1,42 @@
+[
+  {
+    "test_id": "skill_gap_001",
+    "query": "I know Python and SQL. What skills do I need to become a Data Scientist?",
+    "expected_agent": "Skill Gap Agent",
+    "retrieval_context": [
+      "=== Skill Gap Analysis for: Data Scientist ===\n\nSkills you already have (2): Python, SQL\nSkills to acquire (6): Data Visualization, Deep Learning, Machine Learning, R Programming, Statistical Analysis, TensorFlow\n\n--- Relevant Courses ---\n{\"courses\": [{\"title\": \"IBM Data Science Professional Certificate\", \"organization\": \"IBM\", \"level\": \"Beginner\", \"rating\": 4.6, \"enrolled\": 1100000, \"skills\": [\"Data Science\", \"Python\", \"SQL\", \"Machine Learning\", \"Jupyter\"], \"url\": \"https://www.coursera.org/professional-certificates/ibm-data-science\"}, {\"title\": \"Google Data Analytics Professional Certificate\", \"organization\": \"Google\", \"level\": \"Beginner\", \"rating\": 4.8, \"enrolled\": 2457000, \"skills\": [\"Data Analysis\", \"SQL\", \"R Programming\", \"Tableau\", \"Spreadsheets\"], \"url\": \"https://www.coursera.org/professional-certificates/google-data-analytics\"}, {\"title\": \"Deep Learning Specialization\", \"organization\": \"DeepLearning.AI\", \"level\": \"Intermediate\", \"rating\": 4.9, \"enrolled\": 890000, \"skills\": [\"Deep Learning\", \"Neural Networks\", \"TensorFlow\", \"CNN\"], \"url\": \"https://www.coursera.org/specializations/deep-learning\"}]}"
+    ]
+  },
+  {
+    "test_id": "skill_gap_002",
+    "query": "I want to become a frontend developer. I only know HTML and CSS.",
+    "expected_agent": "Skill Gap Agent",
+    "retrieval_context": [
+      "=== Skill Gap Analysis for: Frontend Developer ===\n\nSkills you already have (2): CSS, HTML\nSkills to acquire (4): Bootstrap, JavaScript, React, Web Design\n\n--- Relevant Courses ---\n{\"courses\": [{\"title\": \"HTML, CSS, and Javascript for Web Developers\", \"organization\": \"Johns Hopkins University\", \"level\": \"Beginner\", \"rating\": 4.8, \"enrolled\": 890000, \"skills\": [\"HTML\", \"CSS\", \"JavaScript\", \"Bootstrap\"], \"url\": \"https://www.coursera.org/learn/html-css-javascript-for-web-developers\"}, {\"title\": \"Getting Started with Front-End and Web Development\", \"organization\": \"IBM\", \"level\": \"Beginner\", \"rating\": 4.5, \"enrolled\": 45000, \"skills\": [\"HTML\", \"CSS\", \"JavaScript\", \"React\"], \"url\": \"https://www.coursera.org/learn/getting-started-with-front-end-and-web-development\"}]}"
+    ]
+  },
+  {
+    "test_id": "skill_gap_003",
+    "query": "What do I need to learn to be a cybersecurity analyst? I have networking basics.",
+    "expected_agent": "Skill Gap Agent",
+    "retrieval_context": [
+      "=== Skill Gap Analysis for: Cybersecurity Analyst ===\n\nSkills you already have (1): Networking\nSkills to acquire (5): Cryptography, Incident Response, Network Security, Risk Management, Security Operations\n\n--- Relevant Courses ---\n{\"courses\": [{\"title\": \"Cybersecurity Fundamentals\", \"organization\": \"Johns Hopkins University\", \"level\": \"Intermediate\", \"rating\": 4.5, \"enrolled\": 38000, \"skills\": [\"Cybersecurity\", \"Network Security\", \"Cryptography\", \"Risk Management\"], \"url\": \"https://www.coursera.org/learn/cybersecurity-fundamentals\"}, {\"title\": \"Office of the CISO Institute: Cybersecurity Essentials\", \"organization\": \"Google\", \"level\": \"Beginner\", \"rating\": 4.6, \"enrolled\": 52000, \"skills\": [\"Cybersecurity\", \"Security Operations\", \"Incident Response\"], \"url\": \"https://www.coursera.org/learn/gcat-cybersecurity-essentials\"}]}"
+    ]
+  },
+  {
+    "test_id": "skill_gap_004",
+    "query": "I'm a Python developer who wants to move into machine learning engineering. I know Python, Git, and Docker.",
+    "expected_agent": "Skill Gap Agent",
+    "retrieval_context": [
+      "=== Skill Gap Analysis for: Machine Learning Engineer ===\n\nSkills you already have (1): Python\nSkills to acquire (7): CNN, Data Pipeline, Deep Learning, MLOps, Model Deployment, Neural Networks, TensorFlow\n\n--- Relevant Courses ---\n{\"courses\": [{\"title\": \"Machine Learning Specialization\", \"organization\": \"Stanford University\", \"level\": \"Beginner\", \"rating\": 4.9, \"enrolled\": 1200000, \"skills\": [\"Machine Learning\", \"Supervised Learning\", \"Neural Networks\", \"Regression\"], \"url\": \"https://www.coursera.org/specializations/machine-learning-introduction\"}, {\"title\": \"Deep Learning Specialization\", \"organization\": \"DeepLearning.AI\", \"level\": \"Intermediate\", \"rating\": 4.9, \"enrolled\": 890000, \"skills\": [\"Deep Learning\", \"Neural Networks\", \"TensorFlow\", \"CNN\"], \"url\": \"https://www.coursera.org/specializations/deep-learning\"}, {\"title\": \"Machine Learning Engineering for Production (MLOps)\", \"organization\": \"DeepLearning.AI\", \"level\": \"Intermediate\", \"rating\": 4.7, \"enrolled\": 120000, \"skills\": [\"MLOps\", \"Model Deployment\", \"Data Pipeline\"], \"url\": \"https://www.coursera.org/specializations/machine-learning-engineering-for-production-mlops\"}]}"
+    ]
+  },
+  {
+    "test_id": "skill_gap_005",
+    "query": "I want to become a cloud architect. I already know AWS basics and Linux.",
+    "expected_agent": "Skill Gap Agent",
+    "retrieval_context": [
+      "=== Skill Gap Analysis for: Cloud Architect ===\n\nSkills you already have (1): AWS\nSkills to acquire (5): Automation, Cloud Architecture, CloudFormation, Lambda, Networking\n\n--- Relevant Courses ---\n{\"courses\": [{\"title\": \"AWS Cloud Technical Essentials\", \"organization\": \"Amazon Web Services\", \"level\": \"Beginner\", \"rating\": 4.7, \"enrolled\": 210000, \"skills\": [\"AWS\", \"Cloud Computing\", \"EC2\", \"S3\", \"IAM\"], \"url\": \"https://www.coursera.org/learn/aws-cloud-technical-essentials\"}, {\"title\": \"Automation in the AWS Cloud\", \"organization\": \"Amazon Web Services\", \"level\": \"Beginner\", \"rating\": 4.5, \"enrolled\": 32000, \"skills\": [\"AWS\", \"CloudFormation\", \"Lambda\", \"Automation\"], \"url\": \"https://www.coursera.org/learn/automation-in-aws\"}, {\"title\": \"AWS Fundamentals Specialization\", \"organization\": \"Amazon Web Services\", \"level\": \"Beginner\", \"rating\": 4.6, \"enrolled\": 180000, \"skills\": [\"AWS\", \"Cloud Architecture\", \"Networking\"], \"url\": \"https://www.coursera.org/specializations/aws-fundamentals\"}]}"
+    ]
+  }
+]

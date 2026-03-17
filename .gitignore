@@ -99,6 +99,9 @@ __pycache__/
 .pyre/
 pyrightconfig.json
 
+# DeepEval cache
+ai/.deepeval/
+
 # Testing
 ai/.pytest_cache/
 ai/htmlcov/
