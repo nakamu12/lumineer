@@ -94,6 +94,9 @@ class QdrantSearchAdapter(VectorStorePort):
         sparse_vector = self._build_sparse_vector(query_text)
         qdrant_filter = self._build_filter(filters)
 
+        # Fetch more results than needed to account for chunk deduplication
+        fetch_limit = limit * 3
+
         results = await self._client.query_points(
             collection_name=self._collection,
             prefetch=[
@@ -111,16 +114,21 @@ class QdrantSearchAdapter(VectorStorePort):
                 ),
             ],
             query=FusionQuery(fusion=Fusion.RRF),
-            limit=limit,
+            limit=fetch_limit,
             with_payload=True,
         )
 
-        hits = []
+        # Deduplicate: keep only the best-scoring chunk per course (by course_url)
+        seen_courses: dict[str, dict[str, Any]] = {}
         for point in results.points:
             payload = dict(point.payload or {})
             payload["_id"] = str(point.id)
             payload["_score"] = point.score
-            hits.append(payload)
+            course_key = payload.get("course_url") or payload.get("url", "")
+            if course_key not in seen_courses:
+                seen_courses[course_key] = payload
+
+        hits = list(seen_courses.values())[:limit]
 
         logger.debug("hybrid_search returned %d hits for query=%r", len(hits), query_text)
         return hits
