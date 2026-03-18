@@ -53,6 +53,31 @@ class Settings(BaseSettings):
     AGENT_MODEL: str = "gpt-4o-mini"
     AGENT_MAX_TURNS: int = 10
 
+    # Rate Limiting (L5)
+    RATE_LIMIT_MAX_REQUESTS: int = 30
+    RATE_LIMIT_WINDOW_SECONDS: int = 60
+
+    # Token Budget (L5)
+    MAX_INPUT_TOKENS: int = 10_000
+    MAX_OUTPUT_TOKENS: int = 4_000
+    MAX_TOTAL_TOKENS: int = 14_000
+    MAX_CORRECTIVE_RAG_RETRIES: int = 3
+
+    # Langfuse (optional — disabled when keys are absent)
+    LANGFUSE_PUBLIC_KEY: str | None = None
+    LANGFUSE_SECRET_KEY: str | None = None
+    LANGFUSE_HOST: str = "http://localhost:3003"
+
+    # MCP Server (stretch goal — OAuth 2.1 + Keycloak)
+    # Set KEYCLOAK_URL to enable auth (e.g., "http://keycloak:8080")
+    # Leave unset in dev to run without authentication
+    KEYCLOAK_URL: str | None = None
+    KEYCLOAK_REALM: str = "lumineer"
+    MCP_REQUIRE_AUTH: bool = False  # Set to True in prod to enforce token validation
+    # Public URL of the MCP resource server (used in OAuth 2.1 metadata).
+    # Defaults to http://{HOST}:{PORT}/mcp; override in prod with HTTPS URL.
+    MCP_RESOURCE_SERVER_URL: str | None = None
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8001
@@ -61,6 +86,11 @@ class Settings(BaseSettings):
     def validate_prod(self) -> "Settings":
         """Enforce production-only required fields."""
         # QDRANT_API_KEY is no longer required — GCE Qdrant uses firewall-only protection
+        if self.APP_ENV == "prod":
+            if self.MCP_REQUIRE_AUTH and not self.MCP_RESOURCE_SERVER_URL:
+                raise ValueError(
+                    "MCP_RESOURCE_SERVER_URL is required when MCP_REQUIRE_AUTH=true in production"
+                )
         return self
 
 
