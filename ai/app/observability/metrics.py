@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 from prometheus_client import REGISTRY as DEFAULT_REGISTRY
 from prometheus_client import CollectorRegistry, Counter, Histogram
@@ -63,68 +64,81 @@ class MetricsCollector:
         self.pii_detections.labels(entity_type=entity_type).inc()
 
 
+def _get_or_create(metric_cls: type, name: str, description: str, **kwargs: Any) -> Any:
+    """Return existing metric if already registered, else create new one."""
+    reg = kwargs.get("registry", DEFAULT_REGISTRY)
+    try:
+        return metric_cls(name, description, **kwargs)
+    except ValueError:
+        # Already registered — retrieve from registry
+        for collector in list(reg._names_to_collectors.values()):
+            if getattr(collector, "_name", None) == name:
+                return collector
+        raise  # unexpected — re-raise
+
+
 def create_metrics_collector(*, registry: CollectorRegistry | None = None) -> MetricsCollector:
     """Create a MetricsCollector with the given (or default) registry."""
     reg = registry or REGISTRY
 
-    request_duration = Histogram(
-        "ai_request_duration_seconds",
+    request_duration = _get_or_create(
+        Histogram, "ai_request_duration_seconds",
         "AI service HTTP request duration in seconds",
         labelnames=["endpoint", "method"],
         registry=reg,
     )
 
-    request_errors = Counter(
-        "ai_request_errors_total",
+    request_errors = _get_or_create(
+        Counter, "ai_request_errors_total",
         "Total AI service HTTP request errors",
         labelnames=["endpoint", "method"],
         registry=reg,
     )
 
-    tokens_used = Counter(
-        "ai_tokens_used_total",
+    tokens_used = _get_or_create(
+        Counter, "ai_tokens_used_total",
         "Total tokens consumed by AI service",
         labelnames=["type", "model"],
         registry=reg,
     )
 
-    agent_handoffs = Counter(
-        "ai_agent_handoffs_total",
+    agent_handoffs = _get_or_create(
+        Counter, "ai_agent_handoffs_total",
         "Total agent handoffs",
         labelnames=["from_agent", "to_agent"],
         registry=reg,
     )
 
-    llm_requests = Counter(
-        "ai_llm_requests_total",
+    llm_requests = _get_or_create(
+        Counter, "ai_llm_requests_total",
         "Total LLM requests by agent and status",
         labelnames=["agent", "status"],
         registry=reg,
     )
 
-    llm_latency = Histogram(
-        "ai_llm_latency_seconds",
+    llm_latency = _get_or_create(
+        Histogram, "ai_llm_latency_seconds",
         "LLM call latency in seconds",
         labelnames=["agent"],
         registry=reg,
     )
 
-    llm_cost_usd = Counter(
-        "ai_llm_cost_usd_total",
+    llm_cost_usd = _get_or_create(
+        Counter, "ai_llm_cost_usd_total",
         "Estimated LLM API cost in USD",
         labelnames=["model"],
         registry=reg,
     )
 
-    guardrail_triggers = Counter(
-        "ai_guardrail_triggers_total",
+    guardrail_triggers = _get_or_create(
+        Counter, "ai_guardrail_triggers_total",
         "Total guardrail trigger events",
         labelnames=["type"],
         registry=reg,
     )
 
-    pii_detections = Counter(
-        "ai_pii_detections_total",
+    pii_detections = _get_or_create(
+        Counter, "ai_pii_detections_total",
         "Total PII detection events",
         labelnames=["entity_type"],
         registry=reg,
