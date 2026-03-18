@@ -13,6 +13,8 @@ proxy.all("/api/*", async (c) => {
   const target = `${BACKEND_URL}${url.pathname}${url.search}`
 
   const reqHeaders = new Headers(c.req.raw.headers)
+  // Remove Host header so fetch sets the correct host from the target URL (Cloud Run routing)
+  reqHeaders.delete("host")
   // Forward real client IP for downstream logging
   reqHeaders.set("x-forwarded-for", c.req.header("x-forwarded-for") ?? "unknown")
 
