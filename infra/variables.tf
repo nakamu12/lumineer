@@ -40,6 +40,7 @@ variable "environment" {
 variable "gateway_image" {
   description = "Docker image for Gateway (Hono) service"
   type        = string
+  default     = "asia-northeast1-docker.pkg.dev/lumineer-ai/lumineer-images/lumineer-gateway:latest"
 }
 
 variable "gateway_min_instances" {
@@ -73,6 +74,7 @@ variable "gateway_cpu" {
 variable "api_image" {
   description = "Docker image for API (Hono) service. e.g. gcr.io/<project>/lumineer-api:latest"
   type        = string
+  default     = "asia-northeast1-docker.pkg.dev/lumineer-ai/lumineer-images/lumineer-backend:latest"
 }
 
 variable "api_min_instances" {
@@ -106,6 +108,7 @@ variable "api_cpu" {
 variable "ai_image" {
   description = "Docker image for AI Processing (Python) service"
   type        = string
+  default     = "asia-northeast1-docker.pkg.dev/lumineer-ai/lumineer-images/lumineer-ai:latest"
 }
 
 variable "ai_min_instances" {
