@@ -16,6 +16,7 @@ export interface Course {
 export interface CourseSearchResult {
   courses: Course[]
   total: number
+  summary?: string
   ai_summary?: string
 }
 

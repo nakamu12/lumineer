@@ -9,6 +9,7 @@ const app = createRouter(container)
 export default {
   port: settings.PORT,
   fetch: app.fetch,
+  idleTimeout: 120,
 }
 
 console.log(`Lumineer API running on port ${settings.PORT}`)

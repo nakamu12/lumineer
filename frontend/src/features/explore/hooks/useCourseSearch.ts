@@ -57,16 +57,17 @@ export function useCourseSearch({
       setError(null)
 
       try {
-        const params = new URLSearchParams({
-          q: debouncedQuery,
-          limit: String(LIMIT),
-          offset: String(currentOffset),
-        })
-        if (level) params.set("level", level)
-        if (minRating) params.set("min_rating", minRating)
+        const body: Record<string, unknown> = {
+          query: debouncedQuery,
+          limit: LIMIT,
+        }
+        if (level) body.level = level
+        if (minRating) body.min_rating = Number(minRating)
 
-        const response = await fetch(`${API_BASE_URL}/api/courses/search?${params.toString()}`, {
+        const response = await fetch(`${API_BASE_URL}/api/search`, {
+          method: "POST",
           headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+          body: JSON.stringify(body),
         })
 
         if (!response.ok) {
@@ -87,8 +88,8 @@ export function useCourseSearch({
         } else {
           setCourses(data.courses)
         }
-        setTotal(data.total)
-        setAiSummary(data.ai_summary)
+        setTotal(data.total ?? data.courses?.length ?? 0)
+        setAiSummary(data.summary ?? data.ai_summary)
       } catch (err) {
         if (fetchId !== fetchIdRef.current) return
         setError(err as ApiError)

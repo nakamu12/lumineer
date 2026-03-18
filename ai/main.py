@@ -31,4 +31,5 @@ if __name__ == "__main__":
         host=settings.HOST,
         port=settings.PORT,
         reload=settings.APP_ENV == "dev",
+        reload_dirs=["app"] if settings.APP_ENV == "dev" else None,
     )
