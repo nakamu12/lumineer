@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react"
 import type { Course } from "@/lib/types/course"
 import type { ApiError } from "@/lib/types/api"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001"
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? ""
 
 interface UseCourseDetailReturn {
   course: Course | null

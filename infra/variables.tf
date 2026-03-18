@@ -34,12 +34,47 @@ variable "environment" {
 }
 
 # =============================================================================
+# Cloud Run — Gateway (Hono)
+# =============================================================================
+
+variable "gateway_image" {
+  description = "Docker image for Gateway (Hono) service"
+  type        = string
+  default     = "asia-northeast1-docker.pkg.dev/lumineer-ai/lumineer-images/lumineer-gateway:latest"
+}
+
+variable "gateway_min_instances" {
+  description = "Minimum number of Gateway instances (0 for cost savings, 1 for demo warm-up)"
+  type        = number
+  default     = 0
+}
+
+variable "gateway_max_instances" {
+  description = "Maximum number of Gateway instances"
+  type        = number
+  default     = 3
+}
+
+variable "gateway_memory" {
+  description = "Memory limit for Gateway instances"
+  type        = string
+  default     = "256Mi"
+}
+
+variable "gateway_cpu" {
+  description = "CPU limit for Gateway instances"
+  type        = string
+  default     = "1"
+}
+
+# =============================================================================
 # Cloud Run — API (Hono)
 # =============================================================================
 
 variable "api_image" {
   description = "Docker image for API (Hono) service. e.g. gcr.io/<project>/lumineer-api:latest"
   type        = string
+  default     = "asia-northeast1-docker.pkg.dev/lumineer-ai/lumineer-images/lumineer-backend:latest"
 }
 
 variable "api_min_instances" {
@@ -73,6 +108,7 @@ variable "api_cpu" {
 variable "ai_image" {
   description = "Docker image for AI Processing (Python) service"
   type        = string
+  default     = "asia-northeast1-docker.pkg.dev/lumineer-ai/lumineer-images/lumineer-ai:latest"
 }
 
 variable "ai_min_instances" {
@@ -97,6 +133,28 @@ variable "ai_cpu" {
   description = "CPU limit for AI Processing instances"
   type        = string
   default     = "2"
+}
+
+# =============================================================================
+# GCE — Qdrant
+# =============================================================================
+
+variable "qdrant_machine_type" {
+  description = "Machine type for Qdrant GCE instance"
+  type        = string
+  default     = "e2-micro"
+}
+
+variable "qdrant_disk_size_gb" {
+  description = "Boot disk size in GB for Qdrant instance"
+  type        = number
+  default     = 20
+}
+
+variable "qdrant_zone" {
+  description = "GCE zone for Qdrant instance (override if primary region has no capacity)"
+  type        = string
+  default     = "asia-northeast1-a"
 }
 
 # =============================================================================

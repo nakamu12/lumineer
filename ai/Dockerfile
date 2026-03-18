@@ -24,4 +24,4 @@ COPY . .
 ENV PATH="/app/.venv/bin:$PATH"
 ENV APP_ENV=prod
 EXPOSE 8001
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "1"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8001} --workers 1"]

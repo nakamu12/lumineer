@@ -15,6 +15,12 @@ resource "google_artifact_registry_repository" "images" {
 # Service Accounts
 # =============================================================================
 
+resource "google_service_account" "cloud_run_gateway" {
+  account_id   = "${var.app_name}-gw-sa"
+  display_name = "Lumineer Gateway Cloud Run SA"
+  description  = "Service account for Cloud Run Gateway (Hono) service"
+}
+
 resource "google_service_account" "cloud_run_api" {
   account_id   = "${var.app_name}-api-sa"
   display_name = "Lumineer API Cloud Run SA"
@@ -34,15 +40,21 @@ resource "google_service_account" "github_actions" {
 }
 
 # =============================================================================
-# IAM — API service account
+# IAM — Gateway service account
 # =============================================================================
 
-# Allow API service to read secrets
-resource "google_project_iam_member" "api_secret_accessor" {
-  project = var.project_id
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${google_service_account.cloud_run_api.email}"
+# Allow Gateway to invoke API (Backend) Cloud Run service
+resource "google_cloud_run_v2_service_iam_member" "gateway_invokes_api" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.api.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.cloud_run_gateway.email}"
 }
+
+# =============================================================================
+# IAM — API service account
+# =============================================================================
 
 # Allow API to invoke AI Processing Cloud Run service
 resource "google_cloud_run_v2_service_iam_member" "api_invokes_ai" {
@@ -54,31 +66,74 @@ resource "google_cloud_run_v2_service_iam_member" "api_invokes_ai" {
 }
 
 # =============================================================================
-# IAM — AI Processing service account
+# IAM — API service account (per-secret access + Cloud SQL)
 # =============================================================================
 
-resource "google_project_iam_member" "ai_secret_accessor" {
+resource "google_secret_manager_secret_iam_member" "api_reads_jwt_secret" {
+  secret_id = google_secret_manager_secret.app_secrets["jwt_secret"].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.cloud_run_api.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "api_reads_database_url" {
+  secret_id = google_secret_manager_secret.database_url.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.cloud_run_api.email}"
+}
+
+# Cloud SQL Auth Proxy: API service account needs cloudsql.client to connect
+resource "google_project_iam_member" "api_cloudsql_client" {
   project = var.project_id
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${google_service_account.cloud_run_ai.email}"
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.cloud_run_api.email}"
+}
+
+# =============================================================================
+# IAM — AI Processing service account (per-secret access)
+# =============================================================================
+
+resource "google_secret_manager_secret_iam_member" "ai_reads_openai_key" {
+  secret_id = google_secret_manager_secret.app_secrets["openai_api_key"].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.cloud_run_ai.email}"
 }
 
 # =============================================================================
 # IAM — GitHub Actions service account
 # =============================================================================
 
-# Push Docker images to Artifact Registry
-resource "google_project_iam_member" "gh_actions_artifact_writer" {
-  project = var.project_id
-  role    = "roles/artifactregistry.writer"
-  member  = "serviceAccount:${google_service_account.github_actions.email}"
+# Push Docker images to Artifact Registry (scoped to specific repository)
+resource "google_artifact_registry_repository_iam_member" "gh_actions_artifact_writer" {
+  project    = var.project_id
+  location   = var.region
+  repository = google_artifact_registry_repository.images.repository_id
+  role       = "roles/artifactregistry.writer"
+  member     = "serviceAccount:${google_service_account.github_actions.email}"
 }
 
-# Deploy to Cloud Run
-resource "google_project_iam_member" "gh_actions_run_developer" {
-  project = var.project_id
-  role    = "roles/run.developer"
-  member  = "serviceAccount:${google_service_account.github_actions.email}"
+# Deploy to Cloud Run (per-service binding)
+resource "google_cloud_run_v2_service_iam_member" "gh_actions_deploy_gateway" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.gateway.name
+  role     = "roles/run.developer"
+  member   = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "gh_actions_deploy_api" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.api.name
+  role     = "roles/run.developer"
+  member   = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "gh_actions_deploy_ai" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.ai.name
+  role     = "roles/run.developer"
+  member   = "serviceAccount:${google_service_account.github_actions.email}"
 }
 
 # Act as Cloud Run service accounts (required for deployment)
@@ -92,6 +147,19 @@ resource "google_service_account_iam_member" "gh_actions_act_as_ai_sa" {
   service_account_id = google_service_account.cloud_run_ai.name
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+resource "google_service_account_iam_member" "gh_actions_act_as_gateway_sa" {
+  service_account_id = google_service_account.cloud_run_gateway.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.github_actions.email}"
+}
+
+# Deploy to Firebase Hosting
+resource "google_project_iam_member" "gh_actions_firebase_admin" {
+  project = var.project_id
+  role    = "roles/firebasehosting.admin"
+  member  = "serviceAccount:${google_service_account.github_actions.email}"
 }
 
 # =============================================================================

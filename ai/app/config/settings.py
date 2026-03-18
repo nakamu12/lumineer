@@ -85,9 +85,8 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def validate_prod(self) -> "Settings":
         """Enforce production-only required fields."""
+        # QDRANT_API_KEY is no longer required — GCE Qdrant uses firewall-only protection
         if self.APP_ENV == "prod":
-            if not self.QDRANT_API_KEY:
-                raise ValueError("QDRANT_API_KEY is required in production")
             if self.MCP_REQUIRE_AUTH and not self.MCP_RESOURCE_SERVER_URL:
                 raise ValueError(
                     "MCP_RESOURCE_SERVER_URL is required when MCP_REQUIRE_AUTH=true in production"

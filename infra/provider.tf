@@ -14,6 +14,10 @@ terraform {
       source  = "hashicorp/time"
       version = "~> 0.11"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
   }
 
   # Remote state: GCS backend (uncomment after bucket is created)

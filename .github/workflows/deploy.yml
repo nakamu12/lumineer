@@ -1,0 +1,172 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write # Required for Workload Identity Federation
+
+env:
+  REGION: asia-northeast1
+  AR_REPO: lumineer-images # Artifact Registry repository name
+
+jobs:
+  # ===========================================================================
+  # Build & push Docker images to Artifact Registry
+  # ===========================================================================
+  build:
+    name: Build & Push (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - service: gateway
+            context: ./gateway
+            target: prod
+          - service: backend
+            context: ./backend
+            target: prod
+          - service: ai
+            context: ./ai
+            target: prod
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build & push image
+        run: |
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/lumineer-${{ matrix.service }}:${{ github.sha }}"
+          IMAGE_LATEST="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/lumineer-${{ matrix.service }}:latest"
+
+          docker build \
+            --target ${{ matrix.target }} \
+            --tag "${IMAGE}" \
+            --tag "${IMAGE_LATEST}" \
+            ${{ matrix.context }}
+
+          docker push "${IMAGE}"
+          docker push "${IMAGE_LATEST}"
+
+  # ===========================================================================
+  # Deploy Cloud Run services
+  # ===========================================================================
+  deploy-cloud-run:
+    name: Deploy Cloud Run
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set image tags
+        id: images
+        run: |
+          TAG="${{ github.sha }}"
+          AR="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}"
+          echo "gateway=${AR}/lumineer-gateway:${TAG}" >> $GITHUB_OUTPUT
+          echo "api=${AR}/lumineer-backend:${TAG}" >> $GITHUB_OUTPUT
+          echo "ai=${AR}/lumineer-ai:${TAG}" >> $GITHUB_OUTPUT
+
+      # Deploy AI first (no dependencies)
+      - name: Deploy AI Processing
+        run: |
+          gcloud run deploy lumineer-ai \
+            --image ${{ steps.images.outputs.ai }} \
+            --region ${{ env.REGION }} \
+            --ingress internal \
+            --no-allow-unauthenticated \
+            --quiet
+
+      # Deploy Backend (depends on AI URL)
+      - name: Deploy Backend
+        run: |
+          AI_URL=$(gcloud run services describe lumineer-ai \
+            --region ${{ env.REGION }} \
+            --format 'value(status.url)')
+
+          gcloud run deploy lumineer-api \
+            --image ${{ steps.images.outputs.api }} \
+            --region ${{ env.REGION }} \
+            --ingress all \
+            --update-env-vars "AI_PROCESSING_URL=${AI_URL}" \
+            --allow-unauthenticated \
+            --quiet
+
+      # Deploy Gateway (depends on Backend URL)
+      - name: Deploy Gateway
+        run: |
+          BACKEND_URL=$(gcloud run services describe lumineer-api \
+            --region ${{ env.REGION }} \
+            --format 'value(status.url)')
+
+          gcloud run deploy lumineer-gateway \
+            --image ${{ steps.images.outputs.gateway }} \
+            --region ${{ env.REGION }} \
+            --ingress all \
+            --update-env-vars "BACKEND_URL=${BACKEND_URL},ALLOWED_ORIGINS=https://lumineer-frontend.web.app" \
+            --allow-unauthenticated \
+            --quiet
+
+      - name: Print service URLs
+        run: |
+          echo "=== Deployed Services ==="
+          gcloud run services describe lumineer-gateway --region ${{ env.REGION }} --format 'value(status.url)' | xargs -I{} echo "Gateway: {}"
+          gcloud run services describe lumineer-api --region ${{ env.REGION }} --format 'value(status.url)' | xargs -I{} echo "Backend: {}"
+          gcloud run services describe lumineer-ai --region ${{ env.REGION }} --format 'value(status.url)' | xargs -I{} echo "AI:      {}"
+
+  # ===========================================================================
+  # Deploy Frontend to Firebase Hosting
+  # ===========================================================================
+  deploy-firebase:
+    name: Deploy Firebase Hosting
+    runs-on: ubuntu-latest
+    needs: deploy-cloud-run
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: bun install --frozen-lockfile
+
+      - name: Build frontend
+        working-directory: frontend
+        run: bun run build
+        env:
+          NODE_ENV: production
+          VITE_API_URL: ${{ secrets.GATEWAY_URL }}
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools@13.29.1
+
+      - name: Deploy to Firebase Hosting
+        working-directory: frontend
+        run: firebase deploy --only hosting --project ${{ secrets.GCP_PROJECT_ID }}

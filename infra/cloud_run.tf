@@ -13,6 +13,7 @@ resource "google_project_service" "services" {
     "sts.googleapis.com",
     "firebase.googleapis.com",
     "firebasehosting.googleapis.com",
+    "sqladmin.googleapis.com",
   ])
 
   service            = each.value
@@ -26,15 +27,79 @@ resource "time_sleep" "api_propagation" {
 }
 
 # =============================================================================
-# Cloud Run — API (Bun + Hono)
+# Cloud Run — Gateway (Bun + Hono) — sole public entry point
+# =============================================================================
+
+resource "google_cloud_run_v2_service" "gateway" {
+  name     = "${var.app_name}-gateway"
+  location = var.region
+  ingress  = "INGRESS_TRAFFIC_ALL" # Public entry point
+
+  template {
+    service_account = google_service_account.cloud_run_gateway.email
+
+    scaling {
+      min_instance_count = var.gateway_min_instances
+      max_instance_count = var.gateway_max_instances
+    }
+
+    containers {
+      image = var.gateway_image
+
+      resources {
+        limits = {
+          memory = var.gateway_memory
+          cpu    = var.gateway_cpu
+        }
+        cpu_idle          = true
+        startup_cpu_boost = true
+      }
+
+      env {
+        name  = "APP_ENV"
+        value = var.environment
+      }
+
+      # Gateway proxies to Backend (API) service
+      env {
+        name  = "BACKEND_URL"
+        value = google_cloud_run_v2_service.api.uri
+      }
+
+      liveness_probe {
+        http_get { path = "/health" }
+        initial_delay_seconds = 3
+        period_seconds        = 30
+      }
+
+      startup_probe {
+        http_get { path = "/health" }
+        initial_delay_seconds = 2
+        period_seconds        = 5
+        failure_threshold     = 10
+      }
+    }
+  }
+
+  depends_on = [time_sleep.api_propagation]
+}
+
+# =============================================================================
+# Cloud Run — API (Bun + Hono) — internal only (via Gateway)
 # =============================================================================
 
 resource "google_cloud_run_v2_service" "api" {
   name     = "${var.app_name}-api"
   location = var.region
+  ingress  = "INGRESS_TRAFFIC_ALL" # Public (Gateway proxy does not add identity tokens; JWT auth enforced at app level)
 
   template {
     service_account = google_service_account.cloud_run_api.email
+
+    # Cloud SQL Auth Proxy: secure connection via Unix socket (no VPC needed)
+    annotations = {
+      "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.main.connection_name
+    }
 
     scaling {
       min_instance_count = var.api_min_instances
@@ -60,8 +125,30 @@ resource "google_cloud_run_v2_service" "api" {
       }
 
       env {
-        name  = "AI_SERVICE_URL"
+        name  = "AI_PROCESSING_URL"
         value = google_cloud_run_v2_service.ai.uri
+      }
+
+      # JWT signing secret from Secret Manager
+      env {
+        name = "JWT_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.app_secrets["jwt_secret"].secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      # Database connection URL (Cloud SQL Auth Proxy Unix socket)
+      env {
+        name = "DATABASE_URL"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.database_url.secret_id
+            version = "latest"
+          }
+        }
       }
 
       # Liveness probe
@@ -90,6 +177,7 @@ resource "google_cloud_run_v2_service" "api" {
 resource "google_cloud_run_v2_service" "ai" {
   name     = "${var.app_name}-ai"
   location = var.region
+  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY" # Internal only (via Backend)
 
   template {
     service_account = google_service_account.cloud_run_ai.email
@@ -127,25 +215,12 @@ resource "google_cloud_run_v2_service" "ai" {
         }
       }
 
-      # Qdrant connection
+      # Qdrant connection (GCE instance — Terraform-managed static IP)
+      # Not a secret: no API key, public Coursera data only.
+      # TODO: move to VPC internal networking for tighter security
       env {
-        name = "QDRANT_URL"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.app_secrets["qdrant_url"].secret_id
-            version = "latest"
-          }
-        }
-      }
-
-      env {
-        name = "QDRANT_API_KEY"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.app_secrets["qdrant_api_key"].secret_id
-            version = "latest"
-          }
-        }
+        name  = "QDRANT_URL"
+        value = "http://${google_compute_address.qdrant.address}:6333"
       }
 
       liveness_probe {
@@ -167,9 +242,16 @@ resource "google_cloud_run_v2_service" "ai" {
 }
 
 # =============================================================================
-# Cloud Run — public access (controlled by Bearer token via API Gateway later)
-# For demo: allow unauthenticated (toggle with min_instances=1 for warm-up)
+# Cloud Run — public access: Gateway only
 # =============================================================================
+
+resource "google_cloud_run_v2_service_iam_member" "gateway_public" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.gateway.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
 
 resource "google_cloud_run_v2_service_iam_member" "api_public" {
   project  = var.project_id
@@ -179,5 +261,5 @@ resource "google_cloud_run_v2_service_iam_member" "api_public" {
   member   = "allUsers"
 }
 
-# AI Processing is NOT public — only API can invoke it
+# AI Processing is NOT public — access via Backend service account only
 # (see iam.tf: api_invokes_ai)

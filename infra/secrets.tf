@@ -6,9 +6,8 @@
 
 locals {
   secrets = {
-    openai_api_key  = "OpenAI API key for LLM and Embedding calls"
-    qdrant_url      = "Qdrant Cloud cluster URL"
-    qdrant_api_key  = "Qdrant Cloud API key"
+    openai_api_key = "OpenAI API key for LLM and Embedding calls"
+    jwt_secret     = "JWT signing secret for Backend auth"
   }
 }
 
