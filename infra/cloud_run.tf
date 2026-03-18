@@ -177,7 +177,7 @@ resource "google_cloud_run_v2_service" "api" {
 resource "google_cloud_run_v2_service" "ai" {
   name     = "${var.app_name}-ai"
   location = var.region
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY" # Internal only (via Backend)
+  ingress  = "INGRESS_TRAFFIC_ALL" # Cloud Run-to-Cloud Run requires VPC connector for internal routing; app-level guardrails protect this endpoint
 
   template {
     service_account = google_service_account.cloud_run_ai.email
