@@ -82,63 +82,72 @@ def create_metrics_collector(*, registry: CollectorRegistry | None = None) -> Me
     reg = registry or REGISTRY
 
     request_duration = _get_or_create(
-        Histogram, "ai_request_duration_seconds",
+        Histogram,
+        "ai_request_duration_seconds",
         "AI service HTTP request duration in seconds",
         labelnames=["endpoint", "method"],
         registry=reg,
     )
 
     request_errors = _get_or_create(
-        Counter, "ai_request_errors_total",
+        Counter,
+        "ai_request_errors_total",
         "Total AI service HTTP request errors",
         labelnames=["endpoint", "method"],
         registry=reg,
     )
 
     tokens_used = _get_or_create(
-        Counter, "ai_tokens_used_total",
+        Counter,
+        "ai_tokens_used_total",
         "Total tokens consumed by AI service",
         labelnames=["type", "model"],
         registry=reg,
     )
 
     agent_handoffs = _get_or_create(
-        Counter, "ai_agent_handoffs_total",
+        Counter,
+        "ai_agent_handoffs_total",
         "Total agent handoffs",
         labelnames=["from_agent", "to_agent"],
         registry=reg,
     )
 
     llm_requests = _get_or_create(
-        Counter, "ai_llm_requests_total",
+        Counter,
+        "ai_llm_requests_total",
         "Total LLM requests by agent and status",
         labelnames=["agent", "status"],
         registry=reg,
     )
 
     llm_latency = _get_or_create(
-        Histogram, "ai_llm_latency_seconds",
+        Histogram,
+        "ai_llm_latency_seconds",
         "LLM call latency in seconds",
         labelnames=["agent"],
         registry=reg,
     )
 
     llm_cost_usd = _get_or_create(
-        Counter, "ai_llm_cost_usd_total",
+        Counter,
+        "ai_llm_cost_usd_total",
         "Estimated LLM API cost in USD",
         labelnames=["model"],
         registry=reg,
     )
 
     guardrail_triggers = _get_or_create(
-        Counter, "ai_guardrail_triggers_total",
+        Counter,
+        "ai_guardrail_triggers_total",
         "Total guardrail trigger events",
         labelnames=["type"],
         registry=reg,
     )
 
     pii_detections = _get_or_create(
-        Counter, "ai_pii_detections_total",
+        Counter,
+        "ai_pii_detections_total",
         "Total PII detection events",
         labelnames=["entity_type"],
         registry=reg,
