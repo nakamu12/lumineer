@@ -91,7 +91,7 @@ resource "google_cloud_run_v2_service" "gateway" {
 resource "google_cloud_run_v2_service" "api" {
   name     = "${var.app_name}-api"
   location = var.region
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY" # Internal only (via Gateway)
+  ingress  = "INGRESS_TRAFFIC_ALL" # Public (Gateway proxy does not add identity tokens; JWT auth enforced at app level)
 
   template {
     service_account = google_service_account.cloud_run_api.email
@@ -253,5 +253,13 @@ resource "google_cloud_run_v2_service_iam_member" "gateway_public" {
   member   = "allUsers"
 }
 
-# API and AI Processing are NOT public — access via service accounts only
-# (see iam.tf: gateway_invokes_api, api_invokes_ai)
+resource "google_cloud_run_v2_service_iam_member" "api_public" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.api.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+# AI Processing is NOT public — access via Backend service account only
+# (see iam.tf: api_invokes_ai)

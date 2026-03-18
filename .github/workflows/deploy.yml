@@ -105,9 +105,9 @@ jobs:
           gcloud run deploy lumineer-api \
             --image ${{ steps.images.outputs.api }} \
             --region ${{ env.REGION }} \
-            --ingress internal \
+            --ingress all \
             --update-env-vars "AI_PROCESSING_URL=${AI_URL}" \
-            --no-allow-unauthenticated \
+            --allow-unauthenticated \
             --quiet
 
       # Deploy Gateway (depends on Backend URL)
