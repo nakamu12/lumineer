@@ -149,6 +149,51 @@ This starts all services including frontend, gateway, backend, and AI processing
 
 ---
 
+## Optional: MCP Server (stretch goal)
+
+The MCP server at `http://localhost:8001/mcp` starts automatically with the `app` profile. No extra steps are required to use it without authentication.
+
+```bash
+# MCP server is already running — add to Claude Desktop config:
+# ~/Library/Application Support/Claude/claude_desktop_config.json
+{
+  "mcpServers": {
+    "course-finder": { "url": "http://localhost:8001/mcp" }
+  }
+}
+```
+
+### With OAuth 2.1 authentication (Keycloak)
+
+Start the `mcp` profile to launch Keycloak as the Authorization Server:
+
+```bash
+docker compose --profile app --profile mcp up -d
+```
+
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| Keycloak Admin Console | http://localhost:8080 | `admin` / `admin` |
+| Dev user | — | `dev@example.com` / `password` |
+
+Then enable auth in `.env.local` and restart the AI service:
+
+```env
+KEYCLOAK_URL=http://localhost:8080
+MCP_REQUIRE_AUTH=true
+```
+
+```bash
+# Restart AI Processing to pick up new env vars
+docker compose --profile app --profile mcp up -d --force-recreate ai
+```
+
+MCP clients will now be redirected to Keycloak for login on first connection.
+
+> See [docs/MCP.md](MCP.md) for full MCP documentation.
+
+---
+
 ## Optional: Observability stack
 
 ```bash

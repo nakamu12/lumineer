@@ -19,6 +19,9 @@ dependencies = [
     "uvicorn[standard]>=0.34",
     "langfuse>=2.0,<4.0",
     "prometheus-client>=0.21",
+    # MCP Server (stretch goal)
+    "mcp[cli]>=1.6",
+    "PyJWT[cryptography]>=2.9",
 ]
 
 [build-system]

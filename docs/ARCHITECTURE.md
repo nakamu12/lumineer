@@ -320,7 +320,54 @@ graph TB
 
 ---
 
-## 9. Technology Decisions
+## 9. MCP Server
+
+The AI Processing service exposes a secondary entry point for MCP clients (Claude Desktop, Cursor, VS Code, etc.) at `/mcp`. A Starlette router mounts both apps on the same port:
+
+```
+:8001/       → Litestar REST API  (Web UI backend)
+:8001/mcp    → FastMCP server     (MCP client interface)
+```
+
+Both entry points share the same RAG pipeline and agent infrastructure.
+
+```mermaid
+graph LR
+  subgraph Clients
+    WUI["Web UI\n(Explore / Chat)"]
+    MCP["MCP Client\n(Claude Desktop, Cursor)"]
+  end
+
+  subgraph AI["AI Processing :8001"]
+    LA["Litestar REST API\n/search, /agents/chat"]
+    FM["FastMCP\n/mcp"]
+  end
+
+  subgraph Pipeline
+    TA["Triage Agent"]
+    UC["SearchCoursesUseCase"]
+    QD["Qdrant Hybrid Search"]
+  end
+
+  subgraph Auth["OAuth 2.1 (optional)"]
+    KC["Keycloak :8080\n(--profile mcp)"]
+  end
+
+  WUI -->|HTTP| LA
+  MCP -->|Streamable HTTP| FM
+  LA --> TA
+  FM --> TA
+  FM --> UC
+  TA --> UC
+  UC --> QD
+  MCP -.->|Bearer JWT| KC
+```
+
+**Authentication:** optional in dev (`KEYCLOAK_URL` unset), enforced in prod (`MCP_REQUIRE_AUTH=true`). See [docs/MCP.md](MCP.md).
+
+---
+
+## 10. Technology Decisions
 
 Key architecture decisions are recorded in [docs/adr.md](adr.md).
 

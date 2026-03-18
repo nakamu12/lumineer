@@ -390,6 +390,37 @@ Update pipeline settings. All fields are optional — only provided fields are u
 
 ---
 
+---
+
+## MCP Tools
+
+The AI Processing service also exposes an **MCP (Model Context Protocol) server** at `http://localhost:8001/mcp`. This allows any MCP-compatible client (Claude Desktop, Cursor, VS Code) to call Lumineer tools directly.
+
+> Full documentation: [docs/MCP.md](MCP.md)
+
+### Endpoint
+
+| Environment | URL |
+|-------------|-----|
+| Local development | `http://localhost:8001/mcp` |
+| Production | `https://<ai-service-cloud-run-url>/mcp` |
+
+### Tools
+
+| Tool | Description |
+|------|-------------|
+| `ask_course_finder` | Natural language query — Triage Agent routes to the appropriate specialist |
+| `search_courses_mcp` | Hybrid RAG search with optional filters (level, org, rating, skills) |
+| `get_skill_gap_mcp` | Skill gap analysis for a target role |
+| `get_learning_path_mcp` | Learning path generation grouped by difficulty level |
+
+### Authentication
+
+In dev mode (default), tools are accessible without authentication.
+In prod (`MCP_REQUIRE_AUTH=true`), Bearer tokens issued by Keycloak are required (OAuth 2.1 + PKCE).
+
+---
+
 ## Error Format
 
 All error responses follow the same shape:

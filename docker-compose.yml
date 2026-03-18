@@ -105,8 +105,44 @@ services:
     environment:
       - APP_ENV=dev
       - QDRANT_URL=http://qdrant:6333
+      # MCP OAuth 2.1 — uncomment when running with --profile mcp
+      # - KEYCLOAK_URL=http://keycloak:8080
+      # - MCP_REQUIRE_AUTH=true
     depends_on:
       - qdrant
+
+  # =============================================================================
+  # MCP OAuth 2.1 (start with: docker compose --profile mcp up -d)
+  #
+  # Provides the Authorization Server (Keycloak) for MCP clients.
+  # The lumineer realm is auto-imported from infra/keycloak/lumineer-realm.json.
+  #
+  # Admin console: http://localhost:8080 (admin / admin)
+  # Dev user:      dev@example.com / password
+  #
+  # After starting, also enable auth in the ai service env:
+  #   KEYCLOAK_URL=http://localhost:8080
+  #   MCP_REQUIRE_AUTH=true
+  # =============================================================================
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    profiles: [mcp]
+    command: start-dev --import-realm
+    ports:
+      - "${KEYCLOAK_PORT:-8080}:8080"
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_DB=dev-file
+    volumes:
+      - ./infra/keycloak/lumineer-realm.json:/opt/keycloak/data/import/lumineer-realm.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/realms/lumineer || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   # =============================================================================
   # Observability (start with: docker compose --profile observability up -d)

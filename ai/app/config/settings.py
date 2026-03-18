@@ -68,6 +68,16 @@ class Settings(BaseSettings):
     LANGFUSE_SECRET_KEY: str | None = None
     LANGFUSE_HOST: str = "http://localhost:3003"
 
+    # MCP Server (stretch goal — OAuth 2.1 + Keycloak)
+    # Set KEYCLOAK_URL to enable auth (e.g., "http://keycloak:8080")
+    # Leave unset in dev to run without authentication
+    KEYCLOAK_URL: str | None = None
+    KEYCLOAK_REALM: str = "lumineer"
+    MCP_REQUIRE_AUTH: bool = False  # Set to True in prod to enforce token validation
+    # Public URL of the MCP resource server (used in OAuth 2.1 metadata).
+    # Defaults to http://{HOST}:{PORT}/mcp; override in prod with HTTPS URL.
+    MCP_RESOURCE_SERVER_URL: str | None = None
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8001
@@ -75,8 +85,13 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def validate_prod(self) -> "Settings":
         """Enforce production-only required fields."""
-        if self.APP_ENV == "prod" and not self.QDRANT_API_KEY:
-            raise ValueError("QDRANT_API_KEY is required in production")
+        if self.APP_ENV == "prod":
+            if not self.QDRANT_API_KEY:
+                raise ValueError("QDRANT_API_KEY is required in production")
+            if self.MCP_REQUIRE_AUTH and not self.MCP_RESOURCE_SERVER_URL:
+                raise ValueError(
+                    "MCP_RESOURCE_SERVER_URL is required when MCP_REQUIRE_AUTH=true in production"
+                )
         return self
 
 
