@@ -11,14 +11,16 @@ from langfuse import Langfuse
 logger = logging.getLogger(__name__)
 
 
-class _NoopSpan:
-    """Sentinel span returned when Langfuse is disabled."""
+class _NoopTrace:
+    """Sentinel trace returned when Langfuse is disabled."""
 
-    def end(self) -> None:  # noqa: PLR6301
+    id: str = ""
+
+    def update(self, **kwargs: Any) -> None:  # noqa: PLR6301
         pass
 
 
-_NOOP_SPAN = _NoopSpan()
+_NOOP_TRACE = _NoopTrace()
 
 
 @dataclass
@@ -39,15 +41,11 @@ class LangfuseTracer:
         *,
         name: str,
     ) -> Any:
-        """Start a new Langfuse trace span (or return a no-op sentinel).
-
-        Uses the Langfuse SDK v3 ``start_span()`` API which is based on
-        OpenTelemetry internally.
-        """
+        """Start a new Langfuse trace (or return a no-op sentinel)."""
         if not self.enabled or self._client is None:
-            return _NOOP_SPAN
+            return _NOOP_TRACE
 
-        return self._client.start_span(name=name)
+        return self._client.trace(name=name)
 
     def log_generation(
         self,
@@ -60,23 +58,22 @@ class LangfuseTracer:
         input_tokens: int = 0,
         output_tokens: int = 0,
     ) -> None:
-        """Log an LLM generation on an existing trace span.
+        """Log an LLM generation on an existing trace.
 
         IMPORTANT: ``input_data`` and ``output_data`` are forwarded to
         Langfuse as-is.  Callers MUST pass pre-masked text (e.g. via
         Presidio) to avoid storing PII in the Langfuse backend.
         """
-        if not self.enabled or isinstance(trace, _NoopSpan):
+        if not self.enabled or isinstance(trace, _NoopTrace):
             return
 
-        gen = self._client.start_generation(  # type: ignore[union-attr]
+        trace.generation(
             name=name,
             model=model,
             input=input_data,
             output=output_data,
-            usage_details={"input": input_tokens, "output": output_tokens},
+            usage={"input": input_tokens, "output": output_tokens},
         )
-        gen.end()
 
     def flush(self) -> None:
         """Flush any pending events to Langfuse."""

@@ -108,6 +108,7 @@ services:
     environment:
       - APP_ENV=dev
       - QDRANT_URL=http://qdrant:6333
+      - LANGFUSE_HOST=http://langfuse:3000
       # MCP OAuth 2.1 — uncomment when running with --profile mcp
       # - KEYCLOAK_URL=http://keycloak:8080
       # - MCP_REQUIRE_AUTH=true
