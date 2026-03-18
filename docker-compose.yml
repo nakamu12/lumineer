@@ -130,7 +130,7 @@ services:
       - grafana_data:/var/lib/grafana
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
     depends_on:
       - prometheus
     profiles:
@@ -158,6 +158,16 @@ services:
       - POSTGRES_DB=langfuse
     volumes:
       - langfuse_db_data:/var/lib/postgresql/data
+    profiles:
+      - observability
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    environment:
+      - DATA_SOURCE_NAME=postgresql://lumineer:lumineer@postgres:5432/lumineer?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
     profiles:
       - observability
 

@@ -196,6 +196,11 @@ async def pii_sanitizer_guardrail(
         if pii_found:
             entity_types = list({r.entity_type for r in results})
             logger.warning("Unmasked PII detected in input: %s", entity_types)
+            # Record each unique PII entity type in Prometheus
+            run_ctx = ctx.context
+            if run_ctx is not None and run_ctx.metrics is not None:
+                for entity_type in entity_types:
+                    run_ctx.metrics.record_pii_detection(entity_type=entity_type)
     except Exception:
         logger.exception("PII detection error in safety-net guardrail")
         pii_found = False

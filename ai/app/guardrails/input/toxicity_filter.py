@@ -71,6 +71,11 @@ async def toxicity_guardrail(
         is_toxic = False
         reason = "classifier_error"
 
+    if is_toxic:
+        run_ctx = ctx.context
+        if run_ctx is not None and run_ctx.metrics is not None:
+            run_ctx.metrics.record_guardrail_trigger(guardrail_type="toxicity")
+
     return GuardrailFunctionOutput(
         output_info={"toxicity_detected": is_toxic, "reason": reason},
         tripwire_triggered=is_toxic,

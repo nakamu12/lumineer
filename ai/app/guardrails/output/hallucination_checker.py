@@ -22,8 +22,20 @@ async def hallucination_guardrail(
     agent: Agent[Any],
     output: Any,
 ) -> GuardrailFunctionOutput:
-    """Detect hallucinated course information (skeleton: always passes)."""
+    """Detect hallucinated course information (skeleton: always passes).
+
+    When a real detection is implemented, call:
+        ctx.context.metrics.record_guardrail_trigger(guardrail_type="hallucination")
+    to surface it in the Grafana Safety & Guardrails panel.
+    """
+    hallucination_detected = False  # TODO: implement 2-stage detection
+
+    if hallucination_detected:
+        run_ctx = ctx.context
+        if run_ctx is not None and run_ctx.metrics is not None:
+            run_ctx.metrics.record_guardrail_trigger(guardrail_type="hallucination")
+
     return GuardrailFunctionOutput(
-        output_info={"hallucination_detected": False},
-        tripwire_triggered=False,
+        output_info={"hallucination_detected": hallucination_detected},
+        tripwire_triggered=hallucination_detected,
     )
