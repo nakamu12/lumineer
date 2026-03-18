@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>Lumineer Slide Background — Dark</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1920px;
+    height: 1080px;
+    background: #030608;
+    overflow: hidden;
+    position: relative;
+  }
+  svg.ribbons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+  }
+  .logo-squares {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 10;
+  }
+  .logo-square {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+  }
+  .logo-square-teal { background: #2A9D8F; }
+  .logo-square-blue { background: #3B82F6; }
+</style>
+</head>
+<body>
+  <svg class="ribbons" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Ribbon gradient: teal → blue -->
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#2A9D8F" stop-opacity="0"/>
+        <stop offset="15%" stop-color="#2A9D8F" stop-opacity="0.35"/>
+        <stop offset="40%" stop-color="#14B8A6" stop-opacity="0.25"/>
+        <stop offset="60%" stop-color="#3B82F6" stop-opacity="0.2"/>
+        <stop offset="85%" stop-color="#2A9D8F" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#14B8A6" stop-opacity="0"/>
+      </linearGradient>
+
+      <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#3B82F6" stop-opacity="0"/>
+        <stop offset="20%" stop-color="#3B82F6" stop-opacity="0.3"/>
+        <stop offset="45%" stop-color="#2A9D8F" stop-opacity="0.25"/>
+        <stop offset="65%" stop-color="#14B8A6" stop-opacity="0.2"/>
+        <stop offset="80%" stop-color="#3B82F6" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#2A9D8F" stop-opacity="0"/>
+      </linearGradient>
+
+      <!-- Edge highlight gradients -->
+      <linearGradient id="edge1" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#2A9D8F" stop-opacity="0"/>
+        <stop offset="20%" stop-color="#2A9D8F" stop-opacity="0.5"/>
+        <stop offset="50%" stop-color="#ffffff" stop-opacity="0.15"/>
+        <stop offset="75%" stop-color="#3B82F6" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#14B8A6" stop-opacity="0"/>
+      </linearGradient>
+
+      <linearGradient id="edge2" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#3B82F6" stop-opacity="0"/>
+        <stop offset="25%" stop-color="#3B82F6" stop-opacity="0.45"/>
+        <stop offset="50%" stop-color="#ffffff" stop-opacity="0.12"/>
+        <stop offset="80%" stop-color="#2A9D8F" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="#2A9D8F" stop-opacity="0"/>
+      </linearGradient>
+
+      <!-- Blur filters -->
+      <filter id="softBlur">
+        <feGaussianBlur stdDeviation="25"/>
+      </filter>
+      <filter id="edgeBlur">
+        <feGaussianBlur stdDeviation="3"/>
+      </filter>
+      <filter id="glowBlur">
+        <feGaussianBlur stdDeviation="80"/>
+      </filter>
+    </defs>
+
+    <!-- Ambient glows -->
+    <ellipse cx="350" cy="250" rx="350" ry="250" fill="rgba(42,157,143,0.08)" filter="url(#glowBlur)"/>
+    <ellipse cx="1500" cy="700" rx="300" ry="220" fill="rgba(59,130,246,0.06)" filter="url(#glowBlur)"/>
+
+    <!-- Upper ribbon body — wavy S-curve -->
+    <path d="M-100,330 C300,230 600,500 960,350 C1320,200 1500,470 1700,330 C1800,270 1950,400 2050,350
+             L2050,470 C1950,520 1800,390 1700,450 C1500,590 1320,320 960,470 C600,620 300,350 -100,450 Z"
+          fill="url(#grad1)" filter="url(#softBlur)" opacity="0.5"/>
+
+    <!-- Upper ribbon edges -->
+    <path d="M-100,340 C300,240 600,510 960,360 C1320,210 1500,480 1700,340 C1800,280 1950,410 2050,360"
+          stroke="url(#edge1)" stroke-width="2" fill="none" filter="url(#edgeBlur)" opacity="0.6"/>
+    <path d="M-100,460 C300,360 600,630 960,480 C1320,330 1500,600 1700,460 C1800,400 1950,530 2050,480"
+          stroke="url(#edge1)" stroke-width="1.5" fill="none" filter="url(#edgeBlur)" opacity="0.4"/>
+
+    <!-- Lower ribbon body — opposite wave -->
+    <path d="M-100,700 C250,850 550,600 960,750 C1370,900 1550,650 1750,800 C1850,870 2000,720 2050,780
+             L2050,920 C2000,860 1850,1010 1750,940 C1550,790 1370,1040 960,890 C550,740 250,990 -100,840 Z"
+          fill="url(#grad2)" filter="url(#softBlur)" opacity="0.45"/>
+
+    <!-- Lower ribbon edges -->
+    <path d="M-100,710 C250,860 550,610 960,760 C1370,910 1550,660 1750,810 C1850,880 2000,730 2050,790"
+          stroke="url(#edge2)" stroke-width="2" fill="none" filter="url(#edgeBlur)" opacity="0.55"/>
+    <path d="M-100,850 C250,1000 550,750 960,900 C1370,1050 1550,800 1750,950 C1850,1020 2000,870 2050,930"
+          stroke="url(#edge2)" stroke-width="1.5" fill="none" filter="url(#edgeBlur)" opacity="0.35"/>
+
+    <!-- Subtle middle crossing wisp -->
+    <path d="M-100,580 C400,480 700,650 960,550 C1220,450 1500,620 2050,520
+             L2050,600 C1500,700 1220,530 960,630 C700,730 400,560 -100,660 Z"
+          fill="url(#grad1)" filter="url(#softBlur)" opacity="0.2"/>
+  </svg>
+
+  <!-- Logo -->
+  <div class="logo-squares">
+    <div class="logo-square logo-square-teal"></div>
+    <div class="logo-square logo-square-blue"></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# =============================================================================
+# terraform.tfvars.example
+# Copy to terraform.tfvars and fill in your values.
+# terraform.tfvars is .gitignored — never commit it.
+# =============================================================================
+
+project_id  = "your-gcp-project-id"
+region      = "asia-northeast1"
+environment = "prod"
+
+# Docker images — push sample first, then replace with real images
+gateway_image = "asia-northeast1-docker.pkg.dev/your-gcp-project-id/lumineer-images/lumineer-gateway:latest"
+api_image     = "asia-northeast1-docker.pkg.dev/your-gcp-project-id/lumineer-images/lumineer-api:latest"
+ai_image      = "asia-northeast1-docker.pkg.dev/your-gcp-project-id/lumineer-images/lumineer-ai:latest"
+
+# Demo warm-up: set to 1 to avoid cold start during presentation
+gateway_min_instances = 0
+api_min_instances     = 0
+ai_min_instances      = 0

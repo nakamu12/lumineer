@@ -1,0 +1,207 @@
+[
+  {
+    "test_id": "search_001",
+    "query": "I want to learn Python as a beginner",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Python for the Absolute Beginner", "Introduction to Python Fundamentals", "Learn Python: 1"],
+    "retrieval_context": [
+      "{\"title\": \"Python for Everybody Specialization\", \"organization\": \"University of Michigan\", \"level\": \"Beginner\", \"rating\": 4.8, \"enrolled\": 3364825, \"skills\": [\"Python\", \"JSON\", \"XML\", \"Database\", \"Web Scraping\"], \"url\": \"https://www.coursera.org/specializations/python\"}",
+      "{\"title\": \"Python 3 Programming Specialization\", \"organization\": \"University of Michigan\", \"level\": \"Beginner\", \"rating\": 4.7, \"enrolled\": 256743, \"skills\": [\"Python\", \"Object-Oriented Programming\", \"Sorting\", \"Data Structures\"], \"url\": \"https://www.coursera.org/specializations/python-3-programming\"}",
+      "{\"title\": \"Crash Course on Python\", \"organization\": \"Google\", \"level\": \"Beginner\", \"rating\": 4.8, \"enrolled\": 1126594, \"skills\": [\"Python\", \"Basic Python Syntax\", \"Loops\", \"Strings\"], \"url\": \"https://www.coursera.org/learn/python-crash-course\"}"
+    ]
+  },
+  {
+    "test_id": "search_002",
+    "query": "machine learning courses from Stanford or DeepLearning.AI",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Machine Learning Specialization", "Advanced Learning Algorithms", "Supervised Machine Learning: Regression and Classification"],
+    "retrieval_context": [
+      "{\"title\": \"Machine Learning Specialization\", \"organization\": \"Stanford University\", \"level\": \"Beginner\", \"rating\": 4.9, \"enrolled\": 1200000, \"skills\": [\"Machine Learning\", \"Supervised Learning\", \"Neural Networks\", \"Regression\"], \"url\": \"https://www.coursera.org/specializations/machine-learning-introduction\"}",
+      "{\"title\": \"Deep Learning Specialization\", \"organization\": \"DeepLearning.AI\", \"level\": \"Intermediate\", \"rating\": 4.9, \"enrolled\": 890000, \"skills\": [\"Deep Learning\", \"Neural Networks\", \"TensorFlow\", \"CNN\"], \"url\": \"https://www.coursera.org/specializations/deep-learning\"}",
+      "{\"title\": \"Machine Learning Engineering for Production (MLOps)\", \"organization\": \"DeepLearning.AI\", \"level\": \"Intermediate\", \"rating\": 4.7, \"enrolled\": 120000, \"skills\": [\"MLOps\", \"Model Deployment\", \"Data Pipeline\"], \"url\": \"https://www.coursera.org/specializations/machine-learning-engineering-for-production-mlops\"}"
+    ]
+  },
+  {
+    "test_id": "search_003",
+    "query": "Google data analytics professional certificate",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Google Advanced Data Analytics Professional Certificate"],
+    "retrieval_context": [
+      "{\"title\": \"Google Data Analytics Professional Certificate\", \"organization\": \"Google\", \"level\": \"Beginner\", \"rating\": 4.8, \"enrolled\": 2457000, \"skills\": [\"Data Analysis\", \"SQL\", \"R Programming\", \"Tableau\", \"Spreadsheets\"], \"url\": \"https://www.coursera.org/professional-certificates/google-data-analytics\"}",
+      "{\"title\": \"Google Advanced Data Analytics Professional Certificate\", \"organization\": \"Google\", \"level\": \"Intermediate\", \"rating\": 4.7, \"enrolled\": 320000, \"skills\": [\"Python\", \"Machine Learning\", \"Statistical Analysis\"], \"url\": \"https://www.coursera.org/professional-certificates/google-advanced-data-analytics\"}"
+    ]
+  },
+  {
+    "test_id": "search_004",
+    "query": "advanced deep learning courses about NLP and transformers",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Natural Language Processing Specialization", "Natural Language Processing with Attention Models", "Deep Learning Specialization"],
+    "retrieval_context": [
+      "{\"title\": \"Natural Language Processing with Attention Models\", \"organization\": \"DeepLearning.AI\", \"level\": \"Intermediate\", \"rating\": 4.6, \"enrolled\": 85000, \"skills\": [\"NLP\", \"Transformers\", \"Attention Mechanisms\", \"BERT\"], \"url\": \"https://www.coursera.org/learn/attention-models-in-nlp\"}",
+      "{\"title\": \"Natural Language Processing in TensorFlow\", \"organization\": \"DeepLearning.AI\", \"level\": \"Intermediate\", \"rating\": 4.6, \"enrolled\": 145000, \"skills\": [\"NLP\", \"TensorFlow\", \"Text Classification\", \"Word Embeddings\"], \"url\": \"https://www.coursera.org/learn/natural-language-processing-tensorflow\"}",
+      "{\"title\": \"Natural Language Processing Specialization\", \"organization\": \"DeepLearning.AI\", \"level\": \"Intermediate\", \"rating\": 4.6, \"enrolled\": 130000, \"skills\": [\"NLP\", \"Sentiment Analysis\", \"Machine Translation\", \"Attention\"], \"url\": \"https://www.coursera.org/specializations/natural-language-processing\"}"
+    ]
+  },
+  {
+    "test_id": "search_005",
+    "query": "AWS cloud certification courses for beginners",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["AWS Cloud Practitioner Certification Specialization", "AWS Solutions Architect - Associate Specialization", "Introduction to AWS", "Cloud Fundamentals"],
+    "retrieval_context": [
+      "{\"title\": \"AWS Cloud Technical Essentials\", \"organization\": \"Amazon Web Services\", \"level\": \"Beginner\", \"rating\": 4.7, \"enrolled\": 210000, \"skills\": [\"AWS\", \"Cloud Computing\", \"EC2\", \"S3\", \"IAM\"], \"url\": \"https://www.coursera.org/learn/aws-cloud-technical-essentials\"}",
+      "{\"title\": \"Automation in the AWS Cloud\", \"organization\": \"Amazon Web Services\", \"level\": \"Beginner\", \"rating\": 4.5, \"enrolled\": 32000, \"skills\": [\"AWS\", \"CloudFormation\", \"Lambda\", \"Automation\"], \"url\": \"https://www.coursera.org/learn/automation-in-aws\"}",
+      "{\"title\": \"AWS Fundamentals Specialization\", \"organization\": \"Amazon Web Services\", \"level\": \"Beginner\", \"rating\": 4.6, \"enrolled\": 180000, \"skills\": [\"AWS\", \"Cloud Architecture\", \"Networking\"], \"url\": \"https://www.coursera.org/specializations/aws-fundamentals\"}"
+    ]
+  },
+  {
+    "test_id": "search_006",
+    "query": "IBM data science professional certificate",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["IBM Data Science Professional Certificate"],
+    "retrieval_context": [
+      "{\"title\": \"IBM Data Science Professional Certificate\", \"organization\": \"IBM\", \"level\": \"Beginner\", \"rating\": 4.6, \"enrolled\": 1100000, \"skills\": [\"Data Science\", \"Python\", \"SQL\", \"Machine Learning\", \"Jupyter\"], \"url\": \"https://www.coursera.org/professional-certificates/ibm-data-science\"}",
+      "{\"title\": \"IBM Introduction to Machine Learning Specialization\", \"organization\": \"IBM\", \"level\": \"Intermediate\", \"rating\": 4.5, \"enrolled\": 75000, \"skills\": [\"Machine Learning\", \"Classification\", \"Regression\", \"Clustering\"], \"url\": \"https://www.coursera.org/specializations/ibm-intro-machine-learning\"}"
+    ]
+  },
+  {
+    "test_id": "search_007",
+    "query": "web development courses for frontend",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Frontend Development Specialization", "Introduction to Front-End Development", "Frontend Development using React"],
+    "retrieval_context": [
+      "{\"title\": \"Getting Started with Front-End and Web Development\", \"organization\": \"IBM\", \"level\": \"Beginner\", \"rating\": 4.5, \"enrolled\": 45000, \"skills\": [\"HTML\", \"CSS\", \"JavaScript\", \"React\"], \"url\": \"https://www.coursera.org/learn/getting-started-with-front-end-and-web-development\"}",
+      "{\"title\": \"Fundamentals of Web Development\", \"organization\": \"Illinois Tech\", \"level\": \"Beginner\", \"rating\": 4.4, \"enrolled\": 28000, \"skills\": [\"HTML\", \"CSS\", \"JavaScript\", \"Web Design\"], \"url\": \"https://www.coursera.org/learn/illinois-tech-fundamentals-of-web-development\"}",
+      "{\"title\": \"HTML, CSS, and Javascript for Web Developers\", \"organization\": \"Johns Hopkins University\", \"level\": \"Beginner\", \"rating\": 4.8, \"enrolled\": 890000, \"skills\": [\"HTML\", \"CSS\", \"JavaScript\", \"Bootstrap\"], \"url\": \"https://www.coursera.org/learn/html-css-javascript-for-web-developers\"}"
+    ]
+  },
+  {
+    "test_id": "search_008",
+    "query": "cybersecurity fundamentals",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Introduction to Cybersecurity Fundamentals", "IT Fundamentals for Cybersecurity Specialization", "Cybersecurity Fundamentals Specialization", "Cybersecurity Operations Fundamentals Specialization"],
+    "retrieval_context": [
+      "{\"title\": \"Cybersecurity Fundamentals\", \"organization\": \"Johns Hopkins University\", \"level\": \"Intermediate\", \"rating\": 4.5, \"enrolled\": 38000, \"skills\": [\"Cybersecurity\", \"Network Security\", \"Cryptography\", \"Risk Management\"], \"url\": \"https://www.coursera.org/learn/cybersecurity-fundamentals\"}",
+      "{\"title\": \"Office of the CISO Institute: Cybersecurity Essentials\", \"organization\": \"Google\", \"level\": \"Beginner\", \"rating\": 4.6, \"enrolled\": 52000, \"skills\": [\"Cybersecurity\", \"Security Operations\", \"Incident Response\"], \"url\": \"https://www.coursera.org/learn/gcat-cybersecurity-essentials\"}"
+    ]
+  },
+  {
+    "test_id": "search_009",
+    "query": "UX design courses from Google",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Start the UX Design Process: Empathize, Define, and Ideate", "Foundations of User Experience (UX) Design"],
+    "retrieval_context": [
+      "{\"title\": \"Start the UX Design Process: Empathize, Define, and Ideate\", \"organization\": \"Google\", \"level\": \"Beginner\", \"rating\": 4.8, \"enrolled\": 620000, \"skills\": [\"UX Design\", \"User Research\", \"Wireframing\", \"Prototyping\"], \"url\": \"https://www.coursera.org/learn/start-ux-design-process\"}",
+      "{\"title\": \"UI / UX Design Specialization\", \"organization\": \"California Institute of the Arts\", \"level\": \"Beginner\", \"rating\": 4.5, \"enrolled\": 210000, \"skills\": [\"UI Design\", \"UX Design\", \"Visual Design\", \"Figma\"], \"url\": \"https://www.coursera.org/specializations/ui-ux-design\"}"
+    ]
+  },
+  {
+    "test_id": "search_010",
+    "query": "highly rated project management courses",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Project Management: The Basics for Success", "PMP Exam Prep Certification Training  Specialization", "Working as a Scrum Master"],
+    "retrieval_context": [
+      "{\"title\": \"Google Project Management: Professional Certificate\", \"organization\": \"Google\", \"level\": \"Beginner\", \"rating\": 4.8, \"enrolled\": 1800000, \"skills\": [\"Project Management\", \"Agile\", \"Scrum\", \"Risk Management\"], \"url\": \"https://www.coursera.org/professional-certificates/google-project-management\"}",
+      "{\"title\": \"Project Management: Beyond planning and control\", \"organization\": \"Politecnico di Milano\", \"level\": \"Beginner\", \"rating\": 4.6, \"enrolled\": 45000, \"skills\": [\"Project Management\", \"Planning\", \"Stakeholder Management\"], \"url\": \"https://www.coursera.org/learn/project-management-beyond-planning-and-control\"}",
+      "{\"title\": \"Business Value and Project Management Specialization\", \"organization\": \"University of Illinois Urbana-Champaign\", \"level\": \"Beginner\", \"rating\": 4.5, \"enrolled\": 32000, \"skills\": [\"Project Management\", \"Business Analysis\", \"Value Creation\"], \"url\": \"https://www.coursera.org/specializations/business-value-project-management\"}"
+    ]
+  },
+  {
+    "test_id": "search_011",
+    "query": "TensorFlow deep learning courses",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Introduction to TensorFlow for Artificial Intelligence, Machine Learning, and Deep Learning", "DeepLearning.AI TensorFlow Developer Professional Certificate", "Probabilistic Deep Learning with TensorFlow 2"],
+    "retrieval_context": [
+      "{\"title\": \"Introduction to TensorFlow for Artificial Intelligence, Machine Learning, and Deep Learning\", \"organization\": \"DeepLearning.AI\", \"level\": \"Intermediate\", \"rating\": 4.7, \"enrolled\": 580000, \"skills\": [\"TensorFlow\", \"Deep Learning\", \"Neural Networks\", \"Computer Vision\"], \"url\": \"https://www.coursera.org/learn/introduction-tensorflow\"}",
+      "{\"title\": \"Convolutional Neural Networks in TensorFlow\", \"organization\": \"DeepLearning.AI\", \"level\": \"Intermediate\", \"rating\": 4.6, \"enrolled\": 210000, \"skills\": [\"TensorFlow\", \"CNN\", \"Image Classification\", \"Transfer Learning\"], \"url\": \"https://www.coursera.org/learn/convolutional-neural-networks-tensorflow\"}"
+    ]
+  },
+  {
+    "test_id": "search_012",
+    "query": "Excel data analysis courses",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Excel Skills for Data Analytics and Visualization Specialization", "Data for Analysis with Microsoft Excel", "Introduction to Data Analysis Using Excel"],
+    "retrieval_context": [
+      "{\"title\": \"Excel Skills for Data Analytics and Visualization Specialization\", \"organization\": \"Macquarie University\", \"level\": \"Intermediate\", \"rating\": 4.7, \"enrolled\": 125000, \"skills\": [\"Excel\", \"Data Analytics\", \"Data Visualization\", \"Pivot Tables\"], \"url\": \"https://www.coursera.org/specializations/excel-data-analytics-visualization\"}",
+      "{\"title\": \"A Comprehensive Excel Masterclass\", \"organization\": \"Illinois Tech\", \"level\": \"Intermediate\", \"rating\": 4.4, \"enrolled\": 18000, \"skills\": [\"Excel\", \"Business Analysis\", \"Financial Modeling\"], \"url\": \"https://www.coursera.org/learn/illinois-tech-a-comprehensive-excel-masterclass-unleashing-business-potential\"}"
+    ]
+  },
+  {
+    "test_id": "search_013",
+    "query": "blockchain courses at intermediate level",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Blockchain Architecture - Intermediate Concepts"],
+    "retrieval_context": [
+      "{\"title\": \"Blockchain Specialization\", \"organization\": \"University at Buffalo\", \"level\": \"Intermediate\", \"rating\": 4.6, \"enrolled\": 250000, \"skills\": [\"Blockchain\", \"Smart Contracts\", \"Solidity\", \"Ethereum\"], \"url\": \"https://www.coursera.org/specializations/blockchain\"}",
+      "{\"title\": \"Blockchain Solution Architecture Specialization\", \"organization\": \"LearnQuest\", \"level\": \"Beginner\", \"rating\": 4.3, \"enrolled\": 45000, \"skills\": [\"Blockchain\", \"Architecture\", \"Hyperledger\"], \"url\": \"https://www.coursera.org/specializations/blockchain-solution-architecture\"}"
+    ]
+  },
+  {
+    "test_id": "search_014",
+    "query": "digital marketing courses from Google",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Attract and Engage Customers with Digital Marketing", "Google Digital Marketing & E-commerce Professional Certificate", "Foundations of Digital Marketing and E-commerce"],
+    "retrieval_context": [
+      "{\"title\": \"Attract and Engage Customers with Digital Marketing\", \"organization\": \"Google\", \"level\": \"Beginner\", \"rating\": 4.8, \"enrolled\": 430000, \"skills\": [\"Digital Marketing\", \"SEO\", \"SEM\", \"Email Marketing\"], \"url\": \"https://www.coursera.org/learn/attract-and-engage-customers\"}",
+      "{\"title\": \"Introduction to Digital Marketing\", \"organization\": \"University of California, Irvine\", \"level\": \"Beginner\", \"rating\": 4.5, \"enrolled\": 68000, \"skills\": [\"Digital Marketing\", \"Social Media\", \"Content Marketing\"], \"url\": \"https://www.coursera.org/learn/introduction-digital-marketing\"}"
+    ]
+  },
+  {
+    "test_id": "search_015",
+    "query": "financial management for beginners",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Introduction to Finance: The Basics", "Finance for Technical Managers Specialization", "Finance for Non-Finance Professionals"],
+    "retrieval_context": [
+      "{\"title\": \"Financial Management Specialization\", \"organization\": \"Duke University\", \"level\": \"Beginner\", \"rating\": 4.6, \"enrolled\": 89000, \"skills\": [\"Financial Management\", \"Accounting\", \"Financial Analysis\", \"Budgeting\"], \"url\": \"https://www.coursera.org/specializations/business-financial-management\"}",
+      "{\"title\": \"Financial Analysis - Skills for Success Specialization\", \"organization\": \"University of Illinois Urbana-Champaign\", \"level\": \"Beginner\", \"rating\": 4.5, \"enrolled\": 56000, \"skills\": [\"Financial Analysis\", \"Business Finance\", \"Investment\"], \"url\": \"https://www.coursera.org/specializations/financial-analysis-skills-for-success\"}"
+    ]
+  },
+  {
+    "test_id": "search_016",
+    "query": "self-driving car computer vision course",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Visual Perception for Self-Driving Cars"],
+    "retrieval_context": [
+      "{\"title\": \"Visual Perception for Self-Driving Cars\", \"organization\": \"University of Toronto\", \"level\": \"Advanced\", \"rating\": 4.7, \"enrolled\": 42400, \"skills\": [\"Computer Vision\", \"Object Detection\", \"Robotic Perception\"], \"url\": \"https://www.coursera.org/learn/visual-perception-self-driving-cars\"}"
+    ]
+  },
+  {
+    "test_id": "search_017",
+    "query": "communication skills improvement courses",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Improve Your English Communication Skills Specialization", "Verbal Communications and Presentation Skills", "Communication Skills for Engineers Specialization"],
+    "retrieval_context": [
+      "{\"title\": \"Improve Your English Communication Skills Specialization\", \"organization\": \"Georgia Institute of Technology\", \"level\": \"Beginner\", \"rating\": 4.7, \"enrolled\": 350000, \"skills\": [\"Communication\", \"Business English\", \"Presentation\", \"Writing\"], \"url\": \"https://www.coursera.org/specializations/improve-english\"}",
+      "{\"title\": \"Business English for Cross-cultural Communication\", \"organization\": \"The Hong Kong University of Science and Technology\", \"level\": null, \"rating\": 4.6, \"enrolled\": 78000, \"skills\": [\"Business English\", \"Cross-cultural Communication\", \"Negotiation\"], \"url\": \"https://www.coursera.org/learn/cross-cultural-communication-business\"}"
+    ]
+  },
+  {
+    "test_id": "search_018",
+    "query": "SQL database courses",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Oracle SQL Databases Specialization", "SQL: A Practical Introduction for Querying Databases", "The Structured Query Language (SQL)", "SQL for Data Science with R"],
+    "retrieval_context": [
+      "{\"title\": \"Advanced MySQL Topics\", \"organization\": \"Meta\", \"level\": \"Intermediate\", \"rating\": 4.4, \"enrolled\": 62000, \"skills\": [\"MySQL\", \"SQL\", \"Database Management\", \"Query Optimization\"], \"url\": \"https://www.coursera.org/learn/advanced-mysql-topics\"}",
+      "{\"title\": \"Databases and SQL for Data Science with Python\", \"organization\": \"IBM\", \"level\": \"Beginner\", \"rating\": 4.6, \"enrolled\": 580000, \"skills\": [\"SQL\", \"Python\", \"Database\", \"Cloud Databases\"], \"url\": \"https://www.coursera.org/learn/sql-data-science\"}"
+    ]
+  },
+  {
+    "test_id": "search_019",
+    "query": "algorithms and data structures advanced course",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Data Structures and Algorithms"],
+    "retrieval_context": [
+      "{\"title\": \"Advanced Algorithms and Complexity\", \"organization\": \"University of California San Diego\", \"level\": \"Advanced\", \"rating\": 4.5, \"enrolled\": 95000, \"skills\": [\"Algorithms\", \"Graph Theory\", \"NP-Completeness\", \"Linear Programming\"], \"url\": \"https://www.coursera.org/learn/advanced-algorithms-and-complexity\"}",
+      "{\"title\": \"Statistical Mechanics: Algorithms and Computations\", \"organization\": \"École normale supérieure\", \"level\": null, \"rating\": 4.8, \"enrolled\": 42000, \"skills\": [\"Algorithms\", \"Monte Carlo\", \"Statistical Mechanics\", \"Python\"], \"url\": \"https://www.coursera.org/learn/statistical-mechanics\"}"
+    ]
+  },
+  {
+    "test_id": "search_020",
+    "query": "HR management and leadership specialization",
+    "expected_agent": "Search Agent",
+    "expected_courses": ["Leading: Human Resource Management and Leadership Specialization", "Human Resource Management: HR for People Managers Specialization"],
+    "retrieval_context": [
+      "{\"title\": \"Leading: Human Resource Management and Leadership Specialization\", \"organization\": \"Macquarie University\", \"level\": \"Intermediate\", \"rating\": 4.7, \"enrolled\": 120000, \"skills\": [\"HR Management\", \"Leadership\", \"People Management\", \"Organizational Behavior\"], \"url\": \"https://www.coursera.org/specializations/hr-management-leadership\"}",
+      "{\"title\": \"Nursing Informatics Leadership Specialization\", \"organization\": \"University of Minnesota\", \"level\": \"Beginner\", \"rating\": 4.5, \"enrolled\": 18000, \"skills\": [\"Leadership\", \"Healthcare Informatics\", \"Nursing\"], \"url\": \"https://www.coursera.org/specializations/leadership-nursing-informatics\"}"
+    ]
+  }
+]

@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  frontend:
+    name: Frontend (lint + typecheck + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Prettier check
+        run: bun run format:check
+
+      - name: ESLint
+        run: bun run lint
+
+      - name: TypeScript check
+        run: bun run typecheck
+
+      - name: Vitest
+        run: bun run test
+
+  backend:
+    name: Backend (lint + typecheck + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Prettier check
+        run: bun run format:check
+
+      - name: ESLint
+        run: bun run lint
+
+      - name: TypeScript check
+        run: bun run typecheck
+
+      - name: Vitest
+        run: bun run test
+
+  gateway:
+    name: Gateway (lint + typecheck)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gateway
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Prettier check
+        run: bun run format:check
+
+      - name: ESLint
+        run: bun run lint
+
+      - name: TypeScript check
+        run: bun run typecheck
+
+  ai:
+    name: AI Processing (lint + typecheck + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: uv sync --dev
+
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+      - name: Ruff lint
+        run: uv run ruff check .
+
+      - name: MyPy
+        run: uv run mypy .
+
+      - name: Pytest
+        run: uv run pytest

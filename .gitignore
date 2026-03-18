@@ -99,6 +99,9 @@ __pycache__/
 .pyre/
 pyrightconfig.json
 
+# DeepEval cache
+ai/.deepeval/
+
 # Testing
 ai/.pytest_cache/
 ai/htmlcov/
@@ -117,6 +120,7 @@ ai/test-results/
 # Keep: data/coursera.csv, data/coursera.parquet (tracked as project data)
 # Ignore: generated / large derived files
 data/processed/
+ai/data/processed/
 data/embeddings/
 data/raw/
 data/**/*.npy

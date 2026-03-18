@@ -1,18 +1,21 @@
 ---
-description: 3層アーキテクチャと依存方向の基本ルール
+description: 4層アーキテクチャ（Gateway 含む）と依存方向の基本ルール
 ---
 
 # Architecture Rules
 
-## 3-Layer 分離
+## 4-Layer 分離（ADR-013）
 
 ```
-Frontend (React) → API Layer (Hono/TS) → AI Processing (Python) → Qdrant / OpenAI
+Frontend (React, :5173) → Gateway (Hono, :3000) → Backend (Hono, :3001) → AI Processing (Python, :8001) → Qdrant / OpenAI
 ```
 
+- **Gateway** (`gateway/`): 唯一の外部公開エントリポイント。CORS・ログ・レート制限・proxy のみ。ビジネスロジック禁止
+- **Backend** (`backend/`): クリーンアーキテクチャ。内部のみ（Gateway 経由でのみアクセス可）
+- **AI Processing** (`ai/`): 内部のみ（Backend からのみ呼び出し）
 - レイヤー間通信は HTTP (REST + SSE) のみ。直接 import 禁止
-- Frontend は AI Processing を直接呼ばない。必ず API Layer を経由する
-- AI Processing は Frontend の存在を知らない
+- Frontend は Backend / AI Processing を直接呼ばない。必ず Gateway を経由する
+- AI Processing は Frontend / Gateway の存在を知らない
 
 ## 依存方向（各レイヤー内部）
 

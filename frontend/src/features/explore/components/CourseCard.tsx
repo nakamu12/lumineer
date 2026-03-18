@@ -1,0 +1,81 @@
+import { Link } from "react-router-dom"
+import { Star, Users } from "lucide-react"
+import { Card, CardContent, CardFooter, CardHeader } from "@/lib/ui/card"
+import { Badge } from "@/lib/ui/badge"
+import { Button } from "@/lib/ui/button"
+import { cn } from "@/lib/utils"
+import type { Course } from "@/lib/types/course"
+import { getLevelBadgeClass, formatEnrolled } from "@/lib/utils/course"
+
+interface CourseCardProps {
+  course: Course
+}
+
+export function CourseCard({ course }: CourseCardProps) {
+  const visibleSkills = course.skills.slice(0, 3)
+  const remainingSkills = course.skills.length - 3
+
+  return (
+    <Card className="flex flex-col h-full transition-shadow hover:shadow-md hover:border-primary/30">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <Link
+              to={`/course/${course.id}`}
+              state={{ course }}
+              className="font-semibold text-base leading-snug line-clamp-2 mb-1 hover:text-primary transition-colors"
+              title={course.title}
+            >
+              {course.title}
+            </Link>
+            <p className="text-sm text-muted-foreground truncate">{course.organization}</p>
+          </div>
+          {course.level && (
+            <Badge
+              variant="outline"
+              className={cn("shrink-0 text-xs", getLevelBadgeClass(course.level))}
+            >
+              {course.level}
+            </Badge>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex-1 pb-3">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
+          <span className="flex items-center gap-1">
+            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+            <span className="font-medium text-foreground">{course.rating.toFixed(1)}</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <Users className="h-3.5 w-3.5" />
+            <span>{formatEnrolled(course.enrolled)} enrolled</span>
+          </span>
+        </div>
+
+        {visibleSkills.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {visibleSkills.map((skill) => (
+              <Badge key={skill} variant="secondary" className="text-xs px-2 py-0.5">
+                {skill}
+              </Badge>
+            ))}
+            {remainingSkills > 0 && (
+              <Badge variant="outline" className="text-xs px-2 py-0.5 text-muted-foreground">
+                +{remainingSkills} more
+              </Badge>
+            )}
+          </div>
+        )}
+      </CardContent>
+
+      <CardFooter className="pt-0">
+        <Button variant="outline" size="sm" className="w-full gap-1.5" asChild>
+          <Link to={`/course/${course.id}`} state={{ course }}>
+            View Details
+          </Link>
+        </Button>
+      </CardFooter>
+    </Card>
+  )
+}

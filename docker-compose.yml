@@ -1,0 +1,216 @@
+name: lumineer
+
+services:
+  # =============================================================================
+  # Infrastructure services (always start with: docker compose up -d)
+  # =============================================================================
+
+  postgres:
+    image: postgres:16
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    environment:
+      - POSTGRES_USER=lumineer
+      - POSTGRES_PASSWORD=lumineer
+      - POSTGRES_DB=lumineer
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lumineer"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+      - "${QDRANT_GRPC_PORT:-6334}:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  # =============================================================================
+  # App services (start with: docker compose --profile app up -d)
+  # For local development, run each service directly from the worktree instead:
+  #   backend: cd backend && bun dev
+  #   ai:      cd ai && uv run python main.py
+  #   frontend: cd frontend && bun dev
+  # =============================================================================
+
+  gateway:
+    profiles: [app]
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "${GATEWAY_PORT:-3000}:3000"
+    volumes:
+      - ./gateway:/app
+      - /app/node_modules
+    environment:
+      - PORT=3000
+      - BACKEND_URL=http://backend:3001
+      - ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT:-5173}
+    depends_on:
+      - backend
+
+  frontend:
+    profiles: [app]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:${GATEWAY_PORT:-3000}
+    depends_on:
+      - gateway
+
+  backend:
+    profiles: [app]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file: .env.local
+    environment:
+      - APP_ENV=dev
+      - PORT=3001
+      - AI_PROCESSING_URL=http://ai:8001
+      - DATABASE_URL=postgres://lumineer:lumineer@postgres:5432/lumineer
+      - JWT_SECRET=dev-secret-change-in-prod-min-16chars
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai:
+        condition: service_started
+
+  ai:
+    profiles: [app]
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - "${AI_PORT:-8001}:8001"
+    volumes:
+      - ./ai:/app
+    env_file: .env.local
+    environment:
+      - APP_ENV=dev
+      - QDRANT_URL=http://qdrant:6333
+      # MCP OAuth 2.1 — uncomment when running with --profile mcp
+      # - KEYCLOAK_URL=http://keycloak:8080
+      # - MCP_REQUIRE_AUTH=true
+    depends_on:
+      - qdrant
+
+  # =============================================================================
+  # MCP OAuth 2.1 (start with: docker compose --profile mcp up -d)
+  #
+  # Provides the Authorization Server (Keycloak) for MCP clients.
+  # The lumineer realm is auto-imported from infra/keycloak/lumineer-realm.json.
+  #
+  # Admin console: http://localhost:8080 (admin / admin)
+  # Dev user:      dev@example.com / password
+  #
+  # After starting, also enable auth in the ai service env:
+  #   KEYCLOAK_URL=http://localhost:8080
+  #   MCP_REQUIRE_AUTH=true
+  # =============================================================================
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    profiles: [mcp]
+    command: start-dev --import-realm
+    ports:
+      - "${KEYCLOAK_PORT:-8080}:8080"
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_DB=dev-file
+    volumes:
+      - ./infra/keycloak/lumineer-realm.json:/opt/keycloak/data/import/lumineer-realm.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/realms/lumineer || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # =============================================================================
+  # Observability (start with: docker compose --profile observability up -d)
+  # =============================================================================
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./infra/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    profiles:
+      - observability
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "${GRAFANA_PORT:-3002}:3000"
+    volumes:
+      - ./infra/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    depends_on:
+      - prometheus
+    profiles:
+      - observability
+
+  langfuse:
+    image: langfuse/langfuse:2 
+    ports:
+      - "${LANGFUSE_PORT:-3003}:3000"
+    environment:
+      - DATABASE_URL=postgresql://langfuse:langfuse@langfuse-db:5432/langfuse
+      - NEXTAUTH_SECRET=dev-secret-change-in-prod
+      - NEXTAUTH_URL=http://localhost:${LANGFUSE_PORT:-3003}
+      - SALT=dev-salt-change-in-prod
+    depends_on:
+      - langfuse-db
+    profiles:
+      - observability
+
+  langfuse-db:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=langfuse
+      - POSTGRES_PASSWORD=langfuse
+      - POSTGRES_DB=langfuse
+    volumes:
+      - langfuse_db_data:/var/lib/postgresql/data
+    profiles:
+      - observability
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    environment:
+      - DATA_SOURCE_NAME=postgresql://lumineer:lumineer@postgres:5432/lumineer?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - observability
+
+volumes:
+  qdrant_data:
+  postgres_data:
+  grafana_data:
+  langfuse_db_data:
