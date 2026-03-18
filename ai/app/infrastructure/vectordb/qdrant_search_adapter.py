@@ -12,8 +12,10 @@ from qdrant_client.models import (
     Filter,
     Fusion,
     FusionQuery,
+    IsNullCondition,
     MatchAny,
     MatchValue,
+    PayloadField,
     Prefetch,
     Range,
     SparseVector,
@@ -62,7 +64,7 @@ class QdrantSearchAdapter(VectorStorePort):
                 Filter(
                     should=[
                         FieldCondition(key="level", match=MatchValue(value=str(level))),
-                        FieldCondition(key="level", is_null=True),
+                        IsNullCondition(is_null=PayloadField(key="level")),
                     ]
                 )
             )
