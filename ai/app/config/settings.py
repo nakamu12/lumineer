@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     PREPROCESSED_PATH: str = "data/processed/preprocessed.jsonl"
     BATCH_SIZE_LLM: int = 10
     BATCH_SIZE_EMBEDDING: int = 100
-    BATCH_SIZE_UPSERT: int = 200
+    BATCH_SIZE_UPSERT: int = 50
     CHUNK_SIZE: int = 600
     CHUNK_OVERLAP: int = 120
 

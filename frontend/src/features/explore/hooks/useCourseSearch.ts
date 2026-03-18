@@ -43,7 +43,7 @@ export function useCourseSearch({
   const fetchIdRef = useRef(0)
 
   const fetchCourses = useCallback(
-    async (currentOffset: number, append: boolean) => {
+    async (_currentOffset: number, append: boolean) => {
       if (!debouncedQuery.trim()) {
         setCourses([])
         setTotal(0)
