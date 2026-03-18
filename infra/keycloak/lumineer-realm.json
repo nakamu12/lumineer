@@ -29,8 +29,14 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "pkceCodeChallengeMethod": "S256",
-      "redirectUris": ["*"],
-      "webOrigins": ["*"],
+      "redirectUris": [
+        "http://localhost:*",
+        "http://127.0.0.1:*"
+      ],
+      "webOrigins": [
+        "http://localhost:*",
+        "http://127.0.0.1:*"
+      ],
       "attributes": {
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.session.required": "true"

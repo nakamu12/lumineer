@@ -69,6 +69,9 @@ class KeycloakTokenVerifier(TokenVerifier):
 # ---------------------------------------------------------------------------
 
 
+_MAX_SEARCH_LIMIT = 100
+
+
 async def _run_search(
     query: str,
     level: str | None = None,
@@ -78,6 +81,7 @@ async def _run_search(
     limit: int = 10,
 ) -> Any:
     """Execute SearchCoursesUseCase and return the result."""
+    limit = max(1, min(limit, _MAX_SEARCH_LIMIT))
     container = get_container()
     settings = get_settings()
 

@@ -64,11 +64,15 @@ class JWTValidator:
 
 
 def create_jwt_validator(keycloak_url: str, realm: str) -> JWTValidator:
-    """Build a JWTValidator targeting the given Keycloak realm."""
+    """Build a JWTValidator targeting the given Keycloak realm.
+
+    The audience is set to ``"mcp-server"`` (the bearerOnly Keycloak client)
+    so that tokens issued for other clients on the same issuer are rejected.
+    """
     base = keycloak_url.rstrip("/")
     issuer = f"{base}/realms/{realm}"
     jwks_uri = f"{issuer}/protocol/openid-connect/certs"
-    return JWTValidator(jwks_uri=jwks_uri, issuer=issuer)
+    return JWTValidator(jwks_uri=jwks_uri, issuer=issuer, audience="mcp-server")
 
 
 # ---------------------------------------------------------------------------
