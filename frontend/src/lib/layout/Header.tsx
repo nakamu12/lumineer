@@ -15,7 +15,7 @@ const navItems = [
 export function Header() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, isLoading, logout } = useAuth()
 
   const handleLogout = () => {
     logout()
@@ -51,7 +51,9 @@ export function Header() {
           ))}
 
           <div className="ml-2 flex items-center gap-2 border-l pl-3">
-            {isAuthenticated ? (
+            {isLoading ? (
+              <div className="h-8 w-16 animate-pulse rounded-md bg-muted" />
+            ) : isAuthenticated ? (
               <>
                 <span className="text-sm text-muted-foreground">{user?.display_name}</span>
                 <Button variant="ghost" size="sm" onClick={handleLogout} title="Sign out">

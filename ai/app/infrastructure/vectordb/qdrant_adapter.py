@@ -20,8 +20,8 @@ DENSE_VECTOR_NAME = "dense"
 SPARSE_VECTOR_NAME = "sparse"
 
 
-def create_client(url: str, api_key: str | None = None) -> QdrantClient:
-    return QdrantClient(url=url, api_key=api_key)
+def create_client(url: str, api_key: str | None = None, timeout: int = 120) -> QdrantClient:
+    return QdrantClient(url=url, api_key=api_key, timeout=timeout)
 
 
 def ensure_collection(
