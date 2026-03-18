@@ -103,6 +103,7 @@ services:
       - "${AI_PORT:-8001}:8001"
     volumes:
       - ./ai:/app
+      - /app/.venv
     env_file: .env.local
     environment:
       - APP_ENV=dev

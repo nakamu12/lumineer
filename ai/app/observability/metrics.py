@@ -65,16 +65,20 @@ class MetricsCollector:
 
 
 def _get_or_create(metric_cls: type, name: str, description: str, **kwargs: Any) -> Any:
-    """Return existing metric if already registered, else create new one."""
+    """Return existing metric if already registered, else create new one.
+
+    On hot-reload the default registry already contains the metric.
+    We unregister it first to allow clean re-creation.
+    """
     reg = kwargs.get("registry", DEFAULT_REGISTRY)
-    try:
-        return metric_cls(name, description, **kwargs)
-    except ValueError:
-        # Already registered — retrieve from registry
-        for collector in list(reg._names_to_collectors.values()):
-            if getattr(collector, "_name", None) == name:
-                return collector
-        raise  # unexpected — re-raise
+    # Check all name variants (Counter adds _total, _created suffixes)
+    existing = reg._names_to_collectors.get(name) or reg._names_to_collectors.get(f"{name}_total")
+    if existing is not None:
+        try:
+            reg.unregister(existing)
+        except Exception:
+            pass
+    return metric_cls(name, description, **kwargs)
 
 
 def create_metrics_collector(*, registry: CollectorRegistry | None = None) -> MetricsCollector:

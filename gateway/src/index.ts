@@ -33,6 +33,7 @@ app.notFound((c) => c.json({ error: "Not found" }, 404))
 export default {
   port: settings.PORT,
   fetch: app.fetch,
+  idleTimeout: 120,
 }
 
 console.log(`Lumineer Gateway running on port ${settings.PORT}`)

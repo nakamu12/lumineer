@@ -29,16 +29,17 @@ export class AIProcessingClient implements AIProcessingPort {
 
     const data = (await response.json()) as {
       courses: unknown[]
-      summary: string
-      total: number
+      summary?: string
+      total?: number
+      total_hits?: number
     }
 
     return {
       courses: data.courses.map((c) =>
         CourseFactory.create(c as Parameters<typeof CourseFactory.create>[0]),
       ),
-      summary: data.summary,
-      total: data.total,
+      summary: data.summary ?? "",
+      total: data.total ?? data.total_hits ?? data.courses.length,
     }
   }
 
